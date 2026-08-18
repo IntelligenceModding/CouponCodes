@@ -15,9 +15,16 @@ public final class ModCreativeModeTabs {
 
     public static final Supplier<CreativeModeTab> COUPON_CODES_TAB = CREATIVE_MODE_TABS.register("coupon_codes_tab",
             () -> CreativeModeTab.builder()
-                    .icon(() -> ModItems.BASIC_COUPON.get().getDefaultInstance())
+                    .icon(() -> ModItems.DURABILITY_TIMED_COUPON.get().getDefaultInstance())
                     .title(Component.translatable("itemGroup.coupon_codes"))
-                    .displayItems((parameters, output) -> output.accept(ModItems.BASIC_COUPON.get()))
+                    .displayItems((parameters, output) -> {
+                        output.accept(ModItems.DURABILITY_ONCE_COUPON.get());
+                        output.accept(ModItems.DURABILITY_MULTI_COUPON.get());
+                        output.accept(ModItems.DURABILITY_TIMED_COUPON.get());
+                        output.accept(ModItems.ENCHANTING_EXPERIENCE_ONCE_COUPON.get());
+                        output.accept(ModItems.ENCHANTING_EXPERIENCE_MULTI_COUPON.get());
+                        output.accept(ModItems.ENCHANTING_EXPERIENCE_TIMED_COUPON.get());
+                    })
                     .build());
 
     private ModCreativeModeTabs() {

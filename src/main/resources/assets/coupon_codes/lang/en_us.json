@@ -1,4 +1,17 @@
 {
-  "item.coupon_codes.basic_coupon": "Basic Coupon",
+  "item.coupon_codes.durability_once_coupon": "Once Durability Coupon",
+  "item.coupon_codes.durability_multi_coupon": "Multi Durability Coupon",
+  "item.coupon_codes.durability_timed_coupon": "Timed Durability Coupon",
+  "item.coupon_codes.enchanting_experience_once_coupon": "Once Enchanting Experience Coupon",
+  "item.coupon_codes.enchanting_experience_multi_coupon": "Multi Enchanting Experience Coupon",
+  "item.coupon_codes.enchanting_experience_timed_coupon": "Timed Enchanting Experience Coupon",
+  "item.coupon_codes.coupon.unrolled": "Randomizes when carried",
+  "item.coupon_codes.coupon.effect.durability": "%s%% durability discount",
+  "item.coupon_codes.coupon.effect.enchanting_experience": "%s%% enchanting XP refund",
+  "item.coupon_codes.coupon.mode.timed.active": "%s seconds remaining",
+  "item.coupon_codes.coupon.mode.timed.inactive": "Right-click to activate for %s seconds",
+  "item.coupon_codes.coupon.mode.uses": "%s uses remaining",
+  "bossbar.coupon_codes.timed_coupon": "%s: %ss",
+  "bossbar.coupon_codes.timed_coupon.empty": "Coupon Active",
   "itemGroup.coupon_codes": "Coupon Codes"
 }
