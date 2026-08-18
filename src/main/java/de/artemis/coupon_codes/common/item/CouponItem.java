@@ -1,4 +1,4 @@
-package de.artemis.coupons.common.item;
+package de.artemis.coupon_codes.common.item;
 
 import net.minecraft.world.item.Item;
 
