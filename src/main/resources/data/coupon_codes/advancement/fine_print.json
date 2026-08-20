@@ -1,0 +1,23 @@
+{
+  "parent": "coupon_codes:scratch_off_savings",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:book"
+    },
+    "title": "Fine Print",
+    "description": "Obtain a rare coupon.",
+    "frame": "goal"
+  },
+  "criteria": {
+    "rare_coupon": {
+      "trigger": "coupon_codes:coupon_obtained",
+      "conditions": {
+        "min_rarity": "rare"
+      }
+    }
+  },
+  "rewards": {
+    "experience": 50
+  }
+}

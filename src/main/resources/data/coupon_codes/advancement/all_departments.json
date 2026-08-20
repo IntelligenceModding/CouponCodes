@@ -1,0 +1,54 @@
+{
+  "parent": "coupon_codes:premium_coverage",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:beacon"
+    },
+    "title": "Every Department Signed Off",
+    "description": "Apply a coupon from every discount category.",
+    "frame": "challenge",
+    "hidden": true
+  },
+  "criteria": {
+    "equipment": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "category": "equipment"
+      }
+    },
+    "magic": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "category": "magic"
+      }
+    },
+    "trade": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "category": "trade"
+      }
+    },
+    "consumables": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "category": "consumables"
+      }
+    },
+    "mobility": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "category": "mobility"
+      }
+    },
+    "combat": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "category": "combat"
+      }
+    }
+  },
+  "rewards": {
+    "experience": 500
+  }
+}

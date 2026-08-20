@@ -1,0 +1,20 @@
+{
+  "parent": "coupon_codes:fine_print",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:totem_of_undying"
+    },
+    "title": "Hazard Pay",
+    "description": "Get a coupon drop from a dangerous enemy.",
+    "frame": "goal"
+  },
+  "criteria": {
+    "drop": {
+      "trigger": "coupon_codes:entity_coupon_dropped"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "parent": "coupon_codes:first_deduction",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:brewing_stand"
+    },
+    "title": "Kitchen Credit",
+    "description": "Apply a coupon to food, brewing, or potion duration.",
+    "frame": "task"
+  },
+  "criteria": {
+    "food": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "food"
+      }
+    },
+    "brewing": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "brewing_ingredient"
+      }
+    },
+    "potion": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "potion_duration"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "food",
+      "brewing",
+      "potion"
+    ]
+  ]
+}

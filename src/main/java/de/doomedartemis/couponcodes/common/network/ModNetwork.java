@@ -1,0 +1,40 @@
+package de.doomedartemis.couponcodes.common.network;
+
+import de.doomedartemis.couponcodes.compat.curios.CuriosCompat;
+import de.doomedartemis.couponcodes.common.item.CouponPouchItem;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+
+public final class ModNetwork {
+    private ModNetwork() {
+    }
+
+    public static void register(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar("1");
+        registrar.playToServer(OpenCouponPouchPayload.TYPE, OpenCouponPouchPayload.STREAM_CODEC, ModNetwork::openCouponPouch);
+    }
+
+    private static void openCouponPouch(OpenCouponPouchPayload payload, net.neoforged.neoforge.network.handling.IPayloadContext context) {
+        if (context.player() instanceof ServerPlayer player) {
+            openFirstCarriedPouch(player);
+        }
+    }
+
+    private static void openFirstCarriedPouch(ServerPlayer player) {
+        for (ItemStack stack : player.getInventory().items) {
+            if (CouponPouchItem.open(player, stack)) {
+                return;
+            }
+        }
+
+        for (ItemStack stack : player.getInventory().offhand) {
+            if (CouponPouchItem.open(player, stack)) {
+                return;
+            }
+        }
+
+        CuriosCompat.openFirstPouch(player);
+    }
+}

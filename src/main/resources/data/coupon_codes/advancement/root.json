@@ -1,0 +1,42 @@
+{
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:map"
+    },
+    "title": "Coupon Codes",
+    "description": "Find your first coupon and start reading the terms.",
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "has_empty_coupon": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "coupon_codes:empty_coupon"
+          }
+        ]
+      }
+    },
+    "has_coupon_pouch": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "coupon_codes:coupon_pouch"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_empty_coupon",
+      "has_coupon_pouch"
+    ]
+  ]
+}

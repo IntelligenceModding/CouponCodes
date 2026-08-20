@@ -1,0 +1,46 @@
+{
+  "parent": "coupon_codes:first_deduction",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:ender_pearl"
+    },
+    "title": "Consumable Clawback",
+    "description": "Refund a spent arrow, rocket, pearl, or bone meal.",
+    "frame": "task"
+  },
+  "criteria": {
+    "arrow": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "arrow"
+      }
+    },
+    "rocket": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "rocket"
+      }
+    },
+    "ender_pearl": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "ender_pearl"
+      }
+    },
+    "bone_meal": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "bone_meal"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "arrow",
+      "rocket",
+      "ender_pearl",
+      "bone_meal"
+    ]
+  ]
+}

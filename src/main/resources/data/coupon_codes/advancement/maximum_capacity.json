@@ -1,0 +1,24 @@
+{
+  "parent": "coupon_codes:organized_savings",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:chest"
+    },
+    "title": "Maximum Capacity",
+    "description": "Fill a coupon pouch with coupons.",
+    "frame": "challenge",
+    "hidden": true
+  },
+  "criteria": {
+    "full": {
+      "trigger": "coupon_codes:pouch_stocked",
+      "conditions": {
+        "min_coupons": 27
+      }
+    }
+  },
+  "rewards": {
+    "experience": 200
+  }
+}

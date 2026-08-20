@@ -1,0 +1,23 @@
+{
+  "parent": "coupon_codes:file_cabinet",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:ender_chest"
+    },
+    "title": "Organized Savings",
+    "description": "Store at least nine coupons in a coupon pouch.",
+    "frame": "goal"
+  },
+  "criteria": {
+    "stocked": {
+      "trigger": "coupon_codes:pouch_stocked",
+      "conditions": {
+        "min_coupons": 9
+      }
+    }
+  },
+  "rewards": {
+    "experience": 50
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "parent": "coupon_codes:first_deduction",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:firework_rocket"
+    },
+    "title": "Mobility Department",
+    "description": "Apply any mobility category coupon.",
+    "frame": "task"
+  },
+  "criteria": {
+    "mobility": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "category": "mobility"
+      }
+    }
+  }
+}

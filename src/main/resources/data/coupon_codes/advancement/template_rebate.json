@@ -1,0 +1,23 @@
+{
+  "parent": "coupon_codes:tool_warranty",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:netherite_upgrade_smithing_template"
+    },
+    "title": "Template Rebate",
+    "description": "Refund a smithing template with a coupon.",
+    "frame": "goal"
+  },
+  "criteria": {
+    "smithing_template": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "smithing_template"
+      }
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}

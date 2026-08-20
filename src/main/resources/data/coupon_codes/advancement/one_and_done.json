@@ -1,0 +1,20 @@
+{
+  "parent": "coupon_codes:first_deduction",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:arrow"
+    },
+    "title": "One and Done",
+    "description": "Spend a single-use coupon.",
+    "frame": "task"
+  },
+  "criteria": {
+    "used_once": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "mode": "single_use"
+      }
+    }
+  }
+}

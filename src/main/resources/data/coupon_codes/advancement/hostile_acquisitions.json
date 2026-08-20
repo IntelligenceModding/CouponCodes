@@ -1,0 +1,60 @@
+{
+  "parent": "coupon_codes:hazard_pay",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:dragon_head"
+    },
+    "title": "Hostile Acquisitions",
+    "description": "Get coupon drops from each special enemy.",
+    "frame": "challenge",
+    "hidden": true
+  },
+  "criteria": {
+    "warden": {
+      "trigger": "coupon_codes:entity_coupon_dropped",
+      "conditions": {
+        "entity": "minecraft:warden"
+      }
+    },
+    "elder_guardian": {
+      "trigger": "coupon_codes:entity_coupon_dropped",
+      "conditions": {
+        "entity": "minecraft:elder_guardian"
+      }
+    },
+    "wither": {
+      "trigger": "coupon_codes:entity_coupon_dropped",
+      "conditions": {
+        "entity": "minecraft:wither"
+      }
+    },
+    "ender_dragon": {
+      "trigger": "coupon_codes:entity_coupon_dropped",
+      "conditions": {
+        "entity": "minecraft:ender_dragon"
+      }
+    },
+    "piglin_brute": {
+      "trigger": "coupon_codes:entity_coupon_dropped",
+      "conditions": {
+        "entity": "minecraft:piglin_brute"
+      }
+    },
+    "evoker": {
+      "trigger": "coupon_codes:entity_coupon_dropped",
+      "conditions": {
+        "entity": "minecraft:evoker"
+      }
+    },
+    "ravager": {
+      "trigger": "coupon_codes:entity_coupon_dropped",
+      "conditions": {
+        "entity": "minecraft:ravager"
+      }
+    }
+  },
+  "rewards": {
+    "experience": 500
+  }
+}

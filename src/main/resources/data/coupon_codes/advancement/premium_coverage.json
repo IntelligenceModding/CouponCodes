@@ -1,0 +1,35 @@
+{
+  "parent": "coupon_codes:first_deduction",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:totem_of_undying"
+    },
+    "title": "Premium Coverage",
+    "description": "Use a coupon for a totem refund or death drop protection.",
+    "frame": "goal"
+  },
+  "criteria": {
+    "totem": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "totem"
+      }
+    },
+    "death_drop": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "death_drop"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "totem",
+      "death_drop"
+    ]
+  ],
+  "rewards": {
+    "experience": 100
+  }
+}

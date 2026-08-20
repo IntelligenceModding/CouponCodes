@@ -1,0 +1,30 @@
+{
+  "generic_listings": 1,
+  "rare_listings": 1,
+  "generic": [
+    {
+      "type": "empty_coupon",
+      "weight": 1,
+      "emerald_cost": 5,
+      "count": 1,
+      "max_uses": 4,
+      "xp": 2,
+      "price_multiplier": 0.05
+    }
+  ],
+  "rare": [
+    {
+      "type": "random_coupon",
+      "weight": 1,
+      "costs": {
+        "common": 9,
+        "uncommon": 16,
+        "rare": 28,
+        "epic": 48
+      },
+      "max_uses": 1,
+      "xp": 8,
+      "price_multiplier": 0.05
+    }
+  ]
+}

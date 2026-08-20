@@ -1,0 +1,109 @@
+{
+  "villagers": [
+    {
+      "profession": "minecraft:armorer",
+      "level": 5,
+      "listings": 1,
+      "entries": [
+        {"type": "coupon", "effect": "durability", "mode": "uses", "weight": 4},
+        {"type": "coupon", "effect": "durability", "mode": "timed", "weight": 2},
+        {"type": "coupon", "effect": "repair_material", "mode": "uses", "weight": 3},
+        {"type": "coupon", "effect": "smithing_template", "mode": "once", "weight": 2}
+      ]
+    },
+    {
+      "profession": "minecraft:toolsmith",
+      "level": 4,
+      "listings": 1,
+      "entries": [
+        {"type": "coupon", "effect": "durability", "mode": "uses", "weight": 4},
+        {"type": "coupon", "effect": "repair_material", "mode": "uses", "weight": 4},
+        {"type": "coupon", "effect": "anvil_experience", "mode": "once", "weight": 3},
+        {"type": "coupon", "effect": "anvil_experience", "mode": "uses", "weight": 2}
+      ]
+    },
+    {
+      "profession": "minecraft:weaponsmith",
+      "level": 5,
+      "listings": 1,
+      "entries": [
+        {"type": "coupon", "effect": "durability", "mode": "uses", "weight": 3},
+        {"type": "coupon", "effect": "arrow", "mode": "uses", "weight": 3},
+        {"type": "coupon", "effect": "death_drop", "mode": "once", "weight": 2},
+        {"type": "coupon", "effect": "totem", "mode": "once", "weight": 1}
+      ]
+    },
+    {
+      "profession": "minecraft:fletcher",
+      "level": 4,
+      "listings": 1,
+      "entries": [
+        {"type": "coupon", "effect": "arrow", "mode": "once", "weight": 5},
+        {"type": "coupon", "effect": "arrow", "mode": "uses", "weight": 3},
+        {"type": "coupon", "effect": "arrow", "mode": "timed", "weight": 1}
+      ]
+    },
+    {
+      "profession": "minecraft:farmer",
+      "level": 4,
+      "listings": 1,
+      "entries": [
+        {"type": "coupon", "effect": "food", "mode": "uses", "weight": 4},
+        {"type": "coupon", "effect": "food", "mode": "timed", "weight": 2},
+        {"type": "coupon", "effect": "bone_meal", "mode": "uses", "weight": 3}
+      ]
+    },
+    {
+      "profession": "minecraft:butcher",
+      "level": 4,
+      "listings": 1,
+      "entries": [
+        {"type": "coupon", "effect": "food", "mode": "once", "weight": 4},
+        {"type": "coupon", "effect": "food", "mode": "uses", "weight": 4},
+        {"type": "coupon", "effect": "food", "mode": "timed", "weight": 2}
+      ]
+    },
+    {
+      "profession": "minecraft:cleric",
+      "level": 5,
+      "listings": 1,
+      "entries": [
+        {"type": "coupon", "effect": "brewing_ingredient", "mode": "uses", "weight": 4},
+        {"type": "coupon", "effect": "potion_duration", "mode": "uses", "weight": 4},
+        {"type": "coupon", "effect": "potion_duration", "mode": "timed", "weight": 2},
+        {"type": "coupon", "effect": "totem", "mode": "once", "weight": 1}
+      ]
+    },
+    {
+      "profession": "minecraft:librarian",
+      "level": 5,
+      "listings": 1,
+      "entries": [
+        {"type": "coupon", "effect": "enchanting_experience", "mode": "uses", "weight": 4},
+        {"type": "coupon", "effect": "enchanting_experience", "mode": "timed", "weight": 2},
+        {"type": "coupon", "effect": "anvil_experience", "mode": "uses", "weight": 3},
+        {"type": "coupon", "effect": "potion_duration", "mode": "uses", "weight": 2}
+      ]
+    },
+    {
+      "profession": "minecraft:cartographer",
+      "level": 5,
+      "listings": 1,
+      "entries": [
+        {"type": "coupon", "effect": "ender_pearl", "mode": "uses", "weight": 3},
+        {"type": "coupon", "effect": "rocket", "mode": "uses", "weight": 3},
+        {"type": "coupon", "effect": "fall_damage", "mode": "timed", "weight": 2}
+      ]
+    },
+    {
+      "profession": "minecraft:mason",
+      "level": 5,
+      "listings": 1,
+      "entries": [
+        {"type": "coupon", "effect": "repair_material", "mode": "uses", "weight": 4},
+        {"type": "coupon", "effect": "smithing_template", "mode": "once", "weight": 3},
+        {"type": "coupon", "effect": "durability", "mode": "timed", "weight": 2}
+      ]
+    }
+  ]
+}

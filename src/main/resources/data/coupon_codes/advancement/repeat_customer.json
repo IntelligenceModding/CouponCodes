@@ -1,0 +1,20 @@
+{
+  "parent": "coupon_codes:first_deduction",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:experience_bottle"
+    },
+    "title": "Repeat Customer",
+    "description": "Use a reusable coupon.",
+    "frame": "task"
+  },
+  "criteria": {
+    "used_multi": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "mode": "uses"
+      }
+    }
+  }
+}

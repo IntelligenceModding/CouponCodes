@@ -1,0 +1,24 @@
+{
+  "parent": "coupon_codes:premium_coverage",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:recovery_compass"
+    },
+    "title": "Emergency Policy",
+    "description": "Use death drop protection after a fatal mistake.",
+    "frame": "goal",
+    "hidden": true
+  },
+  "criteria": {
+    "death_drop": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "death_drop"
+      }
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}

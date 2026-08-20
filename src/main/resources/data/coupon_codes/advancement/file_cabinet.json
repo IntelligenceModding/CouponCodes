@@ -1,0 +1,17 @@
+{
+  "parent": "coupon_codes:pocket_accountant",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:barrel"
+    },
+    "title": "File Cabinet",
+    "description": "Open a coupon pouch.",
+    "frame": "task"
+  },
+  "criteria": {
+    "opened": {
+      "trigger": "coupon_codes:pouch_opened"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "parent": "coupon_codes:scratch_off_savings",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:clock"
+    },
+    "title": "Limited-Time Offer",
+    "description": "Activate a timed coupon.",
+    "frame": "goal"
+  },
+  "criteria": {
+    "activated": {
+      "trigger": "coupon_codes:coupon_activated",
+      "conditions": {
+        "mode": "timed"
+      }
+    }
+  },
+  "rewards": {
+    "experience": 50
+  }
+}

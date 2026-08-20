@@ -1,0 +1,106 @@
+{
+  "profiles": [
+    {
+      "loot_tables": [
+        "minecraft:chests/spawn_bonus_chest",
+        "minecraft:chests/village/village_butcher",
+        "minecraft:chests/village/village_fisher",
+        "minecraft:chests/ancient_city_ice_box",
+        "minecraft:chests/shipwreck_supply"
+      ],
+      "entries": [
+        {"type": "category_coupon_set", "category": "consumables", "weight": 10}
+      ],
+      "rolls": [{"chance": 0.025}]
+    },
+    {
+      "loot_tables": [
+        "minecraft:chests/village/village_weaponsmith",
+        "minecraft:chests/village/village_toolsmith",
+        "minecraft:chests/village/village_armorer",
+        "minecraft:chests/abandoned_mineshaft",
+        "minecraft:chests/bastion_other",
+        "minecraft:chests/bastion_bridge",
+        "minecraft:chests/bastion_hoglin_stable",
+        "minecraft:chests/bastion_treasure"
+      ],
+      "entries": [
+        {"type": "category_coupon_set", "category": "equipment", "weight": 10}
+      ],
+      "rolls": [{"chance": 0.035}]
+    },
+    {
+      "loot_tables": [
+        "minecraft:chests/village/village_temple",
+        "minecraft:chests/stronghold_library",
+        "minecraft:chests/stronghold_crossing",
+        "minecraft:chests/stronghold_corridor",
+        "minecraft:chests/nether_bridge"
+      ],
+      "entries": [
+        {"type": "category_coupon_set", "category": "magic", "weight": 10}
+      ],
+      "rolls": [{"chance": 0.035}]
+    },
+    {
+      "loot_tables": [
+        "minecraft:chests/village/village_cartographer",
+        "minecraft:chests/village/village_mason",
+        "minecraft:chests/village/village_shepherd",
+        "minecraft:chests/village/village_tannery"
+      ],
+      "entries": [
+        {"type": "category_coupon_set", "category": "trade", "weight": 10}
+      ],
+      "rolls": [{"chance": 0.03}]
+    },
+    {
+      "loot_tables": [
+        "minecraft:chests/buried_treasure",
+        "minecraft:chests/shipwreck_treasure",
+        "minecraft:chests/underwater_ruin_small",
+        "minecraft:chests/underwater_ruin_big",
+        "minecraft:chests/end_city_treasure"
+      ],
+      "entries": [
+        {"type": "category_coupon_set", "category": "mobility", "weight": 10}
+      ],
+      "rolls": [{"chance": 0.04}]
+    },
+    {
+      "loot_tables": [
+        "minecraft:chests/pillager_outpost",
+        "minecraft:chests/woodland_mansion",
+        "minecraft:chests/trial_chambers/reward",
+        "minecraft:chests/trial_chambers/reward_common",
+        "minecraft:chests/trial_chambers/reward_rare",
+        "minecraft:chests/trial_chambers/reward_unique",
+        "minecraft:chests/trial_chambers/reward_ominous",
+        "minecraft:chests/trial_chambers/reward_ominous_common",
+        "minecraft:chests/trial_chambers/reward_ominous_rare",
+        "minecraft:chests/trial_chambers/reward_ominous_unique"
+      ],
+      "entries": [
+        {"type": "category_coupon_set", "category": "combat", "weight": 10}
+      ],
+      "rolls": [{"chance": 0.04}]
+    },
+    {
+      "entities": [
+        "minecraft:warden",
+        "minecraft:wither",
+        "minecraft:ender_dragon",
+        "minecraft:elder_guardian",
+        "minecraft:evoker",
+        "minecraft:ravager",
+        "minecraft:piglin_brute"
+      ],
+      "entries": [
+        {"type": "category_coupon", "category": "combat", "mode": "uses", "weight": 5},
+        {"type": "category_coupon", "category": "equipment", "mode": "uses", "weight": 3},
+        {"type": "category_coupon", "category": "mobility", "mode": "timed", "weight": 2}
+      ],
+      "rolls": [{"chance": 0.2}]
+    }
+  ]
+}

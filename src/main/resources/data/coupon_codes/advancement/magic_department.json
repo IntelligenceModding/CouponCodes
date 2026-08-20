@@ -1,0 +1,20 @@
+{
+  "parent": "coupon_codes:first_deduction",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:enchanted_book"
+    },
+    "title": "Magic Department",
+    "description": "Apply any magic category coupon.",
+    "frame": "task"
+  },
+  "criteria": {
+    "magic": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "category": "magic"
+      }
+    }
+  }
+}

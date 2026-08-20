@@ -1,0 +1,20 @@
+{
+  "parent": "coupon_codes:first_deduction",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:diamond_sword"
+    },
+    "title": "Combat Department",
+    "description": "Apply any combat category coupon.",
+    "frame": "task"
+  },
+  "criteria": {
+    "combat": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "category": "combat"
+      }
+    }
+  }
+}

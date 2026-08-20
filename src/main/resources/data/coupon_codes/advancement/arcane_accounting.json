@@ -1,0 +1,35 @@
+{
+  "parent": "coupon_codes:first_deduction",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:enchanting_table"
+    },
+    "title": "Arcane Accounting",
+    "description": "Save experience at an enchanting table or an anvil.",
+    "frame": "goal"
+  },
+  "criteria": {
+    "enchanting": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "enchanting_experience"
+      }
+    },
+    "anvil": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "anvil_experience"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "enchanting",
+      "anvil"
+    ]
+  ],
+  "rewards": {
+    "experience": 50
+  }
+}

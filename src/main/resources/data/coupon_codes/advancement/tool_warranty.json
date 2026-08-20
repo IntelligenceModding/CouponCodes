@@ -1,0 +1,23 @@
+{
+  "parent": "coupon_codes:first_deduction",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:diamond_pickaxe"
+    },
+    "title": "Extended Warranty",
+    "description": "Prevent durability loss with a coupon.",
+    "frame": "goal"
+  },
+  "criteria": {
+    "durability": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "effect": "durability"
+      }
+    }
+  },
+  "rewards": {
+    "experience": 50
+  }
+}

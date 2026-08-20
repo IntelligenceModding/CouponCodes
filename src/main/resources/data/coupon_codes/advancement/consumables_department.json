@@ -1,0 +1,20 @@
+{
+  "parent": "coupon_codes:first_deduction",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:golden_carrot"
+    },
+    "title": "Consumables Department",
+    "description": "Apply any consumables category coupon.",
+    "frame": "task"
+  },
+  "criteria": {
+    "consumables": {
+      "trigger": "coupon_codes:coupon_used",
+      "conditions": {
+        "category": "consumables"
+      }
+    }
+  }
+}

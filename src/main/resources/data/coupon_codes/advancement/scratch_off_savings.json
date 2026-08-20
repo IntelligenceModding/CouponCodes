@@ -1,0 +1,17 @@
+{
+  "parent": "coupon_codes:root",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:brush"
+    },
+    "title": "Scratch-Off Savings",
+    "description": "Redeem an empty coupon into a real discount.",
+    "frame": "task"
+  },
+  "criteria": {
+    "rolled": {
+      "trigger": "coupon_codes:coupon_rolled"
+    }
+  }
+}

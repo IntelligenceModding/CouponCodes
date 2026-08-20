@@ -1,0 +1,24 @@
+{
+  "parent": "coupon_codes:fine_print",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:nether_star"
+    },
+    "title": "Platinum Terms",
+    "description": "Obtain an epic coupon.",
+    "frame": "challenge",
+    "hidden": true
+  },
+  "criteria": {
+    "epic_coupon": {
+      "trigger": "coupon_codes:coupon_obtained",
+      "conditions": {
+        "min_rarity": "epic"
+      }
+    }
+  },
+  "rewards": {
+    "experience": 150
+  }
+}
