@@ -12,6 +12,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
@@ -124,7 +125,7 @@ public final class CouponData {
         }
 
         removeExpiredActiveTimedCoupons(player);
-        List<ItemStack> activeCoupons = ACTIVE_TIMED_COUPONS.computeIfAbsent(player.getUUID(), ignored -> new ArrayList<>());
+        List<ItemStack> activeCoupons = activeTimedCoupons(player);
         if (CouponConfig.allowTimedCouponDurationStacking()) {
             for (ItemStack activeCoupon : activeCoupons) {
                 if (!(activeCoupon.getItem() instanceof CouponItem activeCouponItem)) {
@@ -133,6 +134,7 @@ public final class CouponData {
 
                 if (sameTimedCoupon(stack, coupon, activeCoupon, activeCouponItem)) {
                     addTimedCouponDuration(activeCoupon, stack);
+                    markActiveTimedCouponsDirty(player);
                     if (player instanceof ServerPlayer serverPlayer) {
                         CouponCriteria.triggerActivated(serverPlayer, coupon.effect(), coupon.mode());
                     }
@@ -150,6 +152,7 @@ public final class CouponData {
         activeCoupon.setCount(1);
         activateTimed(activeCoupon);
         activeCoupons.add(activeCoupon);
+        markActiveTimedCouponsDirty(player);
         if (player instanceof ServerPlayer serverPlayer) {
             CouponCriteria.triggerActivated(serverPlayer, coupon.effect(), coupon.mode());
         }
@@ -259,7 +262,7 @@ public final class CouponData {
         }
 
         int activeTimed = 0;
-        for (ItemStack stack : ACTIVE_TIMED_COUPONS.getOrDefault(player.getUUID(), List.of())) {
+        for (ItemStack stack : activeTimedCouponsOrEmpty(player)) {
             if (stack.getItem() instanceof CouponItem coupon
                     && CouponConfig.isCouponEnabled(coupon.effect(), coupon.mode())
                     && isActiveTimedCoupon(stack, coupon)) {
@@ -299,7 +302,7 @@ public final class CouponData {
         ItemStack bestCoupon = ItemStack.EMPTY;
         int bestDiscount = -1;
 
-        for (ItemStack stack : ACTIVE_TIMED_COUPONS.getOrDefault(player.getUUID(), List.of())) {
+        for (ItemStack stack : activeTimedCouponsOrEmpty(player)) {
             if (stack.getItem() instanceof CouponItem coupon
                     && CouponConfig.isCouponEnabled(coupon.effect(), coupon.mode())
                     && CouponData.isActiveTimedCoupon(stack, coupon)) {
@@ -322,7 +325,7 @@ public final class CouponData {
         ItemStack bestCoupon = ItemStack.EMPTY;
         int bestDiscount = -1;
 
-        for (ItemStack stack : ACTIVE_TIMED_COUPONS.getOrDefault(player.getUUID(), List.of())) {
+        for (ItemStack stack : activeTimedCouponsOrEmpty(player)) {
             if (stack.getItem() instanceof CouponItem coupon
                     && CouponConfig.isCouponEnabled(coupon.effect(), coupon.mode())
                     && CouponData.isActiveTimedCoupon(stack, coupon)
@@ -339,11 +342,19 @@ public final class CouponData {
     }
 
     public static int clearActiveTimedCoupons(Player player) {
+        if (player.level() instanceof ServerLevel serverLevel) {
+            return ActiveTimedCouponSavedData.get(serverLevel).clear(player.getUUID());
+        }
+
         List<ItemStack> activeCoupons = ACTIVE_TIMED_COUPONS.remove(player.getUUID());
         return activeCoupons == null ? 0 : activeCoupons.size();
     }
 
     public static int clearActiveTimedCoupons(Player player, CouponEffectType effect) {
+        if (player.level() instanceof ServerLevel serverLevel) {
+            return ActiveTimedCouponSavedData.get(serverLevel).clear(player.getUUID(), effect);
+        }
+
         List<ItemStack> activeCoupons = ACTIVE_TIMED_COUPONS.get(player.getUUID());
         if (activeCoupons == null) {
             return 0;
@@ -366,6 +377,10 @@ public final class CouponData {
     }
 
     public static int clearActiveTimedCoupons(Player player, CouponCategory category) {
+        if (player.level() instanceof ServerLevel serverLevel) {
+            return ActiveTimedCouponSavedData.get(serverLevel).clear(player.getUUID(), category);
+        }
+
         List<ItemStack> activeCoupons = ACTIVE_TIMED_COUPONS.get(player.getUUID());
         if (activeCoupons == null) {
             return 0;
@@ -388,26 +403,32 @@ public final class CouponData {
     }
 
     private static void tickActiveTimedCoupons(Player player) {
-        List<ItemStack> activeCoupons = ACTIVE_TIMED_COUPONS.get(player.getUUID());
-        if (activeCoupons == null) {
+        List<ItemStack> activeCoupons = activeTimedCouponsOrEmpty(player);
+        if (activeCoupons.isEmpty()) {
             return;
         }
 
+        boolean ticked = false;
         for (ItemStack stack : activeCoupons) {
             if (stack.getItem() instanceof CouponItem coupon && CouponConfig.isCouponEnabled(coupon.effect(), coupon.mode())) {
                 tick(stack, coupon, player.level());
+                ticked = true;
             }
+        }
+        if (ticked) {
+            markActiveTimedCouponsDirty(player);
         }
 
         removeExpiredActiveTimedCoupons(player);
     }
 
     private static void removeExpiredActiveTimedCoupons(Player player) {
-        List<ItemStack> activeCoupons = ACTIVE_TIMED_COUPONS.get(player.getUUID());
-        if (activeCoupons == null) {
+        List<ItemStack> activeCoupons = activeTimedCouponsOrEmpty(player);
+        if (activeCoupons.isEmpty()) {
             return;
         }
 
+        boolean changed = false;
         Iterator<ItemStack> iterator = activeCoupons.iterator();
         while (iterator.hasNext()) {
             ItemStack stack = iterator.next();
@@ -416,16 +437,22 @@ public final class CouponData {
                     || !CouponConfig.isCouponEnabled(coupon.effect(), coupon.mode())
                     || isExpired(stack, coupon)) {
                 iterator.remove();
+                changed = true;
             }
         }
 
         if (activeCoupons.isEmpty()) {
-            ACTIVE_TIMED_COUPONS.remove(player.getUUID());
+            removeActiveTimedCoupons(player);
             return;
         }
 
         while (activeCoupons.size() > CouponConfig.maxActiveTimedCoupons()) {
             activeCoupons.remove(activeCoupons.size() - 1);
+            changed = true;
+        }
+
+        if (changed) {
+            markActiveTimedCouponsDirty(player);
         }
     }
 
@@ -444,6 +471,34 @@ public final class CouponData {
         activeTag.putInt(TICKS_KEY, activeTag.getInt(TICKS_KEY) + addedTicks);
         activeTag.putInt(INITIAL_TICKS_KEY, activeTag.getInt(INITIAL_TICKS_KEY) + addedTicks);
         save(activeCoupon, activeTag);
+    }
+
+    private static List<ItemStack> activeTimedCoupons(Player player) {
+        if (player.level() instanceof ServerLevel serverLevel) {
+            return ActiveTimedCouponSavedData.get(serverLevel).activeCoupons(player.getUUID());
+        }
+        return ACTIVE_TIMED_COUPONS.computeIfAbsent(player.getUUID(), ignored -> new ArrayList<>());
+    }
+
+    private static List<ItemStack> activeTimedCouponsOrEmpty(Player player) {
+        if (player.level() instanceof ServerLevel serverLevel) {
+            return ActiveTimedCouponSavedData.get(serverLevel).activeCouponsOrEmpty(player.getUUID());
+        }
+        return ACTIVE_TIMED_COUPONS.getOrDefault(player.getUUID(), List.of());
+    }
+
+    private static void removeActiveTimedCoupons(Player player) {
+        if (player.level() instanceof ServerLevel serverLevel) {
+            ActiveTimedCouponSavedData.get(serverLevel).clear(player.getUUID());
+        } else {
+            ACTIVE_TIMED_COUPONS.remove(player.getUUID());
+        }
+    }
+
+    private static void markActiveTimedCouponsDirty(Player player) {
+        if (player.level() instanceof ServerLevel serverLevel) {
+            ActiveTimedCouponSavedData.get(serverLevel).setDirty();
+        }
     }
 
     public static boolean matches(ItemStack stack, CouponItem coupon, CouponEffectType effect) {

@@ -1,162 +1,110 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/Coupons/refs/heads/assets/Project%20Title.png" alt="Coupon Codes" width="900">
+</p>
 
-Coupon Codes
-=======
+<p align="center">
+  Coupon Codes adds collectible discount coupons to Minecraft for players who want small, useful bonuses tied directly into normal survival actions.
+</p>
 
-Coupon Codes is a NeoForge mod that adds collectible coupons for discounts, refunds, timed bonuses, coupon pouches, configurable loot drops, trader offers, and advancements.
+<p align="center">
+  Find, trade, roll, store, activate, and spend coupons for equipment, magic, trades, consumables, mobility, and combat. Coupons can refund resources, reduce costs, protect gear, extend timed benefits, and make everyday Minecraft interactions feel a little more rewarding.
+</p>
 
-Development
-==========
+<p align="center">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/Coupons/refs/heads/assets/Compatibility.png" alt="Compatibility" height="75">
+</p>
 
-Open the project in IntelliJ IDEA or Eclipse and use the Gradle tasks from this repository. If dependencies are missing, run `gradlew --refresh-dependencies`; use `gradlew clean` only to clear generated build output.
+<p align="center">
+  <img src="https://img.shields.io/badge/Minecraft-1.21.1-3C8527?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft 1.21.1">
+  &nbsp;&nbsp;&nbsp;
+  <img src="https://img.shields.io/badge/Loader-NeoForge-6C47FF?style=for-the-badge" alt="NeoForge">
+</p>
 
-Coupon Loot Datapacks
-==========
+<p align="center">
+  <strong>JEI, REI, and Curios are optional integrations.</strong>
+</p>
 
-Coupon chest loot and enemy drops are controlled by JSON files in `data/<namespace>/coupon_loot/*.json`.
-Files can contain one profile or a `profiles` array. Add new files to append more drops, or override the built-in
-defaults by replacing:
+<p align="center">
+  Install JEI or REI alongside Coupon Codes if you want in-game information pages. Install Curios if you want coupon pouches to work from an equipped belt slot.
+</p>
 
-- `data/coupon_codes/coupon_loot/default_chests.json`
-- `data/coupon_codes/coupon_loot/default_entities.json`
+<p align="center">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/Coupons/refs/heads/assets/Features.png" alt="Features" height="75">
+</p>
 
-Example:
+<p align="center">
+  Coupon Codes currently includes the following features:
+</p>
 
-```json
-{
-  "profiles": [
-    {
-      "loot_tables": ["minecraft:chests/simple_dungeon"],
-      "entries": [
-        {"type": "coupon_set", "effect": "durability", "weight": 10},
-        {"type": "coupon", "effect": "death_drop", "mode": "once", "weight": 1},
-        {"type": "category_coupon_set", "category": "equipment", "weight": 3},
-        {"type": "category_coupon", "category": "combat", "mode": "uses", "weight": 2},
-        {"type": "item", "item": "coupon_codes:empty_coupon", "weight": 4, "min_count": 1, "max_count": 2}
-      ],
-      "rolls": [
-        {"chance": 0.12, "count": 1},
-        {"chance_percent": 2, "min_rolls": 1, "max_rolls": 2}
-      ]
-    },
-    {
-      "entities": ["minecraft:evoker"],
-      "entries": [
-        {"type": "coupon", "effect": "totem", "mode": "once", "weight": 10},
-        {"type": "coupon", "effect": "death_drop", "mode": "uses", "weight": 2}
-      ],
-      "rolls": [{"chance": 0.45}]
-    }
-  ]
-}
-```
+<p align="center">
+  &bull; Twenty-one coupon effects across equipment, magic, trade, consumables, mobility, and combat<br>
+  &bull; Single-use, reusable, and timed coupon variants for every coupon effect<br>
+  &bull; Coupon pouches with dye variants, sorting, automatic activation, and a default <strong>P</strong> hotkey<br>
+  &bull; Active timed coupons with boss bars, duration stacking, configurable limits, and world persistence<br>
+  &bull; Empty coupons that roll into random enabled coupons using configurable rarity weights<br>
+  &bull; Datapack-driven coupon chest loot, enemy drops, wandering trader offers, and villager profession trades<br>
+  &bull; Daily boosted coupon types or categories with stronger discounts, extra uses, or longer timed durations<br>
+  &bull; Advancement rewards, server commands, client settings, and configurable coupon effect availability
+</p>
 
-Fields:
+<p align="center">
+  Coupon effects are built around Minecraft actions such as enchanting, anvil repair, villager trading, brewing, bow shots, food use, potion use, mending, totems, smithing, bone meal, fishing, rockets, ender pearls, elytra flight, fall damage, and death drops.
+</p>
 
-- `loot_tables`: vanilla or modded loot table ids to modify.
-- `entities`: entity type ids that can drop coupons on death.
-- `replace`: when true, clears earlier coupon rolls for the listed targets before adding this profile.
-- `rolls`: each roll has `chance` from `0.0` to `1.0`, or `chance_percent`; `count`, `min_rolls`, and `max_rolls` control how many entries are picked when the roll succeeds.
-- `entries`: weighted choices. Use `coupon_set` for all three modes of an effect, `coupon` for one exact coupon, `category_coupon_set` for a random coupon from one category, `category_coupon` for a random coupon from one category and mode, or `item` for empty coupons and pouches.
-- Coupon modes accept `once`, `single_use`, `uses`, `multi`, `reusable`, or `timed`.
-- Coupon categories accept `equipment`, `magic`, `trade`, `consumables`, `mobility`, or `combat`.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/Coupons/refs/heads/assets/Community.png" alt="Community" height="75">
+</p>
 
-Coupon Commands
-==========
+<p align="center">
+  Coupon Codes is developed as part of the <strong>Intelligence Modding Team</strong>.
+</p>
 
-Player-accessible commands:
+<p align="center">
+  Follow the project, browse releases, or join the community for updates, previews, and modding help.
+</p>
 
-- `/coupon_codes daily_boost`: shows today's boosted coupon type or category.
-- `/coupon_codes categories`: lists coupon categories and their effects.
-- `/coupon_codes effects [category]`: lists coupon effects and currently enabled modes.
-- `/coupon_codes inspect`: summarizes your carried coupons, unrolled coupons, active timed coupons, categories, and modes.
-- `/coupon_codes best <effect>`: shows your strongest usable coupon for one effect.
-- `/coupon_codes active_timed`: shows your strongest active timed coupon.
-- `/coupon_codes active_timed category <category>`: shows your strongest active timed coupon in one category.
+<p align="center">
+  <a href="https://discord.intelligence-modding.de/"><img src="https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Join the Intelligence Modding Discord"></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://www.youtube.com/@intelligencemodding4093"><img src="https://img.shields.io/badge/YouTube-Intelligence%20Modding-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Intelligence Modding on YouTube"></a>
+</p>
 
-Admin commands:
+<p align="center">
+  <a href="https://www.curseforge.com/minecraft/mc-mods/coupon_codes"><img src="https://img.shields.io/badge/CurseForge-Coupon%20Codes-F16436?style=for-the-badge&logo=curseforge&logoColor=white" alt="Coupon Codes on CurseForge"></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://modrinth.com/mod/coupon-codes"><img src="https://img.shields.io/badge/Modrinth-Coupon%20Codes-00AF5C?style=for-the-badge&logo=modrinth&logoColor=white" alt="Coupon Codes on Modrinth"></a>
+</p>
 
-- `/coupon_codes inspect <targets>`: summarizes carried coupons for one or more players.
-- `/coupon_codes best <effect> <targets>`: checks a player's strongest usable coupon for one effect.
-- `/coupon_codes give <targets> <effect> <once|multi|timed> <discount_percent> ...`: gives exact coupons.
-- `/coupon_codes give_category <targets> <category> <once|multi|timed> <discount_percent> ...`: gives every enabled coupon in a category and mode.
-- `/coupon_codes give_all <targets> <discount_percent> [count]`: gives every enabled coupon.
-- `/coupon_codes give_random <targets> [count]`: gives random enabled coupons.
-- `/coupon_codes give_random category <category> <targets> [count]`: gives random enabled coupons from one category.
-- `/coupon_codes give_empty <targets> [count]`: gives empty coupons.
-- `/coupon_codes give_pouch <targets> [count]`: gives coupon pouches.
-- `/coupon_codes clear_timed <targets> [effect]`: clears active timed coupons, optionally by effect.
-- `/coupon_codes clear_timed <targets> category <category>`: clears active timed coupons by category.
+<p align="center">
+  <a href="https://github.com/DoomedArtemis"><img src="https://img.shields.io/badge/GitHub-DoomedArtemis-181717?style=for-the-badge&logo=github&logoColor=white" alt="DoomedArtemis on GitHub"></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://github.com/IntelligenceModding"><img src="https://img.shields.io/badge/GitHub-IntelligenceModding-181717?style=for-the-badge&logo=github&logoColor=white" alt="Intelligence Modding on GitHub"></a>
+</p>
 
-Coupon Trade Datapacks
-==========
+<p align="center">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/Coupons/refs/heads/assets/Acknowledgments.png" alt="Acknowledgments" height="75">
+</p>
 
-Wandering trader coupon offers are controlled by JSON files in `data/<namespace>/coupon_trades/*.json`.
-Villager profession coupon offers use the same folder. Override the built-in defaults by replacing:
+<p align="center">
+  Special thanks and credits:
+</p>
 
-- `data/coupon_codes/coupon_trades/wandering_trader.json`
-- `data/coupon_codes/coupon_trades/villager_professions.json`
+<p align="center">
+  &bull; The NeoForged team for NeoForge and its documentation<br>
+  &bull; The Minecraft modding community for examples, tools, and support<br>
+  &bull; The Intelligence Modding community for feedback, testing, and ideas<br>
+  &bull; Everyone who reports issues, suggests improvements, or includes the mod in their worlds or modpacks<br>
+  &bull; The JEI, REI, and Curios projects for optional compatibility APIs
+</p>
 
-Example:
+<p align="center">
+  Some textures are inspired by or adapted from vanilla Minecraft assets.
+</p>
 
-```json
-{
-  "generic_listings": 1,
-  "rare_listings": 1,
-  "generic": [
-    {
-      "type": "empty_coupon",
-      "weight": 1,
-      "emerald_cost": 5,
-      "count": 1,
-      "max_uses": 4,
-      "xp": 2
-    }
-  ],
-  "rare": [
-    {
-      "type": "random_coupon",
-      "weight": 1,
-      "costs": {
-        "common": 9,
-        "uncommon": 16,
-        "rare": 28,
-        "epic": 48
-      },
-      "max_uses": 1,
-      "xp": 8
-    },
-    {
-      "type": "coupon",
-      "effect": "totem",
-      "mode": "once",
-      "weight": 1,
-      "emerald_cost": 40,
-      "max_uses": 1,
-      "xp": 10
-    }
-  ],
-  "villagers": [
-    {
-      "profession": "minecraft:librarian",
-      "level": 5,
-      "listings": 1,
-      "entries": [
-        {"type": "coupon", "effect": "enchanting_experience", "mode": "uses", "weight": 4},
-        {"type": "coupon", "effect": "anvil_experience", "mode": "uses", "weight": 2}
-      ]
-    }
-  ]
-}
-```
+<p align="center">
+  Coupon Codes is released under the MIT License.
+</p>
 
-Fields:
-
-- `generic` and `rare`: offers added to the wandering trader's generic and rare trade pools.
-- `generic_listings` and `rare_listings`: how many coupon trade entries are added to those pools.
-- `villagers`: profession trade pools. Each entry uses `profession`, villager `level` from 1-5, `listings`, and weighted coupon `entries`.
-- `replace`, `replace_generic`, `replace_rare`, `replace_professions`: clears earlier configured coupon trades before adding this file.
-- Trade `type`: `empty_coupon`, `random_coupon`, `coupon`, or `item`.
-- `weight`: relative chance inside the coupon trade pool.
-- `emerald_cost`, `count`, `max_uses`, `xp`, and `price_multiplier`: standard trade values.
-- `random_coupon` uses `costs.common`, `costs.uncommon`, `costs.rare`, and `costs.epic`.
-- Villager profession coupon trades support `coupon` and `random_coupon`; their emerald cost is always clamped to 48-64, defaults to a random 48-64, and ignores villager discounts from curing, Hero of the Village, demand, or special prices.
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-830F26?style=for-the-badge&labelColor=A4011A&logo=bookstack&logoColor=white" alt="MIT License"></a>
+</p>

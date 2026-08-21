@@ -15,12 +15,14 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.lwjgl.glfw.GLFW;
 
 public final class ClientModEvents {
     private static final KeyMapping OPEN_COUPON_POUCH = new KeyMapping(
             "key.coupon_codes.open_coupon_pouch",
             KeyConflictContext.IN_GAME,
-            InputConstants.UNKNOWN,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_P,
             "key.categories.coupon_codes"
     );
 
