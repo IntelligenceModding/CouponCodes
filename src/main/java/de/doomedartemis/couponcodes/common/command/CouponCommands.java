@@ -199,7 +199,7 @@ public final class CouponCommands {
                         effect,
                         mode,
                         IntegerArgumentType.getInteger(context, "discount_percent"),
-                        defaultValue(mode),
+                        defaultValue(effect, mode),
                         1));
 
         if (mode == CouponMode.SINGLE_USE) {
@@ -209,7 +209,7 @@ public final class CouponCommands {
                             effect,
                             mode,
                             IntegerArgumentType.getInteger(context, "discount_percent"),
-                            defaultValue(mode),
+                            defaultValue(effect, mode),
                             IntegerArgumentType.getInteger(context, "count"))));
         } else {
             String valueArgumentName = mode == CouponMode.TIMED ? "seconds" : "uses";
@@ -247,7 +247,7 @@ public final class CouponCommands {
                         category,
                         mode,
                         IntegerArgumentType.getInteger(context, "discount_percent"),
-                        defaultValue(mode),
+                        null,
                         1));
 
         if (mode == CouponMode.SINGLE_USE) {
@@ -257,7 +257,7 @@ public final class CouponCommands {
                             category,
                             mode,
                             IntegerArgumentType.getInteger(context, "discount_percent"),
-                            defaultValue(mode),
+                            null,
                             IntegerArgumentType.getInteger(context, "count"))));
         } else {
             String valueArgumentName = mode == CouponMode.TIMED ? "seconds" : "uses";
@@ -294,7 +294,7 @@ public final class CouponCommands {
         }
 
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(context, "targets");
-        int configuredValue = configuredValue(mode, value);
+        int configuredValue = configuredValue(effect, mode, value);
 
         for (ServerPlayer target : targets) {
             for (int i = 0; i < count; i++) {
@@ -311,14 +311,13 @@ public final class CouponCommands {
         return targets.size() * count;
     }
 
-    private static int giveCategoryCoupons(CommandContext<CommandSourceStack> context, CouponCategory category, CouponMode mode, int discountPercent, int value, int count) throws CommandSyntaxException {
+    private static int giveCategoryCoupons(CommandContext<CommandSourceStack> context, CouponCategory category, CouponMode mode, int discountPercent, Integer value, int count) throws CommandSyntaxException {
         if (!CouponConfig.areCommandsEnabled()) {
             context.getSource().sendFailure(Component.literal("Coupon Codes commands are disabled in the config."));
             return 0;
         }
 
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(context, "targets");
-        int configuredValue = configuredValue(mode, value);
         int given = 0;
 
         for (ServerPlayer target : targets) {
@@ -326,6 +325,9 @@ public final class CouponCommands {
                 if (effect.category() != category || !CouponConfig.isCouponEnabled(effect, mode)) {
                     continue;
                 }
+                int configuredValue = value == null
+                        ? defaultValue(effect, mode)
+                        : configuredValue(effect, mode, value);
                 for (int i = 0; i < count; i++) {
                     ItemStack coupon = new ItemStack(ModItems.couponItem(effect, mode).get());
                     CouponData.set(coupon, mode, discountPercent, configuredValue, false);
@@ -365,7 +367,7 @@ public final class CouponCommands {
                     }
                     for (int i = 0; i < count; i++) {
                         ItemStack coupon = new ItemStack(ModItems.couponItem(effect, mode).get());
-                        CouponData.set(coupon, mode, discountPercent, defaultValue(mode), false);
+                        CouponData.set(coupon, mode, discountPercent, defaultValue(effect, mode), false);
                         giveOrDrop(target, coupon);
                         given++;
                     }
@@ -729,19 +731,25 @@ public final class CouponCommands {
         return mode.commandName();
     }
 
-    private static int defaultValue(CouponMode mode) {
+    private static int defaultValue(CouponEffectType effect, CouponMode mode) {
         return switch (mode) {
             case SINGLE_USE -> 1;
-            case USES -> CouponConfig.multiUseDefaultUses();
-            case TIMED -> CouponConfig.timedDefaultSeconds();
+            case USES -> CouponConfig.multiUseDefaultUses(effect);
+            case TIMED -> CouponConfig.timedDefaultSeconds(effect);
         };
     }
 
-    private static int configuredValue(CouponMode mode, int value) {
+    private static int configuredValue(CouponEffectType effect, CouponMode mode, int value) {
         return switch (mode) {
             case SINGLE_USE -> 1;
-            case USES -> net.minecraft.util.Mth.clamp(value, CouponConfig.multiUseMinUses(), CouponConfig.multiUseMaxUses());
-            case TIMED -> net.minecraft.util.Mth.clamp(value, CouponConfig.timedMinSeconds(), CouponConfig.timedMaxSeconds());
+            case USES -> {
+                CouponConfig.IntRange range = CouponConfig.multiUseRange(effect);
+                yield net.minecraft.util.Mth.clamp(value, range.min(), range.max());
+            }
+            case TIMED -> {
+                CouponConfig.IntRange range = CouponConfig.timedSecondsRange(effect);
+                yield net.minecraft.util.Mth.clamp(value, range.min(), range.max());
+            }
         };
     }
 

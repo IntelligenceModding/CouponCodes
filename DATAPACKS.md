@@ -186,6 +186,8 @@ Each successful roll chooses `min_rolls` to `max_rolls` entries from its weighte
 
 All entry weights are relative. Entries with weight `0` are ignored.
 
+Coupon entries create uninitialized coupon items. When the item initializes in a player's inventory, reusable use counts and timed durations are rolled from that coupon effect's server config range.
+
 ## Coupon Trade Datapack Files
 
 Files in `data/<namespace>/coupon_trades/*.json` add wandering trader and villager profession offers.
@@ -304,6 +306,8 @@ Profession coupon costs use `emerald_cost` or a range:
 ```
 
 Profession coupon costs are clamped to `48` to `64`. Profession trade defaults are `max_uses` 1 and `xp` 20.
+
+Trade coupon entries also create uninitialized coupons. Their discount percent, reusable use count, and timed duration are assigned when the coupon initializes, using the same server config ranges as loot and empty coupon rolls.
 
 ## Other Datapack Data
 

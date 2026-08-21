@@ -91,8 +91,8 @@ public final class CouponData {
         int discount = CouponConfig.randomDiscount(random);
         int value = switch (coupon.mode()) {
             case SINGLE_USE -> 1;
-            case USES -> CouponConfig.randomMultiUses(random);
-            case TIMED -> CouponConfig.randomTimedSeconds(random);
+            case USES -> CouponConfig.randomMultiUses(coupon.effect(), random);
+            case TIMED -> CouponConfig.randomTimedSeconds(coupon.effect(), random);
         };
 
         set(stack, coupon.mode(), discount, value, false);
@@ -103,14 +103,21 @@ public final class CouponData {
         tag.putBoolean(INITIALIZED_KEY, true);
         tag.putInt(DISCOUNT_KEY, Mth.clamp(discountPercent, 1, 95));
 
+        CouponEffectType effect = stack.getItem() instanceof CouponItem coupon && coupon.mode() == mode ? coupon.effect() : null;
         if (mode == CouponMode.TIMED) {
-            int ticks = Mth.clamp(value, CouponConfig.timedMinSeconds(), CouponConfig.timedMaxSeconds()) * 20;
+            CouponConfig.IntRange range = CouponConfig.timedSecondsRange(effect);
+            int ticks = Mth.clamp(value, range.min(), range.max()) * 20;
             tag.putInt(TICKS_KEY, ticks);
             tag.putInt(INITIAL_TICKS_KEY, ticks);
             tag.putBoolean(ACTIVE_KEY, active);
             tag.remove(USES_KEY);
         } else {
-            tag.putInt(USES_KEY, mode == CouponMode.SINGLE_USE ? 1 : Math.max(1, value));
+            int uses = 1;
+            if (mode == CouponMode.USES) {
+                CouponConfig.IntRange range = CouponConfig.multiUseRange(effect);
+                uses = Mth.clamp(value, range.min(), range.max());
+            }
+            tag.putInt(USES_KEY, uses);
             tag.remove(TICKS_KEY);
             tag.remove(INITIAL_TICKS_KEY);
             tag.remove(ACTIVE_KEY);

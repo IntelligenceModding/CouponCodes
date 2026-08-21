@@ -65,6 +65,8 @@ For `multi`, `<uses>` accepts `1` to `64`.
 
 For `timed`, `<seconds>` accepts `1` to `3600`.
 
+The final value is still clamped by the target coupon effect's configured range. For example, a durability timed coupon can use a much longer duration than a death protection timed coupon.
+
 ## Player Information Commands
 
 Show today's daily coupon boost:
@@ -151,7 +153,7 @@ Timed:
 /coupon_codes give <targets> <effect> timed <discount_percent> <seconds> <count>
 ```
 
-If `<uses>` or `<seconds>` is omitted, the command uses the mod's current default reusable use count or timed duration.
+If `<uses>` or `<seconds>` is omitted, the command uses the target effect's configured default reusable use count or timed duration.
 
 Examples:
 
@@ -164,6 +166,8 @@ Examples:
 ## Give Category Coupons
 
 Give every available coupon effect in a category for one mode.
+
+When `<uses>` or `<seconds>` is omitted, every effect in the category receives its own configured default. When a value is supplied, it is clamped separately for each effect.
 
 Single-use:
 

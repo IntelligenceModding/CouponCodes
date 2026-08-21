@@ -58,6 +58,8 @@ public final class CouponConfig {
     private static final ModConfigSpec.BooleanValue CONSUME_CHANCE_COUPONS_ON_FAILED_ROLL;
     private static final ModConfigSpec.BooleanValue CONSUME_DURABILITY_COUPONS_ON_FAILED_ROLL;
     private static final Map<Rarity, ModConfigSpec.IntValue> ROLL_WEIGHTS = new EnumMap<>(Rarity.class);
+    private static final Map<CouponEffectType, ModConfigSpec.ConfigValue<List<? extends Integer>>> MULTI_USE_COUNTS = new EnumMap<>(CouponEffectType.class);
+    private static final Map<CouponEffectType, ModConfigSpec.ConfigValue<List<? extends Integer>>> TIMED_SECONDS = new EnumMap<>(CouponEffectType.class);
     private static final Map<CouponEffectType, ModConfigSpec.BooleanValue> ENABLED_EFFECTS = new EnumMap<>(CouponEffectType.class);
     private static final Map<CouponMode, ModConfigSpec.BooleanValue> ENABLED_MODES = new EnumMap<>(CouponMode.class);
     private static final Map<CouponEffectType, Map<CouponMode, ModConfigSpec.BooleanValue>> ENABLED_COUPONS = new EnumMap<>(CouponEffectType.class);
@@ -181,22 +183,22 @@ public final class CouponConfig {
         builder.pop();
 
         builder.push("values");
-        MULTI_USE_MIN_USES = builder.comment("Minimum random use count for reusable coupons.")
+        MULTI_USE_MIN_USES = builder.comment("Fallback minimum use count for reusable coupons.")
                 .translation(serverConfigKey("values", "multi_use_min_uses"))
                 .defineInRange("multiUseMinUses", 2, 1, 64);
-        MULTI_USE_DEFAULT_USES = builder.comment("Default use count when commands omit a reusable coupon use count.")
+        MULTI_USE_DEFAULT_USES = builder.comment("Fallback default use count when an effect-specific reusable value is unavailable.")
                 .translation(serverConfigKey("values", "multi_use_default_uses"))
                 .defineInRange("multiUseDefaultUses", 3, 1, 64);
-        MULTI_USE_MAX_USES = builder.comment("Maximum random use count for reusable coupons.")
+        MULTI_USE_MAX_USES = builder.comment("Fallback maximum use count for reusable coupons.")
                 .translation(serverConfigKey("values", "multi_use_max_uses"))
                 .defineInRange("multiUseMaxUses", 5, 1, 64);
-        TIMED_MIN_SECONDS = builder.comment("Minimum random duration for timed coupons.")
+        TIMED_MIN_SECONDS = builder.comment("Fallback minimum duration for timed coupons.")
                 .translation(serverConfigKey("values", "timed_min_seconds"))
                 .defineInRange("timedMinSeconds", 15, 1, 3600);
-        TIMED_DEFAULT_SECONDS = builder.comment("Default duration when commands omit a timed coupon duration.")
+        TIMED_DEFAULT_SECONDS = builder.comment("Fallback default duration when an effect-specific timed value is unavailable.")
                 .translation(serverConfigKey("values", "timed_default_seconds"))
                 .defineInRange("timedDefaultSeconds", 30, 1, 3600);
-        TIMED_MAX_SECONDS = builder.comment("Maximum random duration for timed coupons.")
+        TIMED_MAX_SECONDS = builder.comment("Fallback maximum duration for timed coupons.")
                 .translation(serverConfigKey("values", "timed_max_seconds"))
                 .defineInRange("timedMaxSeconds", 60, 1, 3600);
         ANVIL_MINIMUM_EXPERIENCE_COST = builder.comment("Minimum experience cost left after an anvil experience coupon discount.")
@@ -217,6 +219,24 @@ public final class CouponConfig {
         CONSUME_DURABILITY_COUPONS_ON_FAILED_ROLL = builder.comment("Consumes durability coupons even when no damage is prevented.")
                 .translation(serverConfigKey("values", "consume_durability_coupons_on_failed_roll"))
                 .define("consumeDurabilityCouponsOnFailedRoll", true);
+
+        builder.comment("Effect-specific reusable coupon use counts as [min, default, max].")
+                .push("multiUseCounts");
+        for (CouponEffectType effect : CouponEffectType.values()) {
+            MULTI_USE_COUNTS.put(effect, builder
+                    .translation(serverConfigKey("values", "multi_use_counts", configName(effect)))
+                    .defineList(configName(effect), defaultMultiUseCount(effect).asList(), CouponConfig::isValidUseCount));
+        }
+        builder.pop();
+
+        builder.comment("Effect-specific timed coupon durations in seconds as [min, default, max].")
+                .push("timedSeconds");
+        for (CouponEffectType effect : CouponEffectType.values()) {
+            TIMED_SECONDS.put(effect, builder
+                    .translation(serverConfigKey("values", "timed_seconds", configName(effect)))
+                    .defineList(configName(effect), defaultTimedSeconds(effect).asList(), CouponConfig::isValidTimedSeconds));
+        }
+        builder.pop();
         builder.pop();
 
         builder.push("rollWeights");
@@ -402,13 +422,22 @@ public final class CouponConfig {
     }
 
     public static int randomMultiUses(RandomSource random) {
-        int min = multiUseMinUses();
-        int max = multiUseMaxUses();
+        return randomMultiUses(null, random);
+    }
+
+    public static int randomMultiUses(CouponEffectType effect, RandomSource random) {
+        IntRange range = multiUseRange(effect);
+        int min = range.min();
+        int max = range.max();
         return min + random.nextInt(max - min + 1);
     }
 
     public static int multiUseDefaultUses() {
         return Mth.clamp(MULTI_USE_DEFAULT_USES.get(), multiUseMinUses(), multiUseMaxUses());
+    }
+
+    public static int multiUseDefaultUses(CouponEffectType effect) {
+        return multiUseRange(effect).defaultValue();
     }
 
     public static int multiUseMinUses() {
@@ -420,13 +449,22 @@ public final class CouponConfig {
     }
 
     public static int randomTimedSeconds(RandomSource random) {
-        int min = timedMinSeconds();
-        int max = timedMaxSeconds();
+        return randomTimedSeconds(null, random);
+    }
+
+    public static int randomTimedSeconds(CouponEffectType effect, RandomSource random) {
+        IntRange range = timedSecondsRange(effect);
+        int min = range.min();
+        int max = range.max();
         return min + random.nextInt(max - min + 1);
     }
 
     public static int timedDefaultSeconds() {
         return Mth.clamp(TIMED_DEFAULT_SECONDS.get(), timedMinSeconds(), timedMaxSeconds());
+    }
+
+    public static int timedDefaultSeconds(CouponEffectType effect) {
+        return timedSecondsRange(effect).defaultValue();
     }
 
     public static int timedMinSeconds() {
@@ -435,6 +473,22 @@ public final class CouponConfig {
 
     public static int timedMaxSeconds() {
         return Math.max(TIMED_MIN_SECONDS.get(), TIMED_MAX_SECONDS.get());
+    }
+
+    public static IntRange multiUseRange(CouponEffectType effect) {
+        IntRange fallback = new IntRange(multiUseMinUses(), multiUseDefaultUses(), multiUseMaxUses());
+        if (effect == null) {
+            return fallback;
+        }
+        return configuredRange(MULTI_USE_COUNTS.get(effect), fallback, 1, 64);
+    }
+
+    public static IntRange timedSecondsRange(CouponEffectType effect) {
+        IntRange fallback = new IntRange(timedMinSeconds(), timedDefaultSeconds(), timedMaxSeconds());
+        if (effect == null) {
+            return fallback;
+        }
+        return configuredRange(TIMED_SECONDS.get(effect), fallback, 1, 3600);
     }
 
     public static int anvilMinimumExperienceCost() {
@@ -469,6 +523,14 @@ public final class CouponConfig {
         return value instanceof Integer discount && discount >= 1 && discount <= 95;
     }
 
+    private static boolean isValidUseCount(Object value) {
+        return value instanceof Integer uses && uses >= 1 && uses <= 64;
+    }
+
+    private static boolean isValidTimedSeconds(Object value) {
+        return value instanceof Integer seconds && seconds >= 1 && seconds <= 3600;
+    }
+
     private static boolean isValidItemId(Object value) {
         if (!(value instanceof String id) || id.isBlank()) {
             return false;
@@ -491,5 +553,57 @@ public final class CouponConfig {
 
     private static String configKey(String type, String... path) {
         return "config.coupon_codes." + type + "." + String.join(".", path);
+    }
+
+    private static IntRange configuredRange(ModConfigSpec.ConfigValue<List<? extends Integer>> config, IntRange fallback, int hardMin, int hardMax) {
+        if (config == null) {
+            return fallback;
+        }
+
+        List<? extends Integer> values = config.get();
+        if (values == null || values.isEmpty()) {
+            return fallback;
+        }
+
+        int min = Mth.clamp(values.get(0), hardMin, hardMax);
+        int defaultValue = values.size() > 1 ? Mth.clamp(values.get(1), hardMin, hardMax) : fallback.defaultValue();
+        int max = values.size() > 2 ? Mth.clamp(values.get(2), hardMin, hardMax) : min;
+        int low = Math.min(min, max);
+        int high = Math.max(min, max);
+        return new IntRange(low, Mth.clamp(defaultValue, low, high), high);
+    }
+
+    private static IntRange defaultMultiUseCount(CouponEffectType effect) {
+        return switch (effect) {
+            case DURABILITY -> new IntRange(8, 12, 16);
+            case FOOD -> new IntRange(6, 9, 12);
+            case ARROW, BONE_MEAL -> new IntRange(5, 8, 12);
+            case FISHING, ELYTRA_GLIDE, MENDING -> new IntRange(4, 6, 9);
+            case ROCKET, ENDER_PEARL, POTION_DURATION -> new IntRange(3, 5, 8);
+            case VILLAGER_TRADE, BREWING_INGREDIENT -> new IntRange(3, 4, 6);
+            case ANVIL_EXPERIENCE, TOOL_REPAIR, REPAIR_MATERIAL -> new IntRange(2, 3, 5);
+            case ENCHANTING_EXPERIENCE, SMITHING_TEMPLATE, FALL_DAMAGE, VILLAGER_RESTOCK -> new IntRange(2, 3, 4);
+            case TOTEM, DEATH_DROP -> new IntRange(2, 2, 3);
+        };
+    }
+
+    private static IntRange defaultTimedSeconds(CouponEffectType effect) {
+        return switch (effect) {
+            case DURABILITY -> new IntRange(300, 600, 900);
+            case FOOD -> new IntRange(300, 480, 720);
+            case FISHING, ELYTRA_GLIDE, MENDING -> new IntRange(240, 420, 600);
+            case ARROW, BONE_MEAL -> new IntRange(180, 300, 480);
+            case ROCKET, ENDER_PEARL, POTION_DURATION -> new IntRange(150, 240, 420);
+            case VILLAGER_TRADE, BREWING_INGREDIENT -> new IntRange(120, 180, 300);
+            case ANVIL_EXPERIENCE, TOOL_REPAIR, REPAIR_MATERIAL -> new IntRange(90, 150, 240);
+            case ENCHANTING_EXPERIENCE, SMITHING_TEMPLATE, FALL_DAMAGE, VILLAGER_RESTOCK -> new IntRange(60, 90, 180);
+            case TOTEM, DEATH_DROP -> new IntRange(30, 60, 120);
+        };
+    }
+
+    public record IntRange(int min, int defaultValue, int max) {
+        private List<Integer> asList() {
+            return List.of(min, defaultValue, max);
+        }
     }
 }

@@ -44,6 +44,7 @@
   &bull; Empty coupons that roll into random enabled coupons using configurable rarity weights<br>
   &bull; Datapack-driven coupon chest loot, enemy drops, wandering trader offers, and villager profession trades<br>
   &bull; Daily boosted coupon types or categories with stronger discounts, extra uses, or longer timed durations<br>
+  &bull; Effect-specific reusable use counts and timed durations tuned to each coupon's trigger frequency and impact<br>
   &bull; Advancement rewards, server commands, client settings, and configurable coupon effect availability
 </p>
 
