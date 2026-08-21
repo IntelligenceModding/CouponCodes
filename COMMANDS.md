@@ -6,8 +6,6 @@ All commands are under:
 /coupon_codes
 ```
 
-The root command only exists when the server config key `general.enableCommands` is `true`.
-
 Commands that inspect only yourself are available to normal players. Commands that inspect other players, give items, or clear timed coupons require gamemaster permission level.
 
 ## Common Arguments
@@ -63,9 +61,9 @@ Command modes:
 | `multi` | Reusable coupon with a use count. |
 | `timed` | Timed coupon with a duration in seconds. |
 
-For `multi`, `<uses>` accepts `1` to `64`, then is clamped to the server config range `values.multiUseMinUses` to `values.multiUseMaxUses`.
+For `multi`, `<uses>` accepts `1` to `64`.
 
-For `timed`, `<seconds>` accepts `1` to `3600`, then is clamped to the server config range `values.timedMinSeconds` to `values.timedMaxSeconds`.
+For `timed`, `<seconds>` accepts `1` to `3600`.
 
 ## Player Information Commands
 
@@ -75,7 +73,7 @@ Show today's daily coupon boost:
 /coupon_codes daily_boost
 ```
 
-Shows the boosted effect or category and the configured strength, use, and duration multipliers. If daily boosts are disabled or no enabled coupon is eligible, it reports that instead.
+Shows the boosted effect or category and its strength, use, and duration multipliers.
 
 List categories and the effects in each category:
 
@@ -83,7 +81,7 @@ List categories and the effects in each category:
 /coupon_codes categories
 ```
 
-List all coupon effects and enabled modes:
+List all coupon effects and available modes:
 
 ```text
 /coupon_codes effects
@@ -153,7 +151,7 @@ Timed:
 /coupon_codes give <targets> <effect> timed <discount_percent> <seconds> <count>
 ```
 
-If `<uses>` or `<seconds>` is omitted, the command uses `values.multiUseDefaultUses` or `values.timedDefaultSeconds` from the server config.
+If `<uses>` or `<seconds>` is omitted, the command uses the mod's current default reusable use count or timed duration.
 
 Examples:
 
@@ -163,11 +161,9 @@ Examples:
 /coupon_codes give Steve fall_damage timed 20 60 2
 ```
 
-The command refuses to create coupons disabled by server config.
-
 ## Give Category Coupons
 
-Give every enabled coupon effect in a category for one mode.
+Give every available coupon effect in a category for one mode.
 
 Single-use:
 
@@ -198,18 +194,18 @@ Example:
 /coupon_codes give_category @p equipment multi 25 3
 ```
 
-That gives each enabled equipment multi coupon to the target.
+That gives each available equipment multi coupon to the target.
 
-## Give All Configured Coupons
+## Give All Coupons
 
-Give every exact coupon that is enabled in server config:
+Give every available exact coupon:
 
 ```text
 /coupon_codes give_all <targets> <discount_percent>
 /coupon_codes give_all <targets> <discount_percent> <count>
 ```
 
-`<count>` is limited to `1` to `64` here. It applies per exact enabled coupon, not to the total number of items.
+`<count>` is limited to `1` to `64` here. It applies per exact coupon, not to the total number of items.
 
 Example:
 
@@ -219,7 +215,7 @@ Example:
 
 ## Give Random Coupons
 
-Give random initialized coupons using the configured rarity weights and enabled coupon list:
+Give random initialized coupons:
 
 ```text
 /coupon_codes give_random <targets>
@@ -285,16 +281,4 @@ Examples:
 /coupon_codes clear_timed @p fall_damage
 /coupon_codes clear_timed Steve category mobility
 ```
-
-## Config Interactions
-
-`general.enableCommands = false` disables the whole `/coupon_codes` command tree.
-
-`general.enableCoupons = false` prevents coupon effects and blocks exact coupon generation through the give commands.
-
-`enabledEffects`, `enabledModes`, and `enabledCoupons` are all checked when giving exact, category, all, and random coupons.
-
-Random coupon commands use `rollWeights.common`, `rollWeights.uncommon`, `rollWeights.rare`, and `rollWeights.epic`.
-
-Exact command-created coupons use the discount, uses, and seconds supplied by the command, with uses and seconds clamped to server config value ranges.
 

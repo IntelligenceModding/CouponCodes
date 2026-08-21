@@ -1,6 +1,6 @@
-# Coupon Codes Datapacks and Config
+# Coupon Codes Datapacks
 
-This document explains the data-driven parts of Coupon Codes: custom datapack JSON, normal Minecraft data files shipped by the mod, item/effect IDs, and the server/client config files that control behavior.
+This document explains the data-driven parts of Coupon Codes: custom datapack JSON, normal Minecraft data files shipped by the mod, and item/effect IDs.
 
 ## Where Files Go
 
@@ -166,13 +166,13 @@ Each successful roll chooses `min_rolls` to `max_rolls` entries from its weighte
 {"type": "coupon", "effect": "totem", "mode": "uses", "weight": 3}
 ```
 
-`category_coupon_set` picks any enabled coupon in a category and uses the same once/multi/timed weighting as `coupon_set`.
+`category_coupon_set` picks any available coupon in a category and uses the same once/multi/timed weighting as `coupon_set`.
 
 ```json
 {"type": "category_coupon_set", "category": "combat", "weight": 5}
 ```
 
-`category_coupon` picks any enabled coupon in a category for one mode.
+`category_coupon` picks any available coupon in a category for one mode.
 
 ```json
 {"type": "category_coupon", "category": "mobility", "mode": "timed", "weight": 2}
@@ -184,7 +184,7 @@ Each successful roll chooses `min_rolls` to `max_rolls` entries from its weighte
 {"type": "item", "item": "coupon_codes:empty_coupon", "min_count": 1, "max_count": 2, "weight": 8}
 ```
 
-All entry weights are relative. Entries with weight `0` are ignored. Disabled coupons, disabled empty coupon rolls, and disabled pouches are automatically excluded.
+All entry weights are relative. Entries with weight `0` are ignored.
 
 ## Coupon Trade Datapack Files
 
@@ -325,7 +325,7 @@ Profession coupon costs are clamped to `48` to `64`. Profession trade defaults a
 
 ### Advancements
 
-`data/coupon_codes/advancement/*.json` defines Coupon Codes advancements. Their reward behavior is not stored directly in the advancement JSON; the server config can award a configured item whenever a Coupon Codes advancement is completed.
+`data/coupon_codes/advancement/*.json` defines Coupon Codes advancements.
 
 ### NeoForge Loot Modifier Data
 
@@ -333,77 +333,5 @@ Profession coupon costs are clamped to `48` to `64`. Profession trade defaults a
 
 `data/coupon_codes/loot_modifiers/vanilla_chest_coupons.json` defines the `coupon_codes:vanilla_chest_coupons` modifier. It asks `CouponLootDataManager` for extra loot based on the queried loot table.
 
-If a datapack replaces NeoForge global loot modifiers, keep `coupon_codes:vanilla_chest_coupons` unless you intentionally want to disable Coupon Codes chest loot.
-
-## Config Files
-
-The server config is registered as a NeoForge server config and controls gameplay. In a running world it is normally written as:
-
-```text
-<world>/serverconfig/coupon_codes-server.toml
-```
-
-The client config controls local rendering and is normally written as:
-
-```text
-config/coupon_codes-client.toml
-```
-
-Server config gates are checked at runtime. If a coupon, mode, empty coupon roll, or pouch is disabled, datapack loot/trades that would create it are skipped.
-
-### Server Config Sections
-
-| Section | Keys | What it controls |
-| --- | --- | --- |
-| `general` | `enableCoupons`, `enableEmptyCouponRolls`, `enableCouponPouches`, `enableCommands`, `showTimedCouponBossBar`, `discountValues` | Master switches, command availability, timed boss bars, and random discount percentages. |
-| `dailyBoost` | `enableDailyBoosts`, `announceDailyBoosts`, `announcementMessage`, `categoryBoostChance`, `strengthMultiplier`, `useMultiplier`, `durationMultiplier` | Daily boosted effect/category selection and chat announcement. |
-| `advancementRewards` | `enableAdvancementRewards`, `advancementRewardItem`, `advancementRewardCount` | Item reward given for Coupon Codes advancement completion. |
-| `containers` | `allowCouponsInPouches`, `allowCouponsInShulkerBoxes`, `containerSearchDepth` | Whether coupon lookup can search pouches/shulker boxes and how deeply. |
-| `timed` | `allowInventoryActivation`, `allowPouchActivation`, `allowDurationStacking`, `maxActiveCoupons` | Timed coupon activation and active timed coupon limits. |
-| `feedback` | `playActivationFeedback`, `playUseFeedback`, `useFeedbackCooldownTicks`, `activationParticleCount`, `useParticleCount` | Sounds/particles and feedback cooldowns. |
-| `values` | `multiUseMinUses`, `multiUseDefaultUses`, `multiUseMaxUses`, `timedMinSeconds`, `timedDefaultSeconds`, `timedMaxSeconds`, `anvilMinimumExperienceCost`, `anvilMinimumMaterialCost`, `enchantingPercentPerRefundLevel`, `potionDurationExtensionTicks`, `consumeChanceCouponsOnFailedRoll`, `consumeDurabilityCouponsOnFailedRoll` | Random value ranges and effect-specific rules. |
-| `rollWeights` | `common`, `uncommon`, `rare`, `epic` | Weights used when empty coupons or random coupon commands/trades roll a coupon. |
-| `enabledEffects` | One boolean per effect ID | Disables every mode for an effect. |
-| `enabledModes` | `single_use`, `uses`, `timed` | Disables every coupon in a mode. |
-| `enabledCoupons` | One boolean per exact effect/mode pair | Disables one exact coupon item behavior and excludes it from generated loot/trades. |
-
-### Important Defaults
-
-| Key | Default |
-| --- | --- |
-| `general.discountValues` | `[10, 20, 25, 50]` |
-| `dailyBoost.categoryBoostChance` | `10` |
-| `dailyBoost.strengthMultiplier` | `2` |
-| `dailyBoost.useMultiplier` | `2` |
-| `dailyBoost.durationMultiplier` | `2` |
-| `advancementRewards.advancementRewardItem` | `coupon_codes:empty_coupon` |
-| `advancementRewards.advancementRewardCount` | `1` |
-| `containers.allowCouponsInPouches` | `true` |
-| `containers.allowCouponsInShulkerBoxes` | `false` |
-| `containers.containerSearchDepth` | `1` |
-| `timed.maxActiveCoupons` | `1` |
-| `values.multiUseMinUses` / `multiUseDefaultUses` / `multiUseMaxUses` | `2` / `3` / `5` |
-| `values.timedMinSeconds` / `timedDefaultSeconds` / `timedMaxSeconds` | `15` / `30` / `60` |
-| `rollWeights.common` / `uncommon` / `rare` / `epic` | `100` / `40` / `12` / `3` |
-
-### Daily Boost Announcement Placeholders
-
-`dailyBoost.announcementMessage` supports Minecraft-style `&` formatting codes and these placeholders:
-
-```text
-{effect}
-{boost}
-{boost_type}
-{category}
-{strength}
-{uses}
-{duration}
-```
-
-### Client Config
-
-| Key | Default | Meaning |
-| --- | --- | --- |
-| `showTimedCouponBossBar` | `true` | Locally renders Coupon Codes timed-effect boss bars when the server sends them. |
-| `showCouponIconOverlays` | `true` | Shows small effect icons over coupon item stacks. |
+If a datapack replaces NeoForge global loot modifiers, keep `coupon_codes:vanilla_chest_coupons` unless you intentionally want to remove Coupon Codes chest loot.
 

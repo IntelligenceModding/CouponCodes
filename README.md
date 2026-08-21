@@ -52,6 +52,14 @@
 </p>
 
 <p align="center">
+  <a href="COMMANDS.md"><img src="https://img.shields.io/badge/Commands-Reference-2D6CDF?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Coupon Codes command reference"></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="DATAPACKS.md"><img src="https://img.shields.io/badge/Datapacks-Reference-2D6CDF?style=for-the-badge&logo=databricks&logoColor=white" alt="Coupon Codes datapack reference"></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="CONFIG.md"><img src="https://img.shields.io/badge/Config-Reference-2D6CDF?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Coupon Codes config reference"></a>
+</p>
+
+<p align="center">
   <img src="https://raw.githubusercontent.com/IntelligenceModding/Coupons/refs/heads/assets/Community.png" alt="Community" height="75">
 </p>
 
