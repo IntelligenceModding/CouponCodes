@@ -43,8 +43,8 @@ public class CouponCodes {
         NeoForge.EVENT_BUS.addListener(CouponEvents::onGrindstoneTakeItem);
         NeoForge.EVENT_BUS.addListener(CouponEvents::onTradeWithVillager);
         NeoForge.EVENT_BUS.addListener(CouponEvents::onPlayerBrewedPotion);
-        NeoForge.EVENT_BUS.addListener(CouponEvents::onArrowLoose);
-        NeoForge.EVENT_BUS.addListener(CouponEvents::onRightClickItem);
+        NeoForge.EVENT_BUS.addListener(CouponEvents::onEntityJoinLevel);
+        NeoForge.EVENT_BUS.addListener(CouponEvents::onUseItemFinish);
         NeoForge.EVENT_BUS.addListener(CouponEvents::onBonemeal);
         NeoForge.EVENT_BUS.addListener(CouponEvents::onUseTotem);
         NeoForge.EVENT_BUS.addListener(CouponEvents::onItemFished);
@@ -52,6 +52,7 @@ public class CouponCodes {
         NeoForge.EVENT_BUS.addListener(CouponEvents::onLivingFall);
         NeoForge.EVENT_BUS.addListener(CouponEvents::onLivingDrops);
         NeoForge.EVENT_BUS.addListener(CouponEvents::onPlayerRespawn);
+        NeoForge.EVENT_BUS.addListener(CouponEvents::onPlayerLoggedOut);
         NeoForge.EVENT_BUS.addListener(CouponBossBars::onPlayerLoggedOut);
         NeoForge.EVENT_BUS.addListener(CouponCommands::register);
         NeoForge.EVENT_BUS.addListener(CouponDailyBoost::onServerTick);

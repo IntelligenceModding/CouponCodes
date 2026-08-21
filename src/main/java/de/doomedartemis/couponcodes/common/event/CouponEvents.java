@@ -7,37 +7,44 @@ import de.doomedartemis.couponcodes.common.loot.CouponLootDataManager;
 import de.doomedartemis.couponcodes.common.advancement.CouponCriteria;
 import de.doomedartemis.couponcodes.common.item.CouponItem;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.FireworkRocketEntity;
+import net.minecraft.world.entity.projectile.ThrownEnderpearl;
 import net.minecraft.world.item.enchantment.EnchantedItemInUse;
 import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.inventory.SmithingMenu;
 import net.neoforged.neoforge.event.AnvilUpdateEvent;
 import net.neoforged.neoforge.event.GrindstoneEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.brewing.PlayerBrewedPotionEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.LivingUseTotemEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
-import net.neoforged.neoforge.event.entity.player.ArrowLooseEvent;
 import net.neoforged.neoforge.event.entity.player.BonemealEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEnchantItemEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerXpEvent;
 import net.neoforged.neoforge.event.entity.player.TradeWithVillagerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -45,10 +52,12 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public final class CouponEvents {
@@ -75,8 +84,11 @@ public final class CouponEvents {
     };
 
     private static final Map<UUID, Map<String, Integer>> TRACKED_COUNTS = new HashMap<>();
-    private static final Map<UUID, Float> LAST_EXHAUSTION = new HashMap<>();
+    private static final Map<UUID, Map<String, ItemStack>> TRACKED_DAMAGE_STACKS = new HashMap<>();
     private static final Map<UUID, List<ItemStack>> DEATH_DROP_RETURNS = new HashMap<>();
+    private static final Map<UUID, Long> LAST_ARROW_REFUND_TICK = new HashMap<>();
+    private static final Set<UUID> PENDING_ANVIL_XP_DISCOUNTS = new HashSet<>();
+    private static final Set<UUID> PENDING_ANVIL_MATERIAL_DISCOUNTS = new HashSet<>();
 
     private CouponEvents() {
     }
@@ -95,10 +107,10 @@ public final class CouponEvents {
         CouponData.tickCouponsInInventory(player);
         reduceNewElytraGlideDamage(player);
         reduceNewDurabilityDamage(player);
-        reduceNewFoodExhaustion(player);
-        extendPotionEffects(player);
-        for (Item template : SMITHING_TEMPLATES) {
-            refundTrackedInventoryCost(player, CouponEffectType.SMITHING_TEMPLATE, template);
+        if (player.containerMenu instanceof SmithingMenu) {
+            for (Item template : SMITHING_TEMPLATES) {
+                refundTrackedInventoryCost(player, CouponEffectType.SMITHING_TEMPLATE, template);
+            }
         }
         CouponBossBars.update(player);
     }
@@ -125,16 +137,21 @@ public final class CouponEvents {
             return;
         }
 
+        PENDING_ANVIL_XP_DISCOUNTS.remove(player.getUUID());
+        PENDING_ANVIL_MATERIAL_DISCOUNTS.remove(player.getUUID());
+
         CouponData.CarriedCoupon xpCoupon = findBestCoupon(player, CouponEffectType.ANVIL_EXPERIENCE);
         if (xpCoupon != null && event.getCost() > 0) {
             int cost = (int) event.getCost();
             event.setCost(discountedCountWithMinimum(cost, discountPercent(player, xpCoupon), CouponConfig.anvilMinimumExperienceCost()));
+            PENDING_ANVIL_XP_DISCOUNTS.add(player.getUUID());
         }
 
         CouponData.CarriedCoupon materialCoupon = findBestCoupon(player, CouponEffectType.REPAIR_MATERIAL);
         if (materialCoupon != null && event.getMaterialCost() > 0) {
             int materialCost = event.getMaterialCost();
             event.setMaterialCost(discountedCountWithMinimum(materialCost, discountPercent(player, materialCoupon), CouponConfig.anvilMinimumMaterialCost()));
+            PENDING_ANVIL_MATERIAL_DISCOUNTS.add(player.getUUID());
         }
     }
 
@@ -144,8 +161,10 @@ public final class CouponEvents {
             return;
         }
 
-        consumeBestCoupon(player, CouponEffectType.ANVIL_EXPERIENCE);
-        if (!event.getRight().isEmpty()) {
+        if (PENDING_ANVIL_XP_DISCOUNTS.remove(player.getUUID())) {
+            consumeBestCoupon(player, CouponEffectType.ANVIL_EXPERIENCE);
+        }
+        if (PENDING_ANVIL_MATERIAL_DISCOUNTS.remove(player.getUUID())) {
             consumeBestCoupon(player, CouponEffectType.REPAIR_MATERIAL);
         }
         applyToolRepairBonus(player, event.getLeft(), event.getOutput());
@@ -224,25 +243,34 @@ public final class CouponEvents {
         }
     }
 
-    public static void onArrowLoose(ArrowLooseEvent event) {
-        Player player = event.getEntity();
-        if (player.level().isClientSide() || !event.hasAmmo()) {
+    public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide() || event.loadedFromDisk()) {
             return;
         }
 
-        refundConsumableCoupon(player, CouponEffectType.ARROW, firstMatching(player, Items.ARROW, Items.SPECTRAL_ARROW, Items.TIPPED_ARROW));
+        Entity entity = event.getEntity();
+        if (entity instanceof AbstractArrow arrow && arrow.getOwner() instanceof Player player) {
+            refundArrowCoupon(player, arrow);
+        } else if (entity instanceof ThrownEnderpearl pearl && pearl.getOwner() instanceof Player player) {
+            refundConsumableCoupon(player, CouponEffectType.ENDER_PEARL, new ItemStack(Items.ENDER_PEARL));
+        } else if (entity instanceof FireworkRocketEntity rocket && rocket.getOwner() instanceof Player player) {
+            refundConsumableCoupon(player, CouponEffectType.ROCKET, rocket.getItem().copyWithCount(1));
+        }
     }
 
-    public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
-        if (event.getLevel().isClientSide()) {
+    public static void onUseItemFinish(LivingEntityUseItemEvent.Finish event) {
+        if (!(event.getEntity() instanceof Player player) || player.level().isClientSide()) {
             return;
         }
 
-        ItemStack stack = event.getItemStack();
-        if (stack.is(Items.ENDER_PEARL)) {
-            refundConsumableCoupon(event.getEntity(), CouponEffectType.ENDER_PEARL, stack.copyWithCount(1));
-        } else if (stack.is(Items.FIREWORK_ROCKET)) {
-            refundConsumableCoupon(event.getEntity(), CouponEffectType.ROCKET, stack.copyWithCount(1));
+        ItemStack used = event.getItem();
+        if (used.has(DataComponents.FOOD)) {
+            refundConsumableCoupon(player, CouponEffectType.FOOD, used.copyWithCount(1));
+        }
+
+        PotionContents potionContents = used.get(DataComponents.POTION_CONTENTS);
+        if (potionContents != null && potionContents.hasEffects()) {
+            extendPotionEffectsFromUse(player, potionContents);
         }
     }
 
@@ -380,27 +408,37 @@ public final class CouponEvents {
         }
     }
 
+    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        UUID playerId = event.getEntity().getUUID();
+        TRACKED_COUNTS.remove(playerId);
+        TRACKED_DAMAGE_STACKS.remove(playerId);
+        DEATH_DROP_RETURNS.remove(playerId);
+        LAST_ARROW_REFUND_TICK.remove(playerId);
+        PENDING_ANVIL_XP_DISCOUNTS.remove(playerId);
+        PENDING_ANVIL_MATERIAL_DISCOUNTS.remove(playerId);
+    }
+
     private static void reduceNewDurabilityDamage(Player player) {
         Inventory inventory = player.getInventory();
-        Map<String, Integer> trackedCounts = TRACKED_COUNTS.computeIfAbsent(player.getUUID(), ignored -> new HashMap<>());
+        Map<String, ItemStack> trackedStacks = TRACKED_DAMAGE_STACKS.computeIfAbsent(player.getUUID(), ignored -> new HashMap<>());
 
-        trackAndDiscountContainer(player, trackedCounts, "main", inventory.items);
-        trackAndDiscountContainer(player, trackedCounts, "armor", inventory.armor);
-        trackAndDiscountContainer(player, trackedCounts, "offhand", inventory.offhand);
+        trackAndDiscountContainer(player, trackedStacks, "main", inventory.items);
+        trackAndDiscountContainer(player, trackedStacks, "armor", inventory.armor);
+        trackAndDiscountContainer(player, trackedStacks, "offhand", inventory.offhand);
     }
 
     private static void reduceNewElytraGlideDamage(Player player) {
         ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);
-        Map<String, Integer> trackedCounts = TRACKED_COUNTS.computeIfAbsent(player.getUUID(), ignored -> new HashMap<>());
+        Map<String, ItemStack> trackedStacks = TRACKED_DAMAGE_STACKS.computeIfAbsent(player.getUUID(), ignored -> new HashMap<>());
         String key = "elytra_glide:chest";
 
         if (chest.isEmpty() || !chest.is(Items.ELYTRA) || !chest.isDamageableItem()) {
-            trackedCounts.remove(key);
+            trackedStacks.remove(key);
             return;
         }
 
         int currentDamage = chest.getDamageValue();
-        int lastDamage = trackedCounts.getOrDefault(key, currentDamage);
+        int lastDamage = lastTrackedDamage(trackedStacks, key, chest);
         int newDamage = currentDamage - lastDamage;
         if (newDamage > 0 && player.isFallFlying()) {
             CouponData.CarriedCoupon coupon = findBestCoupon(player, CouponEffectType.ELYTRA_GLIDE);
@@ -416,25 +454,25 @@ public final class CouponEvents {
             }
         }
 
-        trackedCounts.put(key, currentDamage);
+        trackDamageStack(trackedStacks, key, chest);
     }
 
-    private static void trackAndDiscountContainer(Player player, Map<String, Integer> trackedCounts, String prefix, Iterable<ItemStack> stacks) {
+    private static void trackAndDiscountContainer(Player player, Map<String, ItemStack> trackedStacks, String prefix, Iterable<ItemStack> stacks) {
         int slot = 0;
         for (ItemStack stack : stacks) {
             String key = "damage:" + prefix + ":" + slot;
             slot++;
 
             if (stack.isEmpty() || !stack.isDamageableItem()) {
-                trackedCounts.remove(key);
+                trackedStacks.remove(key);
                 continue;
             }
 
             int currentDamage = stack.getDamageValue();
-            int lastDamage = trackedCounts.getOrDefault(key, currentDamage);
+            int lastDamage = lastTrackedDamage(trackedStacks, key, stack);
             int newDamage = currentDamage - lastDamage;
 
-            if (newDamage > 0) {
+            if (newDamage > 0 && !(stack.is(Items.ELYTRA) && player.isFallFlying())) {
                 CouponData.CarriedCoupon coupon = findBestCoupon(player, CouponEffectType.DURABILITY);
                 if (coupon != null) {
                     int preventedDamage = preventedAmount(player, newDamage, discountPercent(player, coupon));
@@ -448,48 +486,37 @@ public final class CouponEvents {
                 }
             }
 
-            trackedCounts.put(key, currentDamage);
+            trackDamageStack(trackedStacks, key, stack);
         }
     }
 
-    private static void reduceNewFoodExhaustion(Player player) {
-        float currentExhaustion = player.getFoodData().getExhaustionLevel();
-        float lastExhaustion = LAST_EXHAUSTION.getOrDefault(player.getUUID(), currentExhaustion);
-        float addedExhaustion = currentExhaustion - lastExhaustion;
-
-        if (addedExhaustion > 0.0F) {
-            CouponData.CarriedCoupon coupon = findBestCoupon(player, CouponEffectType.FOOD);
-            if (coupon != null) {
-                float prevented = addedExhaustion * discountPercent(player, coupon) / 100.0F;
-                if (prevented > 0.0F) {
-                    currentExhaustion = Math.max(0.0F, currentExhaustion - prevented);
-                    player.getFoodData().setExhaustion(currentExhaustion);
-                    coupon.consumeUse(player);
-                }
-            }
-        }
-
-        LAST_EXHAUSTION.put(player.getUUID(), currentExhaustion);
-    }
-
-    private static void extendPotionEffects(Player player) {
+    private static void extendPotionEffectsFromUse(Player player, PotionContents potionContents) {
         CouponData.CarriedCoupon coupon = findBestCoupon(player, CouponEffectType.POTION_DURATION);
         if (coupon == null) {
             return;
         }
 
-        List<MobEffectInstance> effects = new ArrayList<>(player.getActiveEffects());
         boolean extended = false;
-        for (MobEffectInstance effect : effects) {
-            if (!effect.isInfiniteDuration() && roll(player, discountPercent(player, coupon))) {
-                Holder<MobEffect> effectType = effect.getEffect();
+        int discount = discountPercent(player, coupon);
+        for (MobEffectInstance appliedEffect : potionContents.getAllEffects()) {
+            if (!appliedEffect.isInfiniteDuration()) {
+                MobEffectInstance currentEffect = player.getEffect(appliedEffect.getEffect());
+                if (currentEffect == null || currentEffect.isInfiniteDuration()) {
+                    continue;
+                }
+
+                int extraDuration = Math.max(
+                        CouponConfig.potionDurationExtensionTicks(),
+                        Math.round(appliedEffect.getDuration() * discount / 100.0F)
+                );
+                Holder<MobEffect> effectType = currentEffect.getEffect();
                 player.addEffect(new MobEffectInstance(
                         effectType,
-                        effect.getDuration() + CouponConfig.potionDurationExtensionTicks(),
-                        effect.getAmplifier(),
-                        effect.isAmbient(),
-                        effect.isVisible(),
-                        effect.showIcon()
+                        currentEffect.getDuration() + extraDuration,
+                        currentEffect.getAmplifier(),
+                        currentEffect.isAmbient(),
+                        currentEffect.isVisible(),
+                        currentEffect.showIcon()
                 ));
                 extended = true;
             }
@@ -498,6 +525,34 @@ public final class CouponEvents {
         if (extended) {
             coupon.consumeUse(player);
         }
+    }
+
+    private static int lastTrackedDamage(Map<String, ItemStack> trackedStacks, String key, ItemStack stack) {
+        ItemStack trackedStack = trackedStacks.get(key);
+        if (trackedStack == null || !sameStackExceptDamage(trackedStack, stack)) {
+            return stack.getDamageValue();
+        }
+        return trackedStack.getDamageValue();
+    }
+
+    private static void trackDamageStack(Map<String, ItemStack> trackedStacks, String key, ItemStack stack) {
+        trackedStacks.put(key, stack.copyWithCount(1));
+    }
+
+    private static boolean sameStackExceptDamage(ItemStack previous, ItemStack current) {
+        if (!previous.is(current.getItem())) {
+            return false;
+        }
+
+        ItemStack previousComparable = previous.copyWithCount(1);
+        ItemStack currentComparable = current.copyWithCount(1);
+        if (previousComparable.isDamageableItem()) {
+            previousComparable.setDamageValue(0);
+        }
+        if (currentComparable.isDamageableItem()) {
+            currentComparable.setDamageValue(0);
+        }
+        return ItemStack.isSameItemSameComponents(previousComparable, currentComparable);
     }
 
     private static CouponData.CarriedCoupon findBestCoupon(Player player, CouponEffectType effect) {
@@ -526,6 +581,38 @@ public final class CouponEvents {
             return;
         }
 
+        int discount = discountPercent(player, coupon);
+        boolean refundRoll = roll(player, discount);
+        if (refundRoll || CouponConfig.consumeChanceCouponsOnFailedRoll()) {
+            coupon.consumeUse(player);
+        }
+        if (refundRoll) {
+            giveOrDrop(player, refund.copyWithCount(1));
+        }
+    }
+
+    private static void refundArrowCoupon(Player player, AbstractArrow arrow) {
+        if (arrow.pickup != AbstractArrow.Pickup.ALLOWED) {
+            return;
+        }
+
+        long gameTime = player.level().getGameTime();
+        Long lastRefundTick = LAST_ARROW_REFUND_TICK.get(player.getUUID());
+        if (lastRefundTick != null && lastRefundTick == gameTime) {
+            return;
+        }
+
+        ItemStack refund = arrow.getPickupItemStackOrigin();
+        if (refund.isEmpty()) {
+            refund = new ItemStack(Items.ARROW);
+        }
+
+        CouponData.CarriedCoupon coupon = findBestCoupon(player, CouponEffectType.ARROW);
+        if (coupon == null) {
+            return;
+        }
+
+        LAST_ARROW_REFUND_TICK.put(player.getUUID(), gameTime);
         int discount = discountPercent(player, coupon);
         boolean refundRoll = roll(player, discount);
         if (refundRoll || CouponConfig.consumeChanceCouponsOnFailedRoll()) {
@@ -596,24 +683,6 @@ public final class CouponEvents {
 
     private static boolean roll(Player player, int discountPercent) {
         return player.getRandom().nextInt(100) < discountPercent;
-    }
-
-    private static ItemStack firstMatching(Player player, Item... items) {
-        for (ItemStack stack : player.getInventory().items) {
-            for (Item item : items) {
-                if (stack.is(item)) {
-                    return stack.copyWithCount(1);
-                }
-            }
-        }
-        for (ItemStack stack : player.getInventory().offhand) {
-            for (Item item : items) {
-                if (stack.is(item)) {
-                    return stack.copyWithCount(1);
-                }
-            }
-        }
-        return ItemStack.EMPTY;
     }
 
     private static void refundTrackedInventoryCost(Player player, CouponEffectType effect, Item item) {

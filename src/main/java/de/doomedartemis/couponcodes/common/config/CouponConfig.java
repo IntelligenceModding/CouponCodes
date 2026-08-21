@@ -208,7 +208,7 @@ public final class CouponConfig {
         ENCHANTING_PERCENT_PER_REFUND_LEVEL = builder.comment("Discount percent required for each refunded enchanting level.")
                 .translation(serverConfigKey("values", "enchanting_percent_per_refund_level"))
                 .defineInRange("enchantingPercentPerRefundLevel", 25, 1, 95);
-        POTION_DURATION_EXTENSION_TICKS = builder.comment("Ticks added per successful potion duration coupon roll.")
+        POTION_DURATION_EXTENSION_TICKS = builder.comment("Minimum ticks added when a potion duration coupon extends a newly applied potion effect.")
                 .translation(serverConfigKey("values", "potion_duration_extension_ticks"))
                 .defineInRange("potionDurationExtensionTicks", 1, 1, 200);
         CONSUME_CHANCE_COUPONS_ON_FAILED_ROLL = builder.comment("Consumes random-chance refund coupons even when their refund roll fails.")
