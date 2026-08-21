@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:emerald"
     },
-    "title": "First Deduction",
-    "description": "Have any coupon discount apply.",
+    "title": {
+      "translate": "advancements.coupon_codes.first_deduction.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.first_deduction.description"
+    },
     "frame": "task"
   },
   "criteria": {

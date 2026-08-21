@@ -3,10 +3,14 @@
   "display": {
     "icon": {
       "count": 1,
-      "id": "minecraft:chest_minecart"
+      "id": "coupon_codes:coupon_pouch"
     },
-    "title": "Pocket Accountant",
-    "description": "Carry a coupon pouch.",
+    "title": {
+      "translate": "advancements.coupon_codes.pocket_accountant.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.pocket_accountant.description"
+    },
     "frame": "task"
   },
   "criteria": {

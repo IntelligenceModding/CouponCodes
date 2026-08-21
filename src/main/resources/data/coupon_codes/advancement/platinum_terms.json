@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:nether_star"
     },
-    "title": "Platinum Terms",
-    "description": "Obtain an epic coupon.",
+    "title": {
+      "translate": "advancements.coupon_codes.platinum_terms.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.platinum_terms.description"
+    },
     "frame": "challenge",
     "hidden": true
   },

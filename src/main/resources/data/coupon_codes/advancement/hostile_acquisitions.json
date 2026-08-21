@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:dragon_head"
     },
-    "title": "Hostile Acquisitions",
-    "description": "Get coupon drops from each special enemy.",
+    "title": {
+      "translate": "advancements.coupon_codes.hostile_acquisitions.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.hostile_acquisitions.description"
+    },
     "frame": "challenge",
     "hidden": true
   },

@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:experience_bottle"
     },
-    "title": "Repeat Customer",
-    "description": "Use a reusable coupon.",
+    "title": {
+      "translate": "advancements.coupon_codes.repeat_customer.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.repeat_customer.description"
+    },
     "frame": "task"
   },
   "criteria": {

@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:emerald"
     },
-    "title": "Merchant Rebate",
-    "description": "Get part of a villager trade cost back.",
+    "title": {
+      "translate": "advancements.coupon_codes.merchant_rebate.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.merchant_rebate.description"
+    },
     "frame": "task"
   },
   "criteria": {

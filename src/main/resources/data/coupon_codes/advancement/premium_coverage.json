@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:totem_of_undying"
     },
-    "title": "Premium Coverage",
-    "description": "Use a coupon for a totem refund or death drop protection.",
+    "title": {
+      "translate": "advancements.coupon_codes.premium_coverage.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.premium_coverage.description"
+    },
     "frame": "goal"
   },
   "criteria": {

@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:enchanting_table"
     },
-    "title": "Arcane Accounting",
-    "description": "Save experience at an enchanting table or an anvil.",
+    "title": {
+      "translate": "advancements.coupon_codes.arcane_accounting.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.arcane_accounting.description"
+    },
     "frame": "goal"
   },
   "criteria": {

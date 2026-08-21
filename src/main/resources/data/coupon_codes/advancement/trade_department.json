@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:emerald"
     },
-    "title": "Trade Department",
-    "description": "Apply any trade category coupon.",
+    "title": {
+      "translate": "advancements.coupon_codes.trade_department.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.trade_department.description"
+    },
     "frame": "task"
   },
   "criteria": {

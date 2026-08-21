@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:diamond_sword"
     },
-    "title": "Combat Department",
-    "description": "Apply any combat category coupon.",
+    "title": {
+      "translate": "advancements.coupon_codes.combat_department.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.combat_department.description"
+    },
     "frame": "task"
   },
   "criteria": {

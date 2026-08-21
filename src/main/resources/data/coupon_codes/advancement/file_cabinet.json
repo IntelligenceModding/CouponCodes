@@ -3,10 +3,14 @@
   "display": {
     "icon": {
       "count": 1,
-      "id": "minecraft:barrel"
+      "id": "coupon_codes:brown_coupon_pouch"
     },
-    "title": "File Cabinet",
-    "description": "Open a coupon pouch.",
+    "title": {
+      "translate": "advancements.coupon_codes.file_cabinet.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.file_cabinet.description"
+    },
     "frame": "task"
   },
   "criteria": {

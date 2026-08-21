@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:book"
     },
-    "title": "Fine Print",
-    "description": "Obtain a rare coupon.",
+    "title": {
+      "translate": "advancements.coupon_codes.fine_print.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.fine_print.description"
+    },
     "frame": "goal"
   },
   "criteria": {

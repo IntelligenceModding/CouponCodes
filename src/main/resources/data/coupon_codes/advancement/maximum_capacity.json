@@ -3,10 +3,14 @@
   "display": {
     "icon": {
       "count": 1,
-      "id": "minecraft:chest"
+      "id": "coupon_codes:yellow_coupon_pouch"
     },
-    "title": "Maximum Capacity",
-    "description": "Fill a coupon pouch with coupons.",
+    "title": {
+      "translate": "advancements.coupon_codes.maximum_capacity.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.maximum_capacity.description"
+    },
     "frame": "challenge",
     "hidden": true
   },

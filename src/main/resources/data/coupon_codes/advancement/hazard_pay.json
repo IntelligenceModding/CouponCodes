@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:totem_of_undying"
     },
-    "title": "Hazard Pay",
-    "description": "Get a coupon drop from a dangerous enemy.",
+    "title": {
+      "translate": "advancements.coupon_codes.hazard_pay.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.hazard_pay.description"
+    },
     "frame": "goal"
   },
   "criteria": {

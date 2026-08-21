@@ -2,6 +2,7 @@ package de.doomedartemis.couponcodes.common.config;
 
 import de.doomedartemis.couponcodes.common.coupon.CouponEffectType;
 import de.doomedartemis.couponcodes.common.coupon.CouponMode;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Rarity;
@@ -28,6 +29,9 @@ public final class CouponConfig {
     private static final ModConfigSpec.IntValue DAILY_BOOST_STRENGTH_MULTIPLIER;
     private static final ModConfigSpec.IntValue DAILY_BOOST_USE_MULTIPLIER;
     private static final ModConfigSpec.IntValue DAILY_BOOST_DURATION_MULTIPLIER;
+    private static final ModConfigSpec.BooleanValue ENABLE_ADVANCEMENT_REWARDS;
+    private static final ModConfigSpec.ConfigValue<String> ADVANCEMENT_REWARD_ITEM;
+    private static final ModConfigSpec.IntValue ADVANCEMENT_REWARD_COUNT;
     private static final ModConfigSpec.BooleanValue ALLOW_COUPONS_IN_POUCHES;
     private static final ModConfigSpec.BooleanValue ALLOW_COUPONS_IN_SHULKER_BOXES;
     private static final ModConfigSpec.IntValue CONTAINER_SEARCH_DEPTH;
@@ -114,6 +118,21 @@ public final class CouponConfig {
         DAILY_BOOST_DURATION_MULTIPLIER = builder.comment("Multiplier applied to today's boosted timed coupon duration.")
                 .translation(serverConfigKey("daily_boost", "duration_multiplier"))
                 .defineInRange("durationMultiplier", 2, 1, 16);
+        builder.pop();
+
+        builder.push("advancementRewards");
+        ENABLE_ADVANCEMENT_REWARDS = builder.comment("Gives a configured reward item when a Coupon Codes advancement is completed.")
+                .translation(serverConfigKey("advancement_rewards", "enable"))
+                .define("enableAdvancementRewards", true);
+        ADVANCEMENT_REWARD_ITEM = builder.comment(
+                        "Item id given when a Coupon Codes advancement is completed.",
+                        "Examples: coupon_codes:empty_coupon, coupon_codes:durability_once_coupon, minecraft:diamond_block."
+                )
+                .translation(serverConfigKey("advancement_rewards", "item"))
+                .define("advancementRewardItem", "coupon_codes:empty_coupon", CouponConfig::isValidItemId);
+        ADVANCEMENT_REWARD_COUNT = builder.comment("Number of configured reward items given for each completed Coupon Codes advancement.")
+                .translation(serverConfigKey("advancement_rewards", "count"))
+                .defineInRange("advancementRewardCount", 1, 1, 64);
         builder.pop();
 
         builder.push("containers");
@@ -288,6 +307,18 @@ public final class CouponConfig {
         return message == null || message.isBlank() ? DEFAULT_DAILY_BOOST_ANNOUNCEMENT : message;
     }
 
+    public static boolean areAdvancementRewardsEnabled() {
+        return ENABLE_ADVANCEMENT_REWARDS.get();
+    }
+
+    public static String advancementRewardItem() {
+        return ADVANCEMENT_REWARD_ITEM.get();
+    }
+
+    public static int advancementRewardCount() {
+        return ADVANCEMENT_REWARD_COUNT.get();
+    }
+
     public static int dailyBoostCategoryChance() {
         return DAILY_BOOST_CATEGORY_CHANCE.get();
     }
@@ -436,6 +467,18 @@ public final class CouponConfig {
 
     private static boolean isValidDiscount(Object value) {
         return value instanceof Integer discount && discount >= 1 && discount <= 95;
+    }
+
+    private static boolean isValidItemId(Object value) {
+        if (!(value instanceof String id) || id.isBlank()) {
+            return false;
+        }
+        try {
+            ResourceLocation.parse(id);
+            return true;
+        } catch (RuntimeException exception) {
+            return false;
+        }
     }
 
     private static String configName(Enum<?> value) {

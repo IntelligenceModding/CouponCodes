@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:brewing_stand"
     },
-    "title": "Kitchen Credit",
-    "description": "Apply a coupon to food, brewing, or potion duration.",
+    "title": {
+      "translate": "advancements.coupon_codes.kitchen_credit.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.kitchen_credit.description"
+    },
     "frame": "task"
   },
   "criteria": {

@@ -1,6 +1,7 @@
 package de.doomedartemis.couponcodes;
 
 import de.doomedartemis.couponcodes.common.command.CouponCommands;
+import de.doomedartemis.couponcodes.common.advancement.AdvancementRewards;
 import de.doomedartemis.couponcodes.common.advancement.CouponCriteria;
 import de.doomedartemis.couponcodes.compat.curios.CuriosCompat;
 import de.doomedartemis.couponcodes.common.config.CouponConfig;
@@ -58,5 +59,6 @@ public class CouponCodes {
         NeoForge.EVENT_BUS.addListener(CouponTradeDataManager::onAddReloadListener);
         NeoForge.EVENT_BUS.addListener(CouponTradeDataManager::onWandererTrades);
         NeoForge.EVENT_BUS.addListener(CouponTradeDataManager::onVillagerTrades);
+        NeoForge.EVENT_BUS.addListener(AdvancementRewards::onAdvancementEarned);
     }
 }

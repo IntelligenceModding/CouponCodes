@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:arrow"
     },
-    "title": "One and Done",
-    "description": "Spend a single-use coupon.",
+    "title": {
+      "translate": "advancements.coupon_codes.one_and_done.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.one_and_done.description"
+    },
     "frame": "task"
   },
   "criteria": {

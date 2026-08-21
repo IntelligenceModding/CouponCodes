@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:clock"
     },
-    "title": "Limited-Time Offer",
-    "description": "Activate a timed coupon.",
+    "title": {
+      "translate": "advancements.coupon_codes.limited_time_offer.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.limited_time_offer.description"
+    },
     "frame": "goal"
   },
   "criteria": {

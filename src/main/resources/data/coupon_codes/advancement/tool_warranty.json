@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:diamond_pickaxe"
     },
-    "title": "Extended Warranty",
-    "description": "Prevent durability loss with a coupon.",
+    "title": {
+      "translate": "advancements.coupon_codes.tool_warranty.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.tool_warranty.description"
+    },
     "frame": "goal"
   },
   "criteria": {

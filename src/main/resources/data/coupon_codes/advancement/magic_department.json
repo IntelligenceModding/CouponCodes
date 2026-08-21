@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:enchanted_book"
     },
-    "title": "Magic Department",
-    "description": "Apply any magic category coupon.",
+    "title": {
+      "translate": "advancements.coupon_codes.magic_department.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.magic_department.description"
+    },
     "frame": "task"
   },
   "criteria": {

@@ -3,10 +3,14 @@
   "display": {
     "icon": {
       "count": 1,
-      "id": "minecraft:ender_chest"
+      "id": "coupon_codes:blue_coupon_pouch"
     },
-    "title": "Organized Savings",
-    "description": "Store at least nine coupons in a coupon pouch.",
+    "title": {
+      "translate": "advancements.coupon_codes.organized_savings.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.organized_savings.description"
+    },
     "frame": "goal"
   },
   "criteria": {

@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:netherite_upgrade_smithing_template"
     },
-    "title": "Template Rebate",
-    "description": "Refund a smithing template with a coupon.",
+    "title": {
+      "translate": "advancements.coupon_codes.template_rebate.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.template_rebate.description"
+    },
     "frame": "goal"
   },
   "criteria": {

@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:beacon"
     },
-    "title": "Every Department Signed Off",
-    "description": "Apply a coupon from every discount category.",
+    "title": {
+      "translate": "advancements.coupon_codes.all_departments.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.all_departments.description"
+    },
     "frame": "challenge",
     "hidden": true
   },

@@ -2,10 +2,14 @@
   "display": {
     "icon": {
       "count": 1,
-      "id": "minecraft:map"
+      "id": "coupon_codes:coupon_pouch"
     },
-    "title": "Coupon Codes",
-    "description": "Find your first coupon and start reading the terms.",
+    "title": {
+      "translate": "advancements.coupon_codes.root.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.root.description"
+    },
     "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
     "frame": "task",
     "show_toast": true,

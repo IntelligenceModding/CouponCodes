@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:golden_carrot"
     },
-    "title": "Consumables Department",
-    "description": "Apply any consumables category coupon.",
+    "title": {
+      "translate": "advancements.coupon_codes.consumables_department.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.consumables_department.description"
+    },
     "frame": "task"
   },
   "criteria": {

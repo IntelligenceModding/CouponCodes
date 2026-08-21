@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:brush"
     },
-    "title": "Scratch-Off Savings",
-    "description": "Redeem an empty coupon into a real discount.",
+    "title": {
+      "translate": "advancements.coupon_codes.scratch_off_savings.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.scratch_off_savings.description"
+    },
     "frame": "task"
   },
   "criteria": {

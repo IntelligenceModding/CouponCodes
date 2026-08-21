@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:ender_pearl"
     },
-    "title": "Consumable Clawback",
-    "description": "Refund a spent arrow, rocket, pearl, or bone meal.",
+    "title": {
+      "translate": "advancements.coupon_codes.consumable_clawback.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.consumable_clawback.description"
+    },
     "frame": "task"
   },
   "criteria": {

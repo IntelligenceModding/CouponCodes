@@ -5,8 +5,12 @@
       "count": 1,
       "id": "minecraft:recovery_compass"
     },
-    "title": "Emergency Policy",
-    "description": "Use death drop protection after a fatal mistake.",
+    "title": {
+      "translate": "advancements.coupon_codes.emergency_policy.title"
+    },
+    "description": {
+      "translate": "advancements.coupon_codes.emergency_policy.description"
+    },
     "frame": "goal",
     "hidden": true
   },
