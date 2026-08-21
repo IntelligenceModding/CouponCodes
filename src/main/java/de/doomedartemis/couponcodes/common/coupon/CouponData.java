@@ -705,6 +705,7 @@ public final class CouponData {
         if (openPouch != null
                 && openPouch.isOpenFor(stack)
                 && CouponConfig.allowCouponsInPouches()
+                && openPouch.isAutoActivationEnabled()
                 && depth < CouponConfig.containerSearchDepth()) {
             collectCarriedCoupons(openPouch.pouchItems(), openPouch::saveContents, coupons, depth + 1, null);
         } else if (stack.getItem() instanceof CouponItem coupon && CouponConfig.isCouponEnabled(coupon.effect(), coupon.mode())) {
@@ -781,7 +782,7 @@ public final class CouponData {
 
     private static boolean isCouponContainer(ItemStack stack) {
         if (stack.getItem() instanceof CouponPouchItem) {
-            return CouponConfig.allowCouponsInPouches();
+            return CouponConfig.allowCouponsInPouches() && CouponPouchItem.isAutoActivationEnabled(stack);
         }
         return CouponConfig.allowCouponsInShulkerBoxes() && isShulkerBox(stack);
     }

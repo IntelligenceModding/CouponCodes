@@ -67,6 +67,6 @@ final class CuriosRuntimeCompat {
     }
 
     private static void onCommonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> CuriosApi.registerCurio(ModItems.COUPON_POUCH.get(), COUPON_POUCH_CURIO));
+        event.enqueueWork(() -> ModItems.allCouponPouches().forEach(item -> CuriosApi.registerCurio(item.get(), COUPON_POUCH_CURIO)));
     }
 }

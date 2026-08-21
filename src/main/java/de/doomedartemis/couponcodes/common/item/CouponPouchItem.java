@@ -6,8 +6,11 @@ import de.doomedartemis.couponcodes.common.menu.CouponPouchMenu;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.SimpleMenuProvider;
@@ -16,6 +19,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 
@@ -24,6 +28,7 @@ import java.util.List;
 public class CouponPouchItem extends Item {
     public static final int SLOT_COUNT = 27;
     private static final CustomModelData OPEN_MODEL_DATA = new CustomModelData(1);
+    private static final String AUTO_ACTIVATION_KEY = "AutoActivation";
 
     public CouponPouchItem(Properties properties) {
         super(properties);
@@ -38,6 +43,8 @@ public class CouponPouchItem extends Item {
 
         tooltip.add(Component.translatable("item.coupon_codes.coupon_pouch.count", occupiedSlots(stack), SLOT_COUNT)
                 .withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("item.coupon_codes.coupon_pouch.auto_activation." + (isAutoActivationEnabled(stack) ? "on" : "off"))
+                .withStyle(isAutoActivationEnabled(stack) ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY));
         if (flag.isAdvanced()) {
             tooltip.add(Component.translatable("item.coupon_codes.coupon_pouch.tooltip").withStyle(ChatFormatting.DARK_GRAY));
         }
@@ -69,6 +76,7 @@ public class CouponPouchItem extends Item {
                 (containerId, inventory, menuPlayer) -> CouponPouchMenu.create(containerId, inventory, stack),
                 Component.translatable("container.coupon_codes.coupon_pouch")
         ));
+        playOpenSound(player);
         CouponCriteria.triggerPouchOpened(player);
         return true;
     }
@@ -79,6 +87,30 @@ public class CouponPouchItem extends Item {
         } else {
             stack.remove(DataComponents.CUSTOM_MODEL_DATA);
         }
+    }
+
+    public static boolean isAutoActivationEnabled(ItemStack stack) {
+        return !tag(stack).contains(AUTO_ACTIVATION_KEY) || tag(stack).getBoolean(AUTO_ACTIVATION_KEY);
+    }
+
+    public static void setAutoActivationEnabled(ItemStack stack, boolean enabled) {
+        CompoundTag tag = tag(stack);
+        tag.putBoolean(AUTO_ACTIVATION_KEY, enabled);
+        CustomData.set(DataComponents.CUSTOM_DATA, stack, tag);
+    }
+
+    public static boolean toggleAutoActivation(ItemStack stack) {
+        boolean enabled = !isAutoActivationEnabled(stack);
+        setAutoActivationEnabled(stack, enabled);
+        return enabled;
+    }
+
+    public static void playCloseSound(ServerPlayer player) {
+        player.playNotifySound(SoundEvents.BUNDLE_REMOVE_ONE, SoundSource.PLAYERS, 0.65F, 0.92F);
+    }
+
+    private static void playOpenSound(ServerPlayer player) {
+        player.playNotifySound(SoundEvents.BUNDLE_INSERT, SoundSource.PLAYERS, 0.65F, 1.08F);
     }
 
     private static int occupiedSlots(ItemStack stack) {
@@ -96,5 +128,9 @@ public class CouponPouchItem extends Item {
             }
         }
         return count;
+    }
+
+    private static CompoundTag tag(ItemStack stack) {
+        return stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
     }
 }

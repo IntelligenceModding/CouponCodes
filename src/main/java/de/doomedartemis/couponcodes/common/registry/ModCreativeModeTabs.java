@@ -21,7 +21,7 @@ public final class ModCreativeModeTabs {
                     .icon(() -> ModItems.couponItem(CouponEffectType.DURABILITY, CouponMode.TIMED).get().getDefaultInstance())
                     .title(Component.translatable("itemGroup.coupon_codes"))
                     .displayItems((parameters, output) -> {
-                        output.accept(ModItems.COUPON_POUCH.get());
+                        ModItems.allCouponPouches().forEach(item -> output.accept(item.get()));
                         output.accept(ModItems.EMPTY_COUPON.get());
                         ModItems.allCoupons().stream()
                                 .filter(item -> CouponConfig.isCouponEnabled(item.get().effect(), item.get().mode()))

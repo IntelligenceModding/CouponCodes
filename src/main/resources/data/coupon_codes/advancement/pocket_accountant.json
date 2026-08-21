@@ -15,7 +15,7 @@
       "conditions": {
         "items": [
           {
-            "items": "coupon_codes:coupon_pouch"
+            "items": "#coupon_codes:coupon_pouches"
           }
         ]
       }

@@ -1,0 +1,40 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_coupon_pouch": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "#coupon_codes:coupon_pouches"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_coupon_pouch"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "coupon_codes:coupon_pouch_dyeing/white",
+      "coupon_codes:coupon_pouch_dyeing/orange",
+      "coupon_codes:coupon_pouch_dyeing/magenta",
+      "coupon_codes:coupon_pouch_dyeing/light_blue",
+      "coupon_codes:coupon_pouch_dyeing/yellow",
+      "coupon_codes:coupon_pouch_dyeing/lime",
+      "coupon_codes:coupon_pouch_dyeing/pink",
+      "coupon_codes:coupon_pouch_dyeing/gray",
+      "coupon_codes:coupon_pouch_dyeing/light_gray",
+      "coupon_codes:coupon_pouch_dyeing/cyan",
+      "coupon_codes:coupon_pouch_dyeing/purple",
+      "coupon_codes:coupon_pouch_dyeing/blue",
+      "coupon_codes:coupon_pouch_dyeing/brown",
+      "coupon_codes:coupon_pouch_dyeing/green",
+      "coupon_codes:coupon_pouch_dyeing/red",
+      "coupon_codes:coupon_pouch_dyeing/black"
+    ]
+  }
+}

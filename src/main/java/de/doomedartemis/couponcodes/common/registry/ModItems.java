@@ -9,6 +9,7 @@ import de.doomedartemis.couponcodes.common.item.CouponItem;
 import de.doomedartemis.couponcodes.common.item.CouponPouchItem;
 import de.doomedartemis.couponcodes.common.item.EmptyCouponItem;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.neoforged.bus.api.IEventBus;
@@ -16,6 +17,7 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,12 +37,38 @@ public final class ModItems {
             new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)
     );
 
+    private static final List<String> COUPON_POUCH_COLORS = List.of(
+            "white",
+            "orange",
+            "magenta",
+            "light_blue",
+            "yellow",
+            "lime",
+            "pink",
+            "gray",
+            "light_gray",
+            "cyan",
+            "purple",
+            "blue",
+            "brown",
+            "green",
+            "red",
+            "black"
+    );
+    private static final Map<String, DeferredItem<CouponPouchItem>> COLORED_COUPON_POUCHES = new LinkedHashMap<>();
     private static final Map<CouponEffectType, Map<CouponMode, DeferredItem<CouponItem>>> COUPONS = new EnumMap<>(CouponEffectType.class);
 
     private ModItems() {
     }
 
     static {
+        for (String color : COUPON_POUCH_COLORS) {
+            COLORED_COUPON_POUCHES.put(color, ITEMS.registerItem(
+                    color + "_coupon_pouch",
+                    CouponPouchItem::new,
+                    new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)
+            ));
+        }
         for (CouponEffectType effect : CouponEffectType.values()) {
             EnumMap<CouponMode, DeferredItem<CouponItem>> byMode = new EnumMap<>(CouponMode.class);
             for (CouponMode mode : CouponMode.values()) {
@@ -62,6 +90,18 @@ public final class ModItems {
         return COUPONS.values().stream()
                 .flatMap(byMode -> byMode.values().stream())
                 .toList();
+    }
+
+    public static List<DeferredItem<CouponPouchItem>> allCouponPouches() {
+        return java.util.stream.Stream.concat(
+                        java.util.stream.Stream.of(COUPON_POUCH),
+                        COLORED_COUPON_POUCHES.values().stream()
+                )
+                .toList();
+    }
+
+    public static Optional<DeferredItem<CouponPouchItem>> coloredCouponPouch(DyeColor color) {
+        return Optional.ofNullable(COLORED_COUPON_POUCHES.get(color.getName()));
     }
 
     public static Optional<DeferredItem<CouponItem>> randomCoupon(RandomSource random) {

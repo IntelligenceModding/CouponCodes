@@ -31,6 +31,10 @@ public final class ClientModEvents {
         event.register(OPEN_COUPON_POUCH);
     }
 
+    public static boolean matchesOpenCouponPouchKey(int keyCode, int scanCode) {
+        return OPEN_COUPON_POUCH.matches(keyCode, scanCode);
+    }
+
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.getConnection() == null || minecraft.screen != null) {

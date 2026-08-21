@@ -11,6 +11,7 @@ import de.doomedartemis.couponcodes.common.config.CouponConfig;
 import de.doomedartemis.couponcodes.common.coupon.CouponCategory;
 import de.doomedartemis.couponcodes.common.coupon.CouponEffectType;
 import de.doomedartemis.couponcodes.common.coupon.CouponMode;
+import de.doomedartemis.couponcodes.common.item.CouponPouchItem;
 import de.doomedartemis.couponcodes.common.registry.ModItems;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -360,7 +361,7 @@ public class CouponLootDataManager extends SimpleJsonResourceReloadListener {
             if (item == ModItems.EMPTY_COUPON.get()) {
                 return CouponConfig.canRollEmptyCoupons();
             }
-            if (item == ModItems.COUPON_POUCH.get()) {
+            if (item instanceof CouponPouchItem) {
                 return CouponConfig.areCouponPouchesEnabled();
             }
             return true;

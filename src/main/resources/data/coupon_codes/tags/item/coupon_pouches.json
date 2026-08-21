@@ -1,0 +1,21 @@
+{
+  "values": [
+    "coupon_codes:coupon_pouch",
+    "coupon_codes:white_coupon_pouch",
+    "coupon_codes:orange_coupon_pouch",
+    "coupon_codes:magenta_coupon_pouch",
+    "coupon_codes:light_blue_coupon_pouch",
+    "coupon_codes:yellow_coupon_pouch",
+    "coupon_codes:lime_coupon_pouch",
+    "coupon_codes:pink_coupon_pouch",
+    "coupon_codes:gray_coupon_pouch",
+    "coupon_codes:light_gray_coupon_pouch",
+    "coupon_codes:cyan_coupon_pouch",
+    "coupon_codes:purple_coupon_pouch",
+    "coupon_codes:blue_coupon_pouch",
+    "coupon_codes:brown_coupon_pouch",
+    "coupon_codes:green_coupon_pouch",
+    "coupon_codes:red_coupon_pouch",
+    "coupon_codes:black_coupon_pouch"
+  ]
+}

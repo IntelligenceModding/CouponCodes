@@ -14,6 +14,6 @@ final class CuriosClientRuntimeCompat {
     }
 
     private static void onClientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> CuriosRendererRegistry.register(ModItems.COUPON_POUCH.get(), CouponPouchCurioRenderer::new));
+        event.enqueueWork(() -> ModItems.allCouponPouches().forEach(item -> CuriosRendererRegistry.register(item.get(), CouponPouchCurioRenderer::new)));
     }
 }

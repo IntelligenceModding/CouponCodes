@@ -171,6 +171,8 @@
         "minecraft:chests/ruined_portal"
       ],
       "entries": [
+        {"type": "item", "item": "coupon_codes:black_coupon_pouch", "weight": 1},
+        {"type": "item", "item": "coupon_codes:red_coupon_pouch", "weight": 1},
         {"type": "coupon_set", "effect": "brewing_ingredient", "weight": 13},
         {"type": "coupon_set", "effect": "potion_duration", "weight": 10},
         {"type": "coupon_set", "effect": "ender_pearl", "weight": 8},
@@ -184,6 +186,8 @@
       "loot_tables": ["minecraft:chests/woodland_mansion"],
       "entries": [
         {"type": "item", "item": "coupon_codes:coupon_pouch", "weight": 3},
+        {"type": "item", "item": "coupon_codes:brown_coupon_pouch", "weight": 1},
+        {"type": "item", "item": "coupon_codes:green_coupon_pouch", "weight": 1},
         {"type": "coupon_set", "effect": "totem", "weight": 12},
         {"type": "coupon_set", "effect": "death_drop", "weight": 8},
         {"type": "coupon_set", "effect": "villager_trade", "weight": 5},
@@ -199,6 +203,8 @@
         "minecraft:chests/bastion_hoglin_stable"
       ],
       "entries": [
+        {"type": "item", "item": "coupon_codes:black_coupon_pouch", "weight": 1},
+        {"type": "item", "item": "coupon_codes:red_coupon_pouch", "weight": 1},
         {"type": "coupon_set", "effect": "smithing_template", "weight": 12},
         {"type": "coupon_set", "effect": "repair_material", "weight": 9},
         {"type": "coupon_set", "effect": "durability", "weight": 7},
@@ -213,6 +219,8 @@
       "loot_tables": ["minecraft:chests/bastion_treasure"],
       "entries": [
         {"type": "item", "item": "coupon_codes:coupon_pouch", "weight": 4},
+        {"type": "item", "item": "coupon_codes:black_coupon_pouch", "weight": 1},
+        {"type": "item", "item": "coupon_codes:red_coupon_pouch", "weight": 1},
         {"type": "coupon_set", "effect": "smithing_template", "weight": 16},
         {"type": "coupon_set", "effect": "death_drop", "weight": 10},
         {"type": "coupon_set", "effect": "repair_material", "weight": 9},

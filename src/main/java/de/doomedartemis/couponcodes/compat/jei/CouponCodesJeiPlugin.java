@@ -6,14 +6,25 @@ import de.doomedartemis.couponcodes.common.coupon.CouponMode;
 import de.doomedartemis.couponcodes.common.registry.ModItems;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.registration.IIngredientAliasRegistration;
 import mezz.jei.api.registration.IModInfoRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @JeiPlugin
@@ -32,14 +43,15 @@ public final class CouponCodesJeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
+        registration.addRecipes(RecipeTypes.CRAFTING, couponPouchDyeingRecipes());
         registration.addItemStackInfo(
                 ModItems.EMPTY_COUPON.get().getDefaultInstance(),
                 Component.translatable("jei.coupon_codes.empty_coupon")
         );
-        registration.addItemStackInfo(
-                ModItems.COUPON_POUCH.get().getDefaultInstance(),
+        ModItems.allCouponPouches().forEach(item -> registration.addItemStackInfo(
+                item.get().getDefaultInstance(),
                 Component.translatable("jei.coupon_codes.coupon_pouch")
-        );
+        ));
 
         for (CouponEffectType effect : CouponEffectType.values()) {
             for (CouponMode mode : CouponMode.values()) {
@@ -58,8 +70,8 @@ public final class CouponCodesJeiPlugin implements IModPlugin {
     public void registerIngredientAliases(IIngredientAliasRegistration registration) {
         addAliases(registration, ModItems.EMPTY_COUPON.get().getDefaultInstance(),
                 "random coupon");
-        addAliases(registration, ModItems.COUPON_POUCH.get().getDefaultInstance(),
-                "coupon storage");
+        ModItems.allCouponPouches().forEach(item -> addAliases(registration, item.get().getDefaultInstance(),
+                "coupon storage"));
 
         for (CouponEffectType effect : CouponEffectType.values()) {
             for (CouponMode mode : CouponMode.values()) {
@@ -104,5 +116,37 @@ public final class CouponCodesJeiPlugin implements IModPlugin {
 
     private static void addAliases(IIngredientAliasRegistration registration, ItemStack stack, List<String> aliases) {
         registration.addAliases(VanillaTypes.ITEM_STACK, stack, aliases);
+    }
+
+    private static List<RecipeHolder<CraftingRecipe>> couponPouchDyeingRecipes() {
+        List<RecipeHolder<CraftingRecipe>> recipes = new ArrayList<>();
+        for (DyeColor color : DyeColor.values()) {
+            ModItems.coloredCouponPouch(color).ifPresent(target -> {
+                Item targetItem = target.get().asItem();
+                NonNullList<Ingredient> ingredients = NonNullList.of(
+                        Ingredient.EMPTY,
+                        Ingredient.of(ModItems.allCouponPouches().stream()
+                                .map(item -> item.get().asItem())
+                                .filter(item -> item != targetItem)
+                                .map(Item::getDefaultInstance)),
+                        Ingredient.of(DyeItem.byColor(color))
+                );
+                ShapelessRecipe recipe = new ShapelessRecipe(
+                        "coupon_pouch_dyeing",
+                        CraftingBookCategory.MISC,
+                        target.get().getDefaultInstance(),
+                        ingredients
+                );
+                recipes.add(new RecipeHolder<>(
+                        dyeingRecipeId(color),
+                        recipe
+                ));
+            });
+        }
+        return recipes;
+    }
+
+    private static ResourceLocation dyeingRecipeId(DyeColor color) {
+        return ResourceLocation.fromNamespaceAndPath(CouponCodes.MOD_ID, "coupon_pouch_dyeing/" + color.getName());
     }
 }

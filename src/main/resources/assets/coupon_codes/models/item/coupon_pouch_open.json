@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "minecraft:item/bundle"
-  }
+    "textures":  {
+                     "layer0":  "coupon_codes:item/coupon_pouch_open_back",
+                     "layer1":  "coupon_codes:item/coupon_pouch_open_front"
+                 },
+    "parent":  "minecraft:item/generated"
 }

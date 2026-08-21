@@ -20,11 +20,14 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class CouponPouchMenu extends AbstractContainerMenu {
@@ -41,6 +44,8 @@ public class CouponPouchMenu extends AbstractContainerMenu {
     private final ItemStack pouch;
     private final Container pouchContainer;
     private final boolean clientSideMenu;
+    private final DataSlot autoActivationData;
+    private int clientAutoActivation = 1;
 
     public static CouponPouchMenu create(int containerId, Inventory playerInventory, ItemStack pouch) {
         return new CouponPouchMenu(containerId, playerInventory, pouch, new PouchContainer(pouch), false);
@@ -68,15 +73,51 @@ public class CouponPouchMenu extends AbstractContainerMenu {
         }
     }
 
+    public boolean isAutoActivationEnabled() {
+        return autoActivationData.get() != 0;
+    }
+
+    public void toggleAutoActivation() {
+        if (!clientSideMenu) {
+            CouponPouchItem.toggleAutoActivation(pouch);
+            broadcastChanges();
+        }
+    }
+
+    public void sortPouchItems() {
+        if (clientSideMenu) {
+            return;
+        }
+
+        List<ItemStack> stacks = new ArrayList<>(POUCH_SLOT_COUNT);
+        for (int slot = 0; slot < POUCH_SLOT_COUNT; slot++) {
+            ItemStack stack = pouchContainer.getItem(slot);
+            if (!stack.isEmpty()) {
+                stacks.add(stack.copy());
+            }
+        }
+
+        stacks.sort(CouponPouchMenu::comparePouchStacks);
+        for (int slot = 0; slot < POUCH_SLOT_COUNT; slot++) {
+            ItemStack stack = slot < stacks.size() ? stacks.get(slot) : ItemStack.EMPTY;
+            pouchContainer.setItem(slot, stack);
+            slots.get(slot).setChanged();
+        }
+        saveContainer(pouch, pouchContainer);
+        broadcastChanges();
+    }
+
     private CouponPouchMenu(int containerId, Inventory playerInventory, ItemStack pouch, Container pouchContainer, boolean clientSideMenu) {
         super(ModMenus.COUPON_POUCH.get(), containerId);
         checkContainerSize(pouchContainer, POUCH_SLOT_COUNT);
         this.pouch = pouch;
         this.pouchContainer = pouchContainer;
         this.clientSideMenu = clientSideMenu;
+        this.autoActivationData = clientSideMenu ? clientAutoActivationData() : serverAutoActivationData();
 
         addPouchSlots(pouchContainer);
         addPlayerInventorySlots(playerInventory);
+        addDataSlot(autoActivationData);
         pouchContainer.startOpen(playerInventory.player);
         if (!clientSideMenu) {
             CouponPouchItem.setOpen(pouch, true);
@@ -146,6 +187,7 @@ public class CouponPouchMenu extends AbstractContainerMenu {
             saveContainer(pouch, pouchContainer);
             CouponPouchItem.setOpen(pouch, false);
             if (player instanceof ServerPlayer serverPlayer) {
+                CouponPouchItem.playCloseSound(serverPlayer);
                 CouponCriteria.triggerPouchStocked(serverPlayer, countStoredCoupons());
             }
         }
@@ -175,6 +217,34 @@ public class CouponPouchMenu extends AbstractContainerMenu {
         return !pouch.isEmpty()
                 && pouch.getItem() instanceof CouponPouchItem
                 && (player.getInventory().contains(pouch) || CuriosCompat.isEquipped(player, pouch));
+    }
+
+    private DataSlot serverAutoActivationData() {
+        return new DataSlot() {
+            @Override
+            public int get() {
+                return CouponPouchItem.isAutoActivationEnabled(pouch) ? 1 : 0;
+            }
+
+            @Override
+            public void set(int value) {
+                CouponPouchItem.setAutoActivationEnabled(pouch, value != 0);
+            }
+        };
+    }
+
+    private DataSlot clientAutoActivationData() {
+        return new DataSlot() {
+            @Override
+            public int get() {
+                return clientAutoActivation;
+            }
+
+            @Override
+            public void set(int value) {
+                clientAutoActivation = value;
+            }
+        };
     }
 
     private boolean isRightClickTimedCouponActivation(int slotId, int button, ClickType clickType) {
@@ -238,6 +308,58 @@ public class CouponPouchMenu extends AbstractContainerMenu {
     private static boolean isAllowedCoupon(ItemStack stack) {
         return stack.isEmpty()
                 || (CouponConfig.allowCouponsInPouches() && (stack.getItem() instanceof CouponItem || stack.getItem() instanceof EmptyCouponItem));
+    }
+
+    private static int comparePouchStacks(ItemStack first, ItemStack second) {
+        return Comparator
+                .comparingInt(CouponPouchMenu::sortGroup)
+                .thenComparingInt(CouponPouchMenu::sortCategory)
+                .thenComparingInt(CouponPouchMenu::sortEffect)
+                .thenComparingInt(CouponPouchMenu::sortMode)
+                .thenComparing(Comparator.comparingInt(CouponPouchMenu::sortDiscount).reversed())
+                .thenComparingInt(CouponPouchMenu::sortRemaining)
+                .thenComparingInt(CouponPouchMenu::sortItem)
+                .compare(first, second);
+    }
+
+    private static int sortGroup(ItemStack stack) {
+        if (stack.getItem() instanceof CouponItem) {
+            return 0;
+        }
+        if (stack.getItem() instanceof EmptyCouponItem) {
+            return 1;
+        }
+        return 2;
+    }
+
+    private static int sortCategory(ItemStack stack) {
+        return stack.getItem() instanceof CouponItem coupon ? coupon.effect().category().ordinal() : Integer.MAX_VALUE;
+    }
+
+    private static int sortEffect(ItemStack stack) {
+        return stack.getItem() instanceof CouponItem coupon ? coupon.effect().ordinal() : Integer.MAX_VALUE;
+    }
+
+    private static int sortMode(ItemStack stack) {
+        return stack.getItem() instanceof CouponItem coupon ? coupon.mode().ordinal() : Integer.MAX_VALUE;
+    }
+
+    private static int sortDiscount(ItemStack stack) {
+        return stack.getItem() instanceof CouponItem ? CouponData.discountPercent(stack) : 0;
+    }
+
+    private static int sortRemaining(ItemStack stack) {
+        if (!(stack.getItem() instanceof CouponItem coupon) || !CouponData.isInitialized(stack)) {
+            return Integer.MAX_VALUE;
+        }
+        return switch (coupon.mode()) {
+            case TIMED -> CouponData.secondsRemaining(stack);
+            case SINGLE_USE, USES -> CouponData.usesRemaining(stack, coupon, null);
+        };
+    }
+
+    private static int sortItem(ItemStack stack) {
+        return Item.getId(stack.getItem());
     }
 
     private int countStoredCoupons() {

@@ -13,6 +13,7 @@ import de.doomedartemis.couponcodes.common.registry.ModCreativeModeTabs;
 import de.doomedartemis.couponcodes.common.registry.ModItems;
 import de.doomedartemis.couponcodes.common.registry.ModLootModifiers;
 import de.doomedartemis.couponcodes.common.registry.ModMenus;
+import de.doomedartemis.couponcodes.common.registry.ModRecipeSerializers;
 import de.doomedartemis.couponcodes.common.trade.CouponTradeDataManager;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -32,6 +33,7 @@ public class CouponCodes {
         ModItems.register(modEventBus);
         ModLootModifiers.register(modEventBus);
         ModMenus.register(modEventBus);
+        ModRecipeSerializers.register(modEventBus);
         ModCreativeModeTabs.register(modEventBus);
         NeoForge.EVENT_BUS.addListener(CouponEvents::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(CouponEvents::onPlayerEnchantItem);
