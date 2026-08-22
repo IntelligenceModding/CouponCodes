@@ -249,6 +249,7 @@
   "advancements.coupon_codes.trade_department.title": "Trade Department",
   "advancements.coupon_codes.trade_department.description": "Apply any trade category coupon.",
   "coupon_codes.configuration.title": "%s Configuration",
+  "coupon_codes.configuration.search": "Search",
   "coupon_codes.configuration.section.coupon.codes.client.toml": "Client Settings",
   "coupon_codes.configuration.section.coupon.codes.client.toml.title": "Client Settings",
   "coupon_codes.configuration.section.coupon.codes.server.toml": "Server Settings",

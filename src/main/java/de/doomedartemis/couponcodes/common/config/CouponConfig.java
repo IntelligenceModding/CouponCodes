@@ -15,7 +15,7 @@ import java.util.Map;
 
 public final class CouponConfig {
     public static final ModConfigSpec SPEC;
-    private static final String DEFAULT_DAILY_BOOST_ANNOUNCEMENT = "&6[Coupons]&r &eDaily boost: &b{boost} &7(strength x{strength}, uses x{uses}, duration x{duration})";
+    private static final String DEFAULT_DAILY_BOOST_ANNOUNCEMENT = "&6[Coupon Codes]&r &eDaily boost: &b{boost} &7(strength x{strength}, uses x{uses}, duration x{duration})";
 
     private static final ModConfigSpec.BooleanValue ENABLE_COUPONS;
     private static final ModConfigSpec.BooleanValue ENABLE_EMPTY_COUPON_ROLLS;
@@ -143,7 +143,7 @@ public final class CouponConfig {
                 .define("allowCouponsInPouches", true);
         ALLOW_COUPONS_IN_SHULKER_BOXES = builder.comment("Allows coupons stored in shulker boxes to be found and consumed.")
                 .translation(serverConfigKey("containers", "allow_coupons_in_shulker_boxes"))
-                .define("allowCouponsInShulkerBoxes", false);
+                .define("allowCouponsInShulkerBoxes", true);
         CONTAINER_SEARCH_DEPTH = builder.comment("Maximum nested container depth checked for carried coupons. 0 means only inventory and offhand.")
                 .translation(serverConfigKey("containers", "container_search_depth"))
                 .defineInRange("containerSearchDepth", 1, 0, 3);

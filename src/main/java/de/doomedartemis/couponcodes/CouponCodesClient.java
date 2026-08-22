@@ -2,6 +2,7 @@ package de.doomedartemis.couponcodes;
 
 import de.doomedartemis.couponcodes.client.ClientConfig;
 import de.doomedartemis.couponcodes.client.ClientModEvents;
+import de.doomedartemis.couponcodes.client.SearchableConfigurationSectionScreen;
 import de.doomedartemis.couponcodes.compat.curios.CuriosCompat;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -16,7 +17,11 @@ import net.neoforged.neoforge.common.NeoForge;
 public class CouponCodesClient {
     public CouponCodesClient(IEventBus modEventBus, ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
-        modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        modContainer.registerExtensionPoint(IConfigScreenFactory.class, (container, parent) -> new ConfigurationScreen(
+                container,
+                parent,
+                (screen, type, config, title) -> new SearchableConfigurationSectionScreen(screen, type, config, title)
+        ));
         CuriosCompat.registerClient(modEventBus);
         modEventBus.addListener(ClientModEvents::onRegisterKeyMappings);
         modEventBus.addListener(ClientModEvents::onRegisterItemDecorations);

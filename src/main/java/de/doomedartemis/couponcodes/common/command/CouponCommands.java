@@ -29,11 +29,14 @@ import java.util.Locale;
 import java.util.Optional;
 
 public final class CouponCommands {
+    private static final int MAX_COMMAND_USES = Integer.MAX_VALUE;
+    private static final int MAX_COMMAND_TIMED_SECONDS = Integer.MAX_VALUE / 20;
+
     private static final String[] CATEGORY_NAMES = Arrays.stream(CouponCategory.values())
             .map(CouponCategory::id)
             .toArray(String[]::new);
     private static final String[] EFFECT_NAMES = Arrays.stream(CouponEffectType.values())
-            .map(CouponEffectType::id)
+            .map(CouponEffectType::commandName)
             .toArray(String[]::new);
 
     private CouponCommands() {
@@ -41,9 +44,9 @@ public final class CouponCommands {
 
     public static void register(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
-        dispatcher.register(Commands.literal("coupon_codes")
+        dispatcher.register(Commands.literal("couponcodes")
                 .requires(source -> CouponConfig.areCommandsEnabled())
-                .then(Commands.literal("daily_boost")
+                .then(Commands.literal("dailyboost")
                         .executes(CouponCommands::showDailyBoost))
                 .then(Commands.literal("categories")
                         .executes(CouponCommands::showCategories))
@@ -59,7 +62,7 @@ public final class CouponCommands {
                                 .executes(CouponCommands::inspectPlayers)))
                 .then(Commands.literal("best")
                         .then(bestCouponArguments()))
-                .then(Commands.literal("active_timed")
+                .then(Commands.literal("activetimed")
                         .executes(CouponCommands::showOwnActiveTimedCoupon)
                         .then(Commands.literal("category")
                                 .then(activeTimedCategoryArguments()))
@@ -69,23 +72,23 @@ public final class CouponCommands {
                 .then(Commands.literal("give")
                         .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(effectArguments()))
-                .then(Commands.literal("give_category")
+                .then(Commands.literal("givecategory")
                         .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(categoryGiveArguments()))
-                .then(Commands.literal("give_all")
+                .then(Commands.literal("giveall")
                         .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("targets", EntityArgument.players())
-                                .then(Commands.argument("discount_percent", IntegerArgumentType.integer(1, 95))
+                                .then(Commands.argument("discountpercent", IntegerArgumentType.integer(1, 95))
                                         .executes(context -> giveAllCoupons(
                                                 context,
-                                                IntegerArgumentType.getInteger(context, "discount_percent"),
+                                                IntegerArgumentType.getInteger(context, "discountpercent"),
                                                 1))
                                         .then(Commands.argument("count", IntegerArgumentType.integer(1, 64))
                                                 .executes(context -> giveAllCoupons(
                                                         context,
-                                                        IntegerArgumentType.getInteger(context, "discount_percent"),
+                                                        IntegerArgumentType.getInteger(context, "discountpercent"),
                                                         IntegerArgumentType.getInteger(context, "count")))))))
-                .then(Commands.literal("give_random")
+                .then(Commands.literal("giverandom")
                         .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.literal("category")
                                 .then(randomCategoryArguments()))
@@ -93,19 +96,19 @@ public final class CouponCommands {
                                 .executes(context -> giveRandomCoupons(context, 1))
                                 .then(Commands.argument("count", IntegerArgumentType.integer(1, 2304))
                                         .executes(context -> giveRandomCoupons(context, IntegerArgumentType.getInteger(context, "count"))))))
-                .then(Commands.literal("give_empty")
+                .then(Commands.literal("giveempty")
                         .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("targets", EntityArgument.players())
                                 .executes(context -> giveSimpleItem(context, ModItems.EMPTY_COUPON.get().getDefaultInstance(), "empty coupon", 1))
                                 .then(Commands.argument("count", IntegerArgumentType.integer(1, 2304))
                                         .executes(context -> giveSimpleItem(context, ModItems.EMPTY_COUPON.get().getDefaultInstance(), "empty coupon", IntegerArgumentType.getInteger(context, "count"))))))
-                .then(Commands.literal("give_pouch")
+                .then(Commands.literal("givepouch")
                         .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("targets", EntityArgument.players())
                                 .executes(context -> giveSimpleItem(context, ModItems.COUPON_POUCH.get().getDefaultInstance(), "coupon pouch", 1))
                                 .then(Commands.argument("count", IntegerArgumentType.integer(1, 64))
                                         .executes(context -> giveSimpleItem(context, ModItems.COUPON_POUCH.get().getDefaultInstance(), "coupon pouch", IntegerArgumentType.getInteger(context, "count"))))))
-                .then(Commands.literal("clear_timed")
+                .then(Commands.literal("cleartimed")
                         .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(clearTimedArguments())));
     }
@@ -113,7 +116,7 @@ public final class CouponCommands {
     private static com.mojang.brigadier.builder.ArgumentBuilder<CommandSourceStack, ?> effectArguments() {
         var targets = Commands.argument("targets", EntityArgument.players());
         for (CouponEffectType effect : CouponEffectType.values()) {
-            targets.then(effect(effect.id(), effect));
+            targets.then(effect(effect.commandName(), effect));
         }
         return targets;
     }
@@ -158,7 +161,7 @@ public final class CouponCommands {
         var targets = Commands.argument("targets", EntityArgument.players())
                 .executes(context -> clearTimedCoupons(context, (CouponEffectType) null));
         for (CouponEffectType effect : CouponEffectType.values()) {
-            targets.then(Commands.literal(effect.id())
+            targets.then(Commands.literal(effect.commandName())
                     .executes(context -> clearTimedCoupons(context, effect)));
         }
         targets.then(Commands.literal("category")
@@ -175,15 +178,15 @@ public final class CouponCommands {
     private static com.mojang.brigadier.builder.ArgumentBuilder<CommandSourceStack, ?> effect(String name, CouponEffectType effect) {
         return Commands.literal(name)
                 .then(mode("once", effect, CouponMode.SINGLE_USE, 1, 1))
-                .then(mode("multi", effect, CouponMode.USES, 1, 64))
-                .then(mode("timed", effect, CouponMode.TIMED, 1, 3600));
+                .then(mode("multi", effect, CouponMode.USES, 1, MAX_COMMAND_USES))
+                .then(mode("timed", effect, CouponMode.TIMED, 1, MAX_COMMAND_TIMED_SECONDS));
     }
 
     private static com.mojang.brigadier.builder.ArgumentBuilder<CommandSourceStack, ?> category(String name, CouponCategory category) {
         return Commands.literal(name)
                 .then(mode("once", category, CouponMode.SINGLE_USE, 1, 1))
-                .then(mode("multi", category, CouponMode.USES, 1, 64))
-                .then(mode("timed", category, CouponMode.TIMED, 1, 3600));
+                .then(mode("multi", category, CouponMode.USES, 1, MAX_COMMAND_USES))
+                .then(mode("timed", category, CouponMode.TIMED, 1, MAX_COMMAND_TIMED_SECONDS));
     }
 
     private static com.mojang.brigadier.builder.ArgumentBuilder<CommandSourceStack, ?> mode(
@@ -193,12 +196,12 @@ public final class CouponCommands {
             int minValue,
             int maxValue
     ) {
-        var discountArgument = Commands.argument("discount_percent", IntegerArgumentType.integer(1, 95))
+        var discountArgument = Commands.argument("discountpercent", IntegerArgumentType.integer(1, 95))
                 .executes(context -> giveCoupons(
                         context,
                         effect,
                         mode,
-                        IntegerArgumentType.getInteger(context, "discount_percent"),
+                        IntegerArgumentType.getInteger(context, "discountpercent"),
                         defaultValue(effect, mode),
                         1));
 
@@ -208,7 +211,7 @@ public final class CouponCommands {
                             context,
                             effect,
                             mode,
-                            IntegerArgumentType.getInteger(context, "discount_percent"),
+                            IntegerArgumentType.getInteger(context, "discountpercent"),
                             defaultValue(effect, mode),
                             IntegerArgumentType.getInteger(context, "count"))));
         } else {
@@ -218,7 +221,7 @@ public final class CouponCommands {
                             context,
                             effect,
                             mode,
-                            IntegerArgumentType.getInteger(context, "discount_percent"),
+                            IntegerArgumentType.getInteger(context, "discountpercent"),
                             IntegerArgumentType.getInteger(context, valueArgumentName),
                             1))
                     .then(Commands.argument("count", IntegerArgumentType.integer(1, 2304))
@@ -226,7 +229,7 @@ public final class CouponCommands {
                                     context,
                                     effect,
                                     mode,
-                                    IntegerArgumentType.getInteger(context, "discount_percent"),
+                                    IntegerArgumentType.getInteger(context, "discountpercent"),
                                     IntegerArgumentType.getInteger(context, valueArgumentName),
                                     IntegerArgumentType.getInteger(context, "count")))));
         }
@@ -241,12 +244,12 @@ public final class CouponCommands {
             int minValue,
             int maxValue
     ) {
-        var discountArgument = Commands.argument("discount_percent", IntegerArgumentType.integer(1, 95))
+        var discountArgument = Commands.argument("discountpercent", IntegerArgumentType.integer(1, 95))
                 .executes(context -> giveCategoryCoupons(
                         context,
                         category,
                         mode,
-                        IntegerArgumentType.getInteger(context, "discount_percent"),
+                        IntegerArgumentType.getInteger(context, "discountpercent"),
                         null,
                         1));
 
@@ -256,7 +259,7 @@ public final class CouponCommands {
                             context,
                             category,
                             mode,
-                            IntegerArgumentType.getInteger(context, "discount_percent"),
+                            IntegerArgumentType.getInteger(context, "discountpercent"),
                             null,
                             IntegerArgumentType.getInteger(context, "count"))));
         } else {
@@ -266,7 +269,7 @@ public final class CouponCommands {
                             context,
                             category,
                             mode,
-                            IntegerArgumentType.getInteger(context, "discount_percent"),
+                            IntegerArgumentType.getInteger(context, "discountpercent"),
                             IntegerArgumentType.getInteger(context, valueArgumentName),
                             1))
                     .then(Commands.argument("count", IntegerArgumentType.integer(1, 2304))
@@ -274,7 +277,7 @@ public final class CouponCommands {
                                     context,
                                     category,
                                     mode,
-                                    IntegerArgumentType.getInteger(context, "discount_percent"),
+                                    IntegerArgumentType.getInteger(context, "discountpercent"),
                                     IntegerArgumentType.getInteger(context, valueArgumentName),
                                     IntegerArgumentType.getInteger(context, "count")))));
         }
@@ -294,18 +297,16 @@ public final class CouponCommands {
         }
 
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(context, "targets");
-        int configuredValue = configuredValue(effect, mode, value);
-
         for (ServerPlayer target : targets) {
             for (int i = 0; i < count; i++) {
                 ItemStack coupon = new ItemStack(ModItems.couponItem(effect, mode).get());
-                CouponData.set(coupon, mode, discountPercent, configuredValue, false);
+                CouponData.set(coupon, mode, discountPercent, value, false);
                 giveOrDrop(target, coupon);
             }
         }
 
         context.getSource().sendSuccess(
-                () -> Component.literal("Gave " + count + " " + format(effect, mode, discountPercent, configuredValue) + " coupon(s) to " + targets.size() + " player(s)."),
+                () -> Component.literal("Gave " + count + " " + format(effect, mode, discountPercent, value) + " coupon(s) to " + targets.size() + " player(s)."),
                 true
         );
         return targets.size() * count;
@@ -325,12 +326,12 @@ public final class CouponCommands {
                 if (effect.category() != category || !CouponConfig.isCouponEnabled(effect, mode)) {
                     continue;
                 }
-                int configuredValue = value == null
+                int couponValue = value == null
                         ? defaultValue(effect, mode)
-                        : configuredValue(effect, mode, value);
+                        : value;
                 for (int i = 0; i < count; i++) {
                     ItemStack coupon = new ItemStack(ModItems.couponItem(effect, mode).get());
-                    CouponData.set(coupon, mode, discountPercent, configuredValue, false);
+                    CouponData.set(coupon, mode, discountPercent, couponValue, false);
                     giveOrDrop(target, coupon);
                     given++;
                 }
@@ -700,7 +701,7 @@ public final class CouponCommands {
     }
 
     private static String format(CouponEffectType effect, CouponMode mode, int discountPercent, int value) {
-        String effectName = effect.id();
+        String effectName = effect.commandName();
         String modeName = mode.commandName();
         if (mode == CouponMode.TIMED) {
             return discountPercent + "% " + effectName + " " + modeName + " for " + value + "s";
@@ -720,11 +721,13 @@ public final class CouponCommands {
     }
 
     private static CouponEffectType parseEffectArgument(CommandContext<CommandSourceStack> context) {
-        try {
-            return CouponEffectType.valueOf(StringArgumentType.getString(context, "effect").toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException exception) {
-            return null;
+        String value = StringArgumentType.getString(context, "effect");
+        for (CouponEffectType effect : CouponEffectType.values()) {
+            if (effect.commandName().equals(value)) {
+                return effect;
+            }
         }
+        return null;
     }
 
     private static String modeName(CouponMode mode) {
@@ -736,20 +739,6 @@ public final class CouponCommands {
             case SINGLE_USE -> 1;
             case USES -> CouponConfig.multiUseDefaultUses(effect);
             case TIMED -> CouponConfig.timedDefaultSeconds(effect);
-        };
-    }
-
-    private static int configuredValue(CouponEffectType effect, CouponMode mode, int value) {
-        return switch (mode) {
-            case SINGLE_USE -> 1;
-            case USES -> {
-                CouponConfig.IntRange range = CouponConfig.multiUseRange(effect);
-                yield net.minecraft.util.Mth.clamp(value, range.min(), range.max());
-            }
-            case TIMED -> {
-                CouponConfig.IntRange range = CouponConfig.timedSecondsRange(effect);
-                yield net.minecraft.util.Mth.clamp(value, range.min(), range.max());
-            }
         };
     }
 

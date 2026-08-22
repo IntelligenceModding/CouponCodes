@@ -39,6 +39,10 @@ public enum CouponEffectType {
         return name().toLowerCase(Locale.ROOT);
     }
 
+    public String commandName() {
+        return id().replace("_", "");
+    }
+
     public String displayName() {
         return CouponCategory.displayName(id());
     }

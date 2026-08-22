@@ -47,7 +47,7 @@ config/coupon_codes-client.toml
 | `advancementRewards.advancementRewardItem` | `coupon_codes:empty_coupon` |
 | `advancementRewards.advancementRewardCount` | `1` |
 | `containers.allowCouponsInPouches` | `true` |
-| `containers.allowCouponsInShulkerBoxes` | `false` |
+| `containers.allowCouponsInShulkerBoxes` | `true` |
 | `containers.containerSearchDepth` | `1` |
 | `timed.allowInventoryActivation` | `true` |
 | `timed.allowPouchActivation` | `true` |
@@ -77,7 +77,7 @@ values.multiUseCounts.<effect> = [min, default, max]
 values.timedSeconds.<effect> = [min, default, max]
 ```
 
-Random rolls choose between the effect's min and max. Commands that omit `<uses>` or `<seconds>` use the effect's default. Commands that provide `<uses>` or `<seconds>` are clamped to the target effect's min and max, so high-impact coupons such as death protection cannot be created with extremely long durations by accident.
+Random rolls choose between the effect's min and max. Commands that omit `<uses>` or `<seconds>` use the effect's default. Admin commands that provide `<uses>` or `<seconds>` write that exact value to the coupon instead of clamping to these ranges.
 
 | Effect | Reusable uses | Timed seconds |
 | --- | --- | --- |
@@ -120,12 +120,12 @@ Random rolls choose between the effect's min and max. Commands that omit `<uses>
 Default message:
 
 ```text
-&6[Coupons]&r &eDaily boost: &b{boost} &7(strength x{strength}, uses x{uses}, duration x{duration})
+&6[Coupon Codes]&r &eDaily boost: &b{boost} &7(strength x{strength}, uses x{uses}, duration x{duration})
 ```
 
 ## Command Interactions
 
-`general.enableCommands = false` disables the whole `/coupon_codes` command tree.
+`general.enableCommands = false` disables the whole `/couponcodes` command tree.
 
 `general.enableCoupons = false` prevents coupon effects and blocks exact coupon generation through the give commands.
 
@@ -133,7 +133,7 @@ Default message:
 
 Random coupon commands use `rollWeights.common`, `rollWeights.uncommon`, `rollWeights.rare`, and `rollWeights.epic`.
 
-Exact command-created coupons use the discount, uses, and seconds supplied by the command. Reusable uses and timed seconds are clamped to the target effect's `values.multiUseCounts.<effect>` or `values.timedSeconds.<effect>` range.
+Exact command-created coupons use the discount, uses, and seconds supplied by the command. Reusable uses and timed seconds supplied by admin commands are not clamped to the target effect's `values.multiUseCounts.<effect>` or `values.timedSeconds.<effect>` range.
 
 If a command omits reusable uses or timed seconds, it uses the target effect's configured default. Category and all-coupon commands apply each effect's own default.
 
