@@ -1,17 +1,19 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/IntelligenceModding/Coupons/refs/heads/assets/Project%20Title.png" alt="Coupon Codes" width="900">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/CouponCodes/refs/heads/assets/Project%20Title.png" alt="Coupon Codes" width="900">
 </p>
 
 <p align="center">
-  Coupon Codes adds collectible discount coupons to Minecraft for players who want small, useful bonuses tied directly into normal survival actions.
+  Coupon Codes adds collectible discount coupons to Minecraft that provide useful bonuses tied directly into normal survival gameplay.
 </p>
 
 <p align="center">
-  Find, trade, roll, store, activate, and spend coupons for equipment, magic, trades, consumables, mobility, and combat. Coupons can refund resources, reduce costs, protect gear, extend timed benefits, and make everyday Minecraft interactions feel a little more rewarding.
+  Find, trade, roll, store, activate, and spend coupons for equipment, magic, trades, consumables, mobility, and combat. Coupons can refund resources, reduce costs, protect gear, extend timed benefits, and make everyday Minecraft interactions more rewarding.
 </p>
 
+<br>
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/IntelligenceModding/Coupons/refs/heads/assets/Compatibility.png" alt="Compatibility" height="75">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/CouponCodes/refs/heads/assets/Compatibility.png" alt="Compatibility" height="75">
 </p>
 
 <p align="center">
@@ -28,8 +30,10 @@
   Install JEI or REI alongside Coupon Codes if you want in-game information pages. Install Curios if you want coupon pouches to work from an equipped belt slot.
 </p>
 
+<br>
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/IntelligenceModding/Coupons/refs/heads/assets/Features.png" alt="Features" height="75">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/CouponCodes/refs/heads/assets/Features.png" alt="Features" height="75">
 </p>
 
 <p align="center">
@@ -60,8 +64,36 @@
   <a href="CONFIG.md"><img src="https://img.shields.io/badge/Config-Reference-2D6CDF?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Coupon Codes config reference"></a>
 </p>
 
+<br>
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/IntelligenceModding/Coupons/refs/heads/assets/Community.png" alt="Community" height="75">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/CouponCodes/refs/heads/assets/Resources.png" alt="Resources" height="75">
+</p>
+
+<p align="center">
+  Bug reports, feature requests, version support requests, and contributions are welcome.
+</p>
+
+<p align="center">
+  Please read the contribution guidelines before submitting changes and use the appropriate issue form when reporting problems or suggesting improvements.
+</p>
+
+<p align="center">
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/GitHub-Contributing%20Guidelines-181717?style=for-the-badge&logo=github&logoColor=white" alt="Contribution Guidelines"></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://github.com/IntelligenceModding/CouponCodes/issues/new/choose"><img src="https://img.shields.io/badge/GitHub-Issues-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Issues"></a>
+</p>
+
+<p align="center">
+  <a href="SUPPORT.md"><img src="https://img.shields.io/badge/GitHub-Support-181717?style=for-the-badge&logo=github&logoColor=white" alt="Support"></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/GitHub-Code%20of%20Conduct-181717?style=for-the-badge&logo=github&logoColor=white" alt="Code of Conduct"></a>
+</p>
+
+<br>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/CouponCodes/refs/heads/assets/Community.png" alt="Community" height="75">
 </p>
 
 <p align="center">
@@ -90,8 +122,10 @@
   <a href="https://github.com/IntelligenceModding"><img src="https://img.shields.io/badge/GitHub-IntelligenceModding-181717?style=for-the-badge&logo=github&logoColor=white" alt="Intelligence Modding on GitHub"></a>
 </p>
 
+<br>
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/IntelligenceModding/Coupons/refs/heads/assets/Acknowledgments.png" alt="Acknowledgments" height="75">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/CouponCodes/refs/heads/assets/Acknowledgments.png" alt="Acknowledgments" height="75">
 </p>
 
 <p align="center">
@@ -102,8 +136,8 @@
   &bull; The NeoForged team for NeoForge and its documentation<br>
   &bull; The Minecraft modding community for examples, tools, and support<br>
   &bull; The Intelligence Modding community for feedback, testing, and ideas<br>
-  &bull; Everyone who reports issues, suggests improvements, or includes the mod in their worlds or modpacks<br>
-  &bull; The JEI, REI, and Curios projects for optional compatibility APIs
+  &bull; Everyone who reports issues, suggests improvements, or includes Coupon Codes in their worlds, servers, or modpacks<br>
+  &bull; The JEI, REI, and Curios projects for their optional compatibility APIs
 </p>
 
 <p align="center">
