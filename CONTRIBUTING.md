@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/IntelligenceModding/CouponCodes/refs/heads/assets/Project%20Title.png" alt="Coupon Codes" height="139">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/CouponCodes/refs/heads/assets/Project%20Title.png" alt="Coupon Codes" width="900">
 </p>
 
 <h1 align="center">Contributing to Coupon Codes</h1>
