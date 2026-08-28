@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "coupon_codes:item/repair_material_once_coupon"
+  }
+}

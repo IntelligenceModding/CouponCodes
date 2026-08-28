@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "coupon_codes:item/fishing_multi_coupon"
+  }
+}

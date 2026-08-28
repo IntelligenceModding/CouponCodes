@@ -27,7 +27,7 @@ import java.util.List;
 
 public class CouponPouchItem extends Item {
     public static final int SLOT_COUNT = 27;
-    private static final CustomModelData OPEN_MODEL_DATA = new CustomModelData(1);
+    private static final CustomModelData OPEN_MODEL_DATA = new CustomModelData(List.of(1.0F), List.of(), List.of(), List.of());
     private static final String AUTO_ACTIVATION_KEY = "AutoActivation";
 
     public CouponPouchItem(Properties properties) {

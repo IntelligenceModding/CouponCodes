@@ -3,6 +3,7 @@ package de.doomedartemis.couponcodes;
 import de.doomedartemis.couponcodes.common.command.CouponCommands;
 import de.doomedartemis.couponcodes.common.advancement.AdvancementRewards;
 import de.doomedartemis.couponcodes.common.advancement.CouponCriteria;
+import de.doomedartemis.couponcodes.compat.curios.CuriosCompat;
 import de.doomedartemis.couponcodes.common.config.CouponConfig;
 import de.doomedartemis.couponcodes.common.coupon.CouponDailyBoost;
 import de.doomedartemis.couponcodes.common.event.CouponBossBars;
@@ -28,6 +29,7 @@ public class CouponCodes {
     public CouponCodes(IEventBus modEventBus, ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.SERVER, CouponConfig.SPEC);
         modEventBus.addListener(ModNetwork::register);
+        CuriosCompat.register(modEventBus);
         CouponCriteria.register(modEventBus);
         ModItems.register(modEventBus);
         ModLootModifiers.register(modEventBus);

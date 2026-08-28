@@ -1,6 +1,7 @@
 package de.doomedartemis.couponcodes.common.menu;
 
 import de.doomedartemis.couponcodes.common.advancement.CouponCriteria;
+import de.doomedartemis.couponcodes.compat.curios.CuriosCompat;
 import de.doomedartemis.couponcodes.common.config.CouponConfig;
 import de.doomedartemis.couponcodes.common.coupon.CouponData;
 import de.doomedartemis.couponcodes.common.coupon.CouponFeedback;
@@ -215,7 +216,7 @@ public class CouponPouchMenu extends AbstractContainerMenu {
     private boolean isOpenPouchStillCarried(Player player) {
         return !pouch.isEmpty()
                 && pouch.getItem() instanceof CouponPouchItem
-                && player.getInventory().contains(pouch);
+                && (player.getInventory().contains(pouch) || CuriosCompat.isEquipped(player, pouch));
     }
 
     private DataSlot serverAutoActivationData() {

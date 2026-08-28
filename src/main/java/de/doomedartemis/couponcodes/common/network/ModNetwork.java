@@ -1,5 +1,6 @@
 package de.doomedartemis.couponcodes.common.network;
 
+import de.doomedartemis.couponcodes.compat.curios.CuriosCompat;
 import de.doomedartemis.couponcodes.common.item.CouponPouchItem;
 import de.doomedartemis.couponcodes.common.menu.CouponPouchMenu;
 import net.minecraft.server.level.ServerPlayer;
@@ -48,5 +49,7 @@ public final class ModNetwork {
                 return;
             }
         }
+
+        CuriosCompat.openFirstPouch(player);
     }
 }

@@ -27,7 +27,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -52,8 +52,8 @@ public class CouponLootDataManager extends SimplePreparableReloadListener<Map<Re
     public CouponLootDataManager() {
     }
 
-    public static void onAddReloadListener(AddReloadListenerEvent event) {
-        event.addListener(new CouponLootDataManager());
+    public static void onAddReloadListener(AddServerReloadListenersEvent event) {
+        event.addListener(ResourceLocation.fromNamespaceAndPath("coupon_codes", "coupon_loot"), new CouponLootDataManager());
     }
 
     public static LootProfile lootTableProfile(ResourceLocation lootTable) {

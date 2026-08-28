@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "coupon_codes:item/smithing_template_multi_coupon"
+  }
+}

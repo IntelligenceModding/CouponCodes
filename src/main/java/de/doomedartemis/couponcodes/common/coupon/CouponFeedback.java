@@ -85,6 +85,7 @@ public final class CouponFeedback {
                     player,
                     dust,
                     false,
+                    false,
                     x,
                     y,
                     z,
@@ -100,6 +101,7 @@ public final class CouponFeedback {
                         player,
                         ParticleTypes.ENCHANT,
                         false,
+                        false,
                         x,
                         y + 0.08D,
                         z,
@@ -113,6 +115,7 @@ public final class CouponFeedback {
                 player.serverLevel().sendParticles(
                         player,
                         glintDust,
+                        false,
                         false,
                         x,
                         y + 0.04D,

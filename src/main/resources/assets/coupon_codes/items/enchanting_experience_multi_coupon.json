@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "coupon_codes:item/enchanting_experience_multi_coupon"
+  }
+}

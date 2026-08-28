@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "coupon_codes:item/mending_once_coupon"
+  }
+}

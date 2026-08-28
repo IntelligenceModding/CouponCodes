@@ -19,6 +19,7 @@ The mod also ships normal Minecraft/NeoForge data under:
 data/coupon_codes/recipe/
 data/coupon_codes/advancement/
 data/coupon_codes/tags/item/
+data/coupon_codes/curios/entities/
 data/coupon_codes/loot_modifiers/
 data/neoforge/loot_modifiers/
 ```
@@ -319,6 +320,12 @@ Trade coupon entries also create uninitialized coupons. Their discount percent, 
 ### Tags
 
 `data/coupon_codes/tags/item/coupon_pouches.json` contains every pouch item. Use this tag when another datapack or mod integration needs to recognize pouches.
+
+`data/curios/tags/item/belt.json` includes Coupon Codes pouches in the Curios belt item tag.
+
+### Curios Entity Slot Data
+
+`data/coupon_codes/curios/entities/player.json` declares that players can use the `belt` Curios slot for coupon pouches when Curios is installed.
 
 ### Advancements
 

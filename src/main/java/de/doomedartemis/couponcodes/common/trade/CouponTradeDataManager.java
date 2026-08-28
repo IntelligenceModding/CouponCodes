@@ -32,7 +32,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 import net.neoforged.neoforge.event.village.WandererTradesEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -68,8 +68,8 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
     public CouponTradeDataManager() {
     }
 
-    public static void onAddReloadListener(AddReloadListenerEvent event) {
-        event.addListener(new CouponTradeDataManager());
+    public static void onAddReloadListener(AddServerReloadListenersEvent event) {
+        event.addListener(ResourceLocation.fromNamespaceAndPath("coupon_codes", "coupon_trades"), new CouponTradeDataManager());
     }
 
     public static void onWandererTrades(WandererTradesEvent event) {
