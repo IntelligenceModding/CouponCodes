@@ -89,7 +89,7 @@ coupon_codes:black_coupon_pouch
 
 Files in `data/<namespace>/coupon_loot/*.json` define extra coupon drops for loot tables and entity deaths.
 
-Chest/container loot is applied by the NeoForge global loot modifier `coupon_codes:vanilla_chest_coupons`. Most entity drops are applied during the living drops event. Ender Dragon entity drops are delayed until late in the dragon death animation, so they appear with the experience over the exit portal shortly before the dragon egg appears. Both systems read the same `coupon_loot` profile format.
+Chest/container loot is applied by the NeoForge global loot modifier `coupon_codes:vanilla_chest_coupons`. Most entity drops are applied during the living drops event. Ender Dragon entity drops are delayed until late in the dragon death animation, so they appear at the dragon's position before it is removed. Both systems read the same `coupon_loot` profile format.
 
 ### Basic Structure
 
