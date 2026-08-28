@@ -80,7 +80,6 @@
     {
       "loot_tables": ["minecraft:chests/village/village_temple"],
       "entries": [
-        {"type": "coupon_set", "effect": "brewing_ingredient", "weight": 12},
         {"type": "coupon_set", "effect": "potion_duration", "weight": 10},
         {"type": "coupon_set", "effect": "enchanting_experience", "weight": 6},
         {"type": "coupon_set", "effect": "villager_trade", "weight": 4}
@@ -114,7 +113,6 @@
         {"type": "item", "item": "coupon_codes:coupon_pouch", "weight": 2},
         {"type": "coupon_set", "effect": "enchanting_experience", "weight": 14},
         {"type": "coupon_set", "effect": "potion_duration", "weight": 9},
-        {"type": "coupon_set", "effect": "brewing_ingredient", "weight": 7},
         {"type": "coupon_set", "effect": "ender_pearl", "weight": 6},
         {"type": "coupon_set", "effect": "anvil_experience", "weight": 4},
         {"type": "coupon_set", "effect": "death_drop", "weight": 1}
@@ -173,7 +171,6 @@
       "entries": [
         {"type": "item", "item": "coupon_codes:black_coupon_pouch", "weight": 1},
         {"type": "item", "item": "coupon_codes:red_coupon_pouch", "weight": 1},
-        {"type": "coupon_set", "effect": "brewing_ingredient", "weight": 13},
         {"type": "coupon_set", "effect": "potion_duration", "weight": 10},
         {"type": "coupon_set", "effect": "ender_pearl", "weight": 8},
         {"type": "coupon_set", "effect": "repair_material", "weight": 5},

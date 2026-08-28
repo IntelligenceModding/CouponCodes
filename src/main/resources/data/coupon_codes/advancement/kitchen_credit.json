@@ -3,7 +3,7 @@
   "display": {
     "icon": {
       "count": 1,
-      "id": "minecraft:brewing_stand"
+      "id": "minecraft:potion"
     },
     "title": {
       "translate": "advancements.coupon_codes.kitchen_credit.title"
@@ -20,12 +20,6 @@
         "effect": "food"
       }
     },
-    "brewing": {
-      "trigger": "coupon_codes:coupon_used",
-      "conditions": {
-        "effect": "brewing_ingredient"
-      }
-    },
     "potion": {
       "trigger": "coupon_codes:coupon_used",
       "conditions": {
@@ -36,7 +30,6 @@
   "requirements": [
     [
       "food",
-      "brewing",
       "potion"
     ]
   ]

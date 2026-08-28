@@ -9,7 +9,6 @@ public enum CouponEffectType {
     TOOL_REPAIR(CouponCategory.EQUIPMENT),
     VILLAGER_TRADE(CouponCategory.TRADE),
     VILLAGER_RESTOCK(CouponCategory.TRADE),
-    BREWING_INGREDIENT(CouponCategory.MAGIC),
     ARROW(CouponCategory.COMBAT),
     FOOD(CouponCategory.CONSUMABLES),
     POTION_DURATION(CouponCategory.MAGIC),

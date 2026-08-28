@@ -41,7 +41,7 @@
 </p>
 
 <p align="center">
-  &bull; Twenty-one coupon effects across equipment, magic, trade, consumables, mobility, and combat<br>
+  &bull; Twenty coupon effects across equipment, magic, trade, consumables, mobility, and combat<br>
   &bull; Single-use, reusable, and timed coupon variants for every coupon effect<br>
   &bull; Coupon pouches with dye variants, sorting, automatic activation, and a default <strong>P</strong> hotkey<br>
   &bull; Active timed coupons with boss bars, duration stacking, configurable limits, and world persistence<br>
@@ -53,7 +53,7 @@
 </p>
 
 <p align="center">
-  Coupon effects are built around Minecraft actions such as enchanting, anvil repair, villager trading, brewing, bow shots, food use, potion use, mending, totems, smithing, bone meal, fishing, rockets, ender pearls, elytra flight, fall damage, and death drops.
+  Coupon effects are built around Minecraft actions such as enchanting, anvil repair, villager trading, bow shots, food use, potion use, mending, totems, smithing, bone meal, fishing, rockets, ender pearls, elytra flight, fall damage, and death drops.
 </p>
 
 <p align="center">

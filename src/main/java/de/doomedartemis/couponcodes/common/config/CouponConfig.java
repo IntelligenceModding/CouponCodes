@@ -580,7 +580,7 @@ public final class CouponConfig {
             case ARROW, BONE_MEAL -> new IntRange(5, 8, 12);
             case FISHING, ELYTRA_GLIDE, MENDING -> new IntRange(4, 6, 9);
             case ROCKET, ENDER_PEARL, POTION_DURATION -> new IntRange(3, 5, 8);
-            case VILLAGER_TRADE, BREWING_INGREDIENT -> new IntRange(3, 4, 6);
+            case VILLAGER_TRADE -> new IntRange(3, 4, 6);
             case ANVIL_EXPERIENCE, TOOL_REPAIR, REPAIR_MATERIAL -> new IntRange(2, 3, 5);
             case ENCHANTING_EXPERIENCE, SMITHING_TEMPLATE, FALL_DAMAGE, VILLAGER_RESTOCK -> new IntRange(2, 3, 4);
             case TOTEM, DEATH_DROP -> new IntRange(2, 2, 3);
@@ -594,7 +594,7 @@ public final class CouponConfig {
             case FISHING, ELYTRA_GLIDE, MENDING -> new IntRange(240, 420, 600);
             case ARROW, BONE_MEAL -> new IntRange(180, 300, 480);
             case ROCKET, ENDER_PEARL, POTION_DURATION -> new IntRange(150, 240, 420);
-            case VILLAGER_TRADE, BREWING_INGREDIENT -> new IntRange(120, 180, 300);
+            case VILLAGER_TRADE -> new IntRange(120, 180, 300);
             case ANVIL_EXPERIENCE, TOOL_REPAIR, REPAIR_MATERIAL -> new IntRange(90, 150, 240);
             case ENCHANTING_EXPERIENCE, SMITHING_TEMPLATE, FALL_DAMAGE, VILLAGER_RESTOCK -> new IntRange(60, 90, 180);
             case TOTEM, DEATH_DROP -> new IntRange(30, 60, 120);

@@ -41,7 +41,7 @@ Coupon categories:
 | Category | Effects |
 | --- | --- |
 | `equipment` | `durability`, `anvil_experience`, `tool_repair`, `smithing_template`, `repair_material` |
-| `magic` | `enchanting_experience`, `brewing_ingredient`, `potion_duration`, `mending` |
+| `magic` | `enchanting_experience`, `potion_duration`, `mending` |
 | `trade` | `villager_trade`, `villager_restock` |
 | `consumables` | `food`, `bone_meal`, `fishing` |
 | `mobility` | `rocket`, `ender_pearl`, `elytra_glide`, `fall_damage` |
@@ -89,7 +89,7 @@ coupon_codes:black_coupon_pouch
 
 Files in `data/<namespace>/coupon_loot/*.json` define extra coupon drops for loot tables and entity deaths.
 
-Chest/container loot is applied by the NeoForge global loot modifier `coupon_codes:vanilla_chest_coupons`. Entity drops are applied during the living drops event. Both systems read the same `coupon_loot` profile format.
+Chest/container loot is applied by the NeoForge global loot modifier `coupon_codes:vanilla_chest_coupons`. Most entity drops are applied during the living drops event. Ender Dragon entity drops are delayed until late in the dragon death animation, so they appear with the experience over the exit portal shortly before the dragon egg appears. Both systems read the same `coupon_loot` profile format.
 
 ### Basic Structure
 

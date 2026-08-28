@@ -92,7 +92,6 @@ public final class CouponCodesJeiPlugin implements IModPlugin {
             case TOOL_REPAIR -> List.of("grindstone", "tool repair");
             case VILLAGER_TRADE -> List.of("emerald");
             case VILLAGER_RESTOCK -> List.of("villager restock", "trade reset");
-            case BREWING_INGREDIENT -> List.of("blaze powder");
             case ARROW -> List.of("bow", "crossbow");
             case FOOD -> List.of("hunger");
             case POTION_DURATION -> List.of("status effect");

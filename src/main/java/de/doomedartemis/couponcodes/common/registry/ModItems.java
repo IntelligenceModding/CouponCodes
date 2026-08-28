@@ -166,7 +166,7 @@ public final class ModItems {
     private static int baseRarityScore(CouponEffectType effect) {
         return switch (effect) {
             case DURABILITY, FOOD, BONE_MEAL, FISHING -> 0;
-            case ENCHANTING_EXPERIENCE, BREWING_INGREDIENT, ARROW, POTION_DURATION, MENDING, ROCKET, ENDER_PEARL, ELYTRA_GLIDE, FALL_DAMAGE -> 1;
+            case ENCHANTING_EXPERIENCE, ARROW, POTION_DURATION, MENDING, ROCKET, ENDER_PEARL, ELYTRA_GLIDE, FALL_DAMAGE -> 1;
             case ANVIL_EXPERIENCE, TOOL_REPAIR, VILLAGER_TRADE, VILLAGER_RESTOCK, SMITHING_TEMPLATE, REPAIR_MATERIAL -> 2;
             case TOTEM, DEATH_DROP -> 3;
         };

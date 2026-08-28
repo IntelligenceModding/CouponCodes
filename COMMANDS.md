@@ -25,7 +25,6 @@ anvilexperience
 toolrepair
 villagertrade
 villagerrestock
-brewingingredient
 arrow
 food
 potionduration

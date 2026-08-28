@@ -40,6 +40,8 @@ config/coupon_codes-client.toml
 | `general.enableCommands` | `true` |
 | `general.showTimedCouponBossBar` | `true` |
 | `general.discountValues` | `[10, 20, 25, 50]` |
+| `dailyBoost.enableDailyBoosts` | `true` |
+| `dailyBoost.announceDailyBoosts` | `true` |
 | `dailyBoost.categoryBoostChance` | `10` |
 | `dailyBoost.strengthMultiplier` | `2` |
 | `dailyBoost.useMultiplier` | `2` |
@@ -92,7 +94,6 @@ Random rolls choose between the effect's min and max. Commands that omit `<uses>
 | `ender_pearl` | `[3, 5, 8]` | `[150, 240, 420]` |
 | `potion_duration` | `[3, 5, 8]` | `[150, 240, 420]` |
 | `villager_trade` | `[3, 4, 6]` | `[120, 180, 300]` |
-| `brewing_ingredient` | `[3, 4, 6]` | `[120, 180, 300]` |
 | `anvil_experience` | `[2, 3, 5]` | `[90, 150, 240]` |
 | `tool_repair` | `[2, 3, 5]` | `[90, 150, 240]` |
 | `repair_material` | `[2, 3, 5]` | `[90, 150, 240]` |

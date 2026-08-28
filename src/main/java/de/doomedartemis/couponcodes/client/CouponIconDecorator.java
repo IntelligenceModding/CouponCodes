@@ -47,7 +47,6 @@ public class CouponIconDecorator implements IItemDecorator {
             case TOOL_REPAIR -> Items.GRINDSTONE;
             case VILLAGER_TRADE -> Items.EMERALD;
             case VILLAGER_RESTOCK -> Items.CLOCK;
-            case BREWING_INGREDIENT -> Items.BLAZE_POWDER;
             case ARROW -> Items.ARROW;
             case FOOD -> Items.BREAD;
             case POTION_DURATION -> Items.POTION;

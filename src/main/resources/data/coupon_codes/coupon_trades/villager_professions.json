@@ -68,7 +68,6 @@
       "level": 5,
       "listings": 1,
       "entries": [
-        {"type": "coupon", "effect": "brewing_ingredient", "mode": "uses", "weight": 4},
         {"type": "coupon", "effect": "potion_duration", "mode": "uses", "weight": 4},
         {"type": "coupon", "effect": "potion_duration", "mode": "timed", "weight": 2},
         {"type": "coupon", "effect": "totem", "mode": "once", "weight": 1}
