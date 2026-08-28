@@ -23,6 +23,7 @@ import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.inventory.AnvilMenu;
+import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -37,7 +38,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.inventory.SmithingMenu;
-import net.neoforged.neoforge.event.GrindstoneEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
@@ -96,6 +96,7 @@ public final class CouponEvents {
     private static final Map<UUID, List<ItemStack>> DEATH_DROP_RETURNS = new HashMap<>();
     private static final Map<UUID, List<ItemStack>> PENDING_ITEM_REFUNDS = new HashMap<>();
     private static final Map<UUID, UUID> PENDING_DRAGON_COUPON_DROP_KILLERS = new HashMap<>();
+    private static final Map<UUID, GrindstoneState> GRINDSTONE_STATES = new HashMap<>();
     private static final Map<UUID, AnvilDiscountState> ANVIL_DISCOUNTS = new HashMap<>();
     private static final Map<UUID, Long> LAST_ARROW_REFUND_TICK = new HashMap<>();
     private static final Set<UUID> PENDING_ANVIL_XP_DISCOUNTS = new HashSet<>();
@@ -129,6 +130,11 @@ public final class CouponEvents {
             refundSmithingTemplate(player, smithingMenu);
         } else {
             SMITHING_STATES.remove(player.getUUID());
+        }
+        if (player.containerMenu instanceof GrindstoneMenu grindstoneMenu) {
+            refundGrindstoneMaterial(player, grindstoneMenu);
+        } else {
+            GRINDSTONE_STATES.remove(player.getUUID());
         }
         CouponBossBars.update(player);
     }
@@ -207,32 +213,6 @@ public final class CouponEvents {
                 event.getMerchantOffer().resetUses();
                 syncMerchantOffers(player, event);
             }
-        }
-    }
-
-    public static void onGrindstoneTakeItem(GrindstoneEvent.OnTakeItem event) {
-        Player player = event.getPlayer();
-        if (player == null || player.level().isClientSide()) {
-            return;
-        }
-
-        ItemStack top = event.getTopItem();
-        ItemStack bottom = event.getBottomItem();
-        if (top.isEmpty() || bottom.isEmpty() || !top.isDamageableItem() || !bottom.isDamageableItem() || !top.is(bottom.getItem())) {
-            return;
-        }
-
-        CouponData.CarriedCoupon coupon = findBestCoupon(player, CouponEffectType.TOOL_REPAIR);
-        if (coupon == null) {
-            return;
-        }
-
-        boolean refund = roll(player, discountPercent(player, coupon));
-        if (refund || CouponConfig.consumeChanceCouponsOnFailedRoll()) {
-            coupon.consumeUse(player);
-        }
-        if (refund) {
-            event.setNewBottomItem(bottom.copyWithCount(1));
         }
     }
 
@@ -438,6 +418,7 @@ public final class CouponEvents {
         TRACKED_DAMAGE_STACKS.remove(playerId);
         DEATH_DROP_RETURNS.remove(playerId);
         LAST_ARROW_REFUND_TICK.remove(playerId);
+        GRINDSTONE_STATES.remove(playerId);
         PENDING_ANVIL_XP_DISCOUNTS.remove(playerId);
         PENDING_ANVIL_MATERIAL_DISCOUNTS.remove(playerId);
         PENDING_ITEM_REFUNDS.remove(playerId);
@@ -856,6 +837,33 @@ public final class CouponEvents {
         }
     }
 
+    private static void refundGrindstoneMaterial(Player player, GrindstoneMenu menu) {
+        GrindstoneState current = GrindstoneState.capture(player, menu);
+        GrindstoneState previous = GRINDSTONE_STATES.put(player.getUUID(), current);
+        if (previous == null || !previous.hadResult() || !previous.canRefund() || !current.inputsEmpty()) {
+            return;
+        }
+        if (countMatchingCarriedItems(player, previous.result()) <= previous.carriedResultCount()) {
+            return;
+        }
+
+        CouponData.CarriedCoupon coupon = findBestCoupon(player, CouponEffectType.TOOL_REPAIR);
+        if (coupon == null) {
+            return;
+        }
+
+        boolean refund = roll(player, discountPercent(player, coupon));
+        if (refund || CouponConfig.consumeChanceCouponsOnFailedRoll()) {
+            coupon.consumeUse(player);
+        }
+        if (refund) {
+            giveOrDrop(player, previous.bottom().copyWithCount(1));
+            if (player instanceof ServerPlayer serverPlayer) {
+                syncInventory(serverPlayer);
+            }
+        }
+    }
+
     private static boolean isSmithingTemplate(ItemStack stack) {
         if (stack.isEmpty()) {
             return false;
@@ -1072,6 +1080,34 @@ public final class CouponEvents {
 
         private static int consumedCount(ItemStack previous, ItemStack current) {
             return previous.getCount() - current.getCount();
+        }
+    }
+
+    private record GrindstoneState(ItemStack top, ItemStack bottom, ItemStack result, int carriedResultCount) {
+        private static GrindstoneState capture(Player player, GrindstoneMenu menu) {
+            ItemStack result = menu.getSlot(GrindstoneMenu.RESULT_SLOT).getItem().copy();
+            return new GrindstoneState(
+                    menu.getSlot(GrindstoneMenu.INPUT_SLOT).getItem().copy(),
+                    menu.getSlot(GrindstoneMenu.ADDITIONAL_SLOT).getItem().copy(),
+                    result,
+                    countMatchingCarriedItems(player, result)
+            );
+        }
+
+        private boolean hadResult() {
+            return !this.result.isEmpty();
+        }
+
+        private boolean inputsEmpty() {
+            return this.top.isEmpty() && this.bottom.isEmpty();
+        }
+
+        private boolean canRefund() {
+            return !this.top.isEmpty()
+                    && !this.bottom.isEmpty()
+                    && this.top.isDamageableItem()
+                    && this.bottom.isDamageableItem()
+                    && this.top.is(this.bottom.getItem());
         }
     }
 

@@ -12,7 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -51,20 +51,20 @@ public class CouponPouchItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+    public InteractionResult use(Level level, Player player, InteractionHand usedHand) {
         ItemStack stack = player.getItemInHand(usedHand);
         if (level.isClientSide()) {
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         }
         if (!CouponConfig.areCouponPouchesEnabled()) {
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (player instanceof ServerPlayer serverPlayer) {
             open(serverPlayer, stack);
         }
 
-        return InteractionResultHolder.success(stack);
+        return InteractionResult.SUCCESS;
     }
 
     public static boolean open(ServerPlayer player, ItemStack stack) {

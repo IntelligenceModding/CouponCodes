@@ -8,7 +8,7 @@ import de.doomedartemis.couponcodes.common.registry.ModItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -38,19 +38,19 @@ public class EmptyCouponItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+    public InteractionResult use(Level level, Player player, InteractionHand usedHand) {
         ItemStack stack = player.getItemInHand(usedHand);
         if (level.isClientSide()) {
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         }
 
         if (!CouponConfig.canRollEmptyCoupons()) {
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         Optional<DeferredItem<CouponItem>> rolledCoupon = ModItems.randomCoupon(player.getRandom());
         if (rolledCoupon.isEmpty()) {
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         ItemStack coupon = new ItemStack(rolledCoupon.get().get());
@@ -70,6 +70,6 @@ public class EmptyCouponItem extends Item {
             player.drop(coupon, false);
         }
 
-        return InteractionResultHolder.success(stack);
+        return InteractionResult.SUCCESS;
     }
 }

@@ -41,7 +41,7 @@ public final class CouponCodesReiPlugin implements REIClientPlugin {
         ModItems.allCouponPouches().forEach(item -> addInformation(
                 registry,
                 item.get().getDefaultInstance(),
-                item.get().getDescription(),
+                item.get().getDefaultInstance().getHoverName(),
                 Component.translatable("rei.coupon_codes.coupon_pouch")
         ));
 
@@ -72,7 +72,7 @@ public final class CouponCodesReiPlugin implements REIClientPlugin {
         for (DyeColor color : DyeColor.values()) {
             ModItems.coloredCouponPouch(color).ifPresent(target -> {
                 Item targetItem = target.get().asItem();
-                registry.add(DefaultCustomShapelessDisplay.simple(
+                registry.add(new DefaultCustomShapelessDisplay(
                         List.of(
                                 EntryIngredients.ofItemStacks(ModItems.allCouponPouches().stream()
                                         .map(item -> item.get().asItem())

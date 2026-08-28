@@ -35,18 +35,10 @@ repositories {
         name = 'Fabric'
         url = 'https://maven.fabricmc.net'
     }
-    maven {
-        name = 'Curios'
-        url = 'https://maven.theillusivec4.top'
-    }
 }
 
 configurations {
     clientRuntimeMods {
-        canBeConsumed = false
-        canBeResolved = true
-    }
-    jeiRuntimeMod {
         canBeConsumed = false
         canBeResolved = true
     }
@@ -57,18 +49,22 @@ configurations {
     }
 }
 
+tasks.register('cleanClientRuntimeMods', Delete) {
+    delete layout.projectDirectory.dir('run/mods')
+}
+
+tasks.register('cleanReiRuntimeMods', Delete) {
+    delete layout.projectDirectory.dir('run-rei/mods')
+}
+
 tasks.register('syncClientRuntimeMods', Sync) {
+    dependsOn tasks.named('cleanClientRuntimeMods')
     from configurations.clientRuntimeMods
     into layout.projectDirectory.dir('run/mods')
 }
 
-tasks.register('syncJeiRuntimeMods', Sync) {
-    from configurations.clientRuntimeMods
-    from configurations.jeiRuntimeMod
-    into layout.projectDirectory.dir('run-jei/mods')
-}
-
 tasks.register('syncReiRuntimeMods', Sync) {
+    dependsOn tasks.named('cleanReiRuntimeMods')
     from configurations.clientRuntimeMods
     from configurations.reiRuntimeMod
     into layout.projectDirectory.dir('run-rei/mods')
@@ -77,23 +73,11 @@ tasks.register('syncReiRuntimeMods', Sync) {
 neoForge {
     version = project.neo_version
 
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
-    }
-
     runs {
         client {
             client()
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
             taskBefore tasks.named('syncClientRuntimeMods')
-        }
-
-        clientWithJEI {
-            client()
-            gameDirectory = file('run-jei')
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-            taskBefore tasks.named('syncJeiRuntimeMods')
         }
 
         clientWithREI {
@@ -128,15 +112,10 @@ neoForge {
 }
 
 dependencies {
-    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
-    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
-    jeiRuntimeMod "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
     compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:${rei_version}"
     compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:${rei_version}"
     compileOnly "net.fabricmc:fabric-loader:0.16.9"
     reiRuntimeMod "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
-    compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
-    clientRuntimeMods "top.theillusivec4.curios:curios-neoforge:${curios_version}"
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -145,9 +124,7 @@ tasks.named('processResources', ProcessResources).configure {
             minecraft_version_range: minecraft_version_range,
             neo_version            : neo_version,
             neo_version_range      : neo_version_range,
-            jei_version_range      : jei_version_range,
             rei_version_range      : rei_version_range,
-            curios_version_range   : curios_version_range,
             mod_id                 : mod_id,
             mod_name               : mod_name,
             mod_license            : mod_license,

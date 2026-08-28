@@ -6,7 +6,6 @@ import de.doomedartemis.couponcodes.common.item.CouponPouchItem;
 import de.doomedartemis.couponcodes.common.registry.ModItems;
 import de.doomedartemis.couponcodes.common.registry.ModRecipeSerializers;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.DyeColor;
@@ -15,17 +14,21 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
-public class DyeCouponPouchRecipe extends CustomRecipe {
+import java.util.List;
+
+public class DyeCouponPouchRecipe implements CraftingRecipe {
     private static final String GROUP = "coupon_pouch_dyeing";
+    private final CraftingBookCategory category;
     private final DyeColor targetColor;
 
     public DyeCouponPouchRecipe(CraftingBookCategory category, DyeColor targetColor) {
-        super(category);
+        this.category = category;
         this.targetColor = targetColor;
     }
 
@@ -49,34 +52,35 @@ public class DyeCouponPouchRecipe extends CustomRecipe {
     }
 
     @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width * height >= 2;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends CraftingRecipe> getSerializer() {
         return ModRecipeSerializers.COUPON_POUCH_DYEING.get();
     }
 
     @Override
-    public String getGroup() {
+    public String group() {
         return GROUP;
     }
 
     @Override
-    public NonNullList<Ingredient> getIngredients() {
+    public CraftingBookCategory category() {
+        return category;
+    }
+
+    @Override
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.create(ingredients());
+    }
+
+    private List<Ingredient> ingredients() {
         Item targetItem = targetItem(targetColor);
-        return NonNullList.of(
-                Ingredient.EMPTY,
+        return List.of(
                 Ingredient.of(ModItems.allCouponPouches().stream()
                         .map(item -> item.get().asItem())
-                        .filter(item -> item != targetItem)
-                        .map(Item::getDefaultInstance)),
+                        .filter(item -> item != targetItem)),
                 Ingredient.of(DyeItem.byColor(targetColor))
         );
     }
 
-    @Override
     public ItemStack getResultItem(HolderLookup.Provider registries) {
         Item target = targetItem(targetColor);
         return target == null ? ItemStack.EMPTY : target.getDefaultInstance();

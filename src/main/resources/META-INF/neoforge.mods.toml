@@ -27,22 +27,8 @@ ordering="NONE"
 side="BOTH"
 
 [[dependencies]]
-modId="jei"
-type="optional"
-versionRange="${jei_version_range}"
-ordering="AFTER"
-side="CLIENT"
-
-[[dependencies]]
 modId="roughlyenoughitems"
 type="optional"
 versionRange="${rei_version_range}"
 ordering="AFTER"
 side="CLIENT"
-
-[[dependencies]]
-modId="curios"
-type="optional"
-versionRange="${curios_version_range}"
-ordering="AFTER"
-side="BOTH"

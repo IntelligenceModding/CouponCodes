@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonParseException;
 import com.mojang.logging.LogUtils;
 import de.doomedartemis.couponcodes.common.config.CouponConfig;
@@ -14,9 +15,11 @@ import de.doomedartemis.couponcodes.common.coupon.CouponMode;
 import de.doomedartemis.couponcodes.common.item.CouponPouchItem;
 import de.doomedartemis.couponcodes.common.registry.ModItems;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -27,6 +30,8 @@ import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import org.slf4j.Logger;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,16 +40,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-public class CouponLootDataManager extends SimpleJsonResourceReloadListener {
+public class CouponLootDataManager extends SimplePreparableReloadListener<Map<ResourceLocation, JsonElement>> {
     private static final Gson GSON = new GsonBuilder().create();
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String DIRECTORY = "coupon_loot";
+    private static final FileToIdConverter LISTER = FileToIdConverter.json(DIRECTORY);
 
     private static Map<ResourceLocation, LootProfile> lootTableProfiles = Map.of();
     private static Map<ResourceLocation, LootProfile> entityProfiles = Map.of();
 
     public CouponLootDataManager() {
-        super(GSON, DIRECTORY);
     }
 
     public static void onAddReloadListener(AddReloadListenerEvent event) {
@@ -85,6 +90,20 @@ public class CouponLootDataManager extends SimpleJsonResourceReloadListener {
         }
 
         return generated;
+    }
+
+    @Override
+    protected Map<ResourceLocation, JsonElement> prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
+        Map<ResourceLocation, JsonElement> resources = new HashMap<>();
+        for (Map.Entry<ResourceLocation, Resource> entry : LISTER.listMatchingResources(resourceManager).entrySet()) {
+            ResourceLocation id = LISTER.fileToId(entry.getKey());
+            try (Reader reader = entry.getValue().openAsReader()) {
+                resources.put(id, JsonParser.parseReader(reader));
+            } catch (IOException | JsonParseException exception) {
+                LOGGER.error("Couldn't read coupon loot data {}", id, exception);
+            }
+        }
+        return resources;
     }
 
     @Override

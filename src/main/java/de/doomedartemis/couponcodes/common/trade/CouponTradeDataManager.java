@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonParseException;
 import com.mojang.logging.LogUtils;
 import de.doomedartemis.couponcodes.common.config.CouponConfig;
@@ -13,9 +14,11 @@ import de.doomedartemis.couponcodes.common.coupon.CouponMode;
 import de.doomedartemis.couponcodes.common.item.CouponItem;
 import de.doomedartemis.couponcodes.common.registry.ModItems;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -38,6 +41,8 @@ import org.slf4j.Logger;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -47,10 +52,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-public class CouponTradeDataManager extends SimpleJsonResourceReloadListener {
+public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<ResourceLocation, JsonElement>> {
     private static final Gson GSON = new GsonBuilder().create();
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String DIRECTORY = "coupon_trades";
+    private static final FileToIdConverter LISTER = FileToIdConverter.json(DIRECTORY);
     private static final float DEFAULT_PRICE_MULTIPLIER = 0.05F;
     private static final int MIN_PROFESSION_COUPON_COST = 48;
     private static final int MAX_PROFESSION_COUPON_COST = 64;
@@ -60,7 +66,6 @@ public class CouponTradeDataManager extends SimpleJsonResourceReloadListener {
     private static Map<VillagerProfession, Int2ObjectMap<TradePool>> professionPools = Map.of();
 
     public CouponTradeDataManager() {
-        super(GSON, DIRECTORY);
     }
 
     public static void onAddReloadListener(AddReloadListenerEvent event) {
@@ -94,6 +99,20 @@ public class CouponTradeDataManager extends SimpleJsonResourceReloadListener {
         for (int i = 0; i < pool.listings(); i++) {
             trades.add(new PoolTradeListing(pool));
         }
+    }
+
+    @Override
+    protected Map<ResourceLocation, JsonElement> prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
+        Map<ResourceLocation, JsonElement> resources = new HashMap<>();
+        for (Map.Entry<ResourceLocation, Resource> entry : LISTER.listMatchingResources(resourceManager).entrySet()) {
+            ResourceLocation id = LISTER.fileToId(entry.getKey());
+            try (Reader reader = entry.getValue().openAsReader()) {
+                resources.put(id, JsonParser.parseReader(reader));
+            } catch (IOException | JsonParseException exception) {
+                LOGGER.error("Couldn't read coupon trade data {}", id, exception);
+            }
+        }
+        return resources;
     }
 
     @Override

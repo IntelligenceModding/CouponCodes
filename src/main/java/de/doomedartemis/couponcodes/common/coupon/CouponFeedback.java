@@ -11,8 +11,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Rarity;
-import org.joml.Vector3f;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -64,9 +62,9 @@ public final class CouponFeedback {
             return;
         }
 
-        Vector3f rarityColor = color(rarity);
+        int rarityColor = color(rarity);
         DustParticleOptions dust = new DustParticleOptions(rarityColor, scale);
-        DustColorTransitionOptions glintDust = new DustColorTransitionOptions(rarityColor, new Vector3f(1.0F, 1.0F, 1.0F), scale * 0.85F);
+        DustColorTransitionOptions glintDust = new DustColorTransitionOptions(rarityColor, 0xFFFFFF, scale * 0.85F);
         double originY = player.getY() + 0.1D;
 
         for (int i = 0; i < count; i++) {
@@ -129,12 +127,12 @@ public final class CouponFeedback {
         }
     }
 
-    private static Vector3f color(Rarity rarity) {
+    private static int color(Rarity rarity) {
         return switch (rarity) {
-            case COMMON -> new Vector3f(1.0F, 1.0F, 1.0F);
-            case UNCOMMON -> new Vector3f(1.0F, 1.0F, 0.333F);
-            case RARE -> new Vector3f(0.333F, 1.0F, 1.0F);
-            case EPIC -> new Vector3f(1.0F, 0.333F, 1.0F);
+            case COMMON -> 0xFFFFFF;
+            case UNCOMMON -> 0xFFFF55;
+            case RARE -> 0x55FFFF;
+            case EPIC -> 0xFF55FF;
         };
     }
 

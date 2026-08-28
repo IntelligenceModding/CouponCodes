@@ -1,7 +1,6 @@
 package de.doomedartemis.couponcodes.common.coupon;
 
 import de.doomedartemis.couponcodes.common.advancement.CouponCriteria;
-import de.doomedartemis.couponcodes.compat.curios.CuriosCompat;
 import de.doomedartemis.couponcodes.common.config.CouponConfig;
 import de.doomedartemis.couponcodes.common.item.CouponItem;
 import de.doomedartemis.couponcodes.common.item.CouponPouchItem;
@@ -239,7 +238,6 @@ public final class CouponData {
     public static void tickCouponsInInventory(Player player) {
         tickCouponsInStacks(player, player.getInventory().items, player.getRandom(), 0);
         tickCouponsInStacks(player, player.getInventory().offhand, player.getRandom(), 0);
-        CuriosCompat.tickCouponsInEquippedCurios(player, player.getRandom());
         updateBestCarriedMarkers(player);
         tickActiveTimedCoupons(player);
     }
@@ -727,7 +725,6 @@ public final class CouponData {
         }, coupons, 0, openPouch);
         collectCarriedCoupons(player.getInventory().armor, () -> {
         }, coupons, 0, openPouch);
-        CuriosCompat.collectCarriedCoupons(player, coupons, openPouch);
         return coupons;
     }
 

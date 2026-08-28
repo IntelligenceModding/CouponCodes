@@ -7,15 +7,9 @@
     "LLL"
   ],
   "key": {
-    "S": {
-      "item": "minecraft:string"
-    },
-    "L": {
-      "item": "minecraft:leather"
-    },
-    "P": {
-      "item": "minecraft:paper"
-    }
+    "S": "minecraft:string",
+    "L": "minecraft:leather",
+    "P": "minecraft:paper"
   },
   "result": {
     "id": "coupon_codes:coupon_pouch",

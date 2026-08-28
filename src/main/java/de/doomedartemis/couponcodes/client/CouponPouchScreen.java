@@ -7,6 +7,7 @@ import de.doomedartemis.couponcodes.common.network.ToggleCouponPouchAutoActivati
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -74,8 +75,8 @@ public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> 
         int top = (height - imageHeight) / 2;
         renderTabs(guiGraphics, left, top);
         int pouchHeight = CouponPouchMenu.ROWS * 18 + 17;
-        guiGraphics.blit(CONTAINER_BACKGROUND, left, top, 0, 0, imageWidth, pouchHeight);
-        guiGraphics.blit(CONTAINER_BACKGROUND, left, top + pouchHeight, 0, 126, imageWidth, 96);
+        guiGraphics.blit(RenderType::guiTextured, CONTAINER_BACKGROUND, left, top, 0, 0, imageWidth, pouchHeight, 256, 256);
+        guiGraphics.blit(RenderType::guiTextured, CONTAINER_BACKGROUND, left, top + pouchHeight, 0, 126, imageWidth, 96, 256, 256);
     }
 
     private void renderTabs(GuiGraphics guiGraphics, int left, int top) {
@@ -84,7 +85,7 @@ public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> 
     }
 
     private void renderTab(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, ItemStack icon) {
-        guiGraphics.blitSprite(sprite, x, y, TAB_WIDTH, TAB_HEIGHT);
+        guiGraphics.blitSprite(RenderType::guiTextured, sprite, x, y, TAB_WIDTH, TAB_HEIGHT);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F, 0.0F, 100.0F);
         guiGraphics.renderItem(icon, x + 5, y + 9);

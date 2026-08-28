@@ -7,7 +7,7 @@ import de.doomedartemis.couponcodes.common.coupon.CouponEffectType;
 import de.doomedartemis.couponcodes.common.coupon.CouponMode;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -35,25 +35,25 @@ public class CouponItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+    public InteractionResult use(Level level, Player player, InteractionHand usedHand) {
         ItemStack stack = player.getItemInHand(usedHand);
         if (level.isClientSide() || mode != CouponMode.TIMED) {
-            return InteractionResultHolder.pass(stack);
+            return InteractionResult.PASS;
         }
         if (!CouponConfig.isCouponEnabled(effect, mode)) {
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
         if (!CouponConfig.allowTimedCouponInventoryActivation()) {
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         CouponData.initializeIfNeeded(stack, this, player.getRandom());
         if (!CouponData.activateTimed(player, stack, this)) {
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         CouponFeedback.playActivation(player, this);
-        return InteractionResultHolder.success(stack);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
