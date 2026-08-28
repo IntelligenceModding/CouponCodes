@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Minecraft-1.21.2-3C8527?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft 1.21.2">
+  <img src="https://img.shields.io/badge/Minecraft-1.21.3-3C8527?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft 1.21.3">
   &nbsp;&nbsp;&nbsp;
   <img src="https://img.shields.io/badge/Loader-NeoForge-6C47FF?style=for-the-badge" alt="NeoForge">
 </p>
@@ -28,6 +28,10 @@
 
 <p align="center">
   Install REI alongside Coupon Codes if you want in-game information pages.
+</p>
+
+<p align="center">
+  JEI and Curios compatibility is not enabled on this branch because those projects do not publish NeoForge 1.21.3 builds.
 </p>
 
 <br>
