@@ -205,16 +205,45 @@ That gives each available equipment multi coupon to the target.
 Give every available exact coupon:
 
 ```text
+/couponcodes give <targets> all <discountpercent>
+/couponcodes give <targets> all <discountpercent> <count>
 /couponcodes giveall <targets> <discountpercent>
 /couponcodes giveall <targets> <discountpercent> <count>
 ```
+
+Give every available exact coupon for one mode:
+
+```text
+/couponcodes give <targets> all once <discountpercent>
+/couponcodes give <targets> all once <discountpercent> <count>
+/couponcodes give <targets> all multi <discountpercent>
+/couponcodes give <targets> all multi <discountpercent> <uses>
+/couponcodes give <targets> all multi <discountpercent> <uses> <count>
+/couponcodes give <targets> all timed <discountpercent>
+/couponcodes give <targets> all timed <discountpercent> <seconds>
+/couponcodes give <targets> all timed <discountpercent> <seconds> <count>
+/couponcodes giveall <targets> once <discountpercent>
+/couponcodes giveall <targets> once <discountpercent> <count>
+/couponcodes giveall <targets> multi <discountpercent>
+/couponcodes giveall <targets> multi <discountpercent> <uses>
+/couponcodes giveall <targets> multi <discountpercent> <uses> <count>
+/couponcodes giveall <targets> timed <discountpercent>
+/couponcodes giveall <targets> timed <discountpercent> <seconds>
+/couponcodes giveall <targets> timed <discountpercent> <seconds> <count>
+```
+
+`/couponcodes give <targets> all ...` is an alias for `/couponcodes giveall ...`.
+
+When `<uses>` or `<seconds>` is omitted from a mode-specific all command, every effect receives its own configured default.
 
 `<count>` is limited to `1` to `64` here. It applies per exact coupon, not to the total number of items.
 
 Example:
 
 ```text
+/couponcodes give @p all 10
 /couponcodes giveall @p 10
+/couponcodes giveall @p timed 20 60
 ```
 
 ## Give Random Coupons

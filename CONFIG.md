@@ -129,7 +129,7 @@ Default message:
 
 `general.enableCoupons = false` prevents coupon effects and blocks exact coupon generation through the give commands.
 
-`enabledEffects`, `enabledModes`, and `enabledCoupons` are checked when giving exact, category, all, and random coupons.
+`enabledEffects`, `enabledModes`, and `enabledCoupons` are checked when giving exact, category, all, and random coupons. This includes both `/couponcodes give <targets> all ...` and `/couponcodes giveall ...`.
 
 Random coupon commands use `rollWeights.common`, `rollWeights.uncommon`, `rollWeights.rare`, and `rollWeights.epic`.
 

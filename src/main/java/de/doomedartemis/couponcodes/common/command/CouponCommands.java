@@ -78,6 +78,9 @@ public final class CouponCommands {
                 .then(Commands.literal("giveall")
                         .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("targets", EntityArgument.players())
+                                .then(allMode("once", CouponMode.SINGLE_USE, 1, 1))
+                                .then(allMode("multi", CouponMode.USES, 1, MAX_COMMAND_USES))
+                                .then(allMode("timed", CouponMode.TIMED, 1, MAX_COMMAND_TIMED_SECONDS))
                                 .then(Commands.argument("discountpercent", IntegerArgumentType.integer(1, 95))
                                         .executes(context -> giveAllCoupons(
                                                 context,
@@ -115,10 +118,28 @@ public final class CouponCommands {
 
     private static com.mojang.brigadier.builder.ArgumentBuilder<CommandSourceStack, ?> effectArguments() {
         var targets = Commands.argument("targets", EntityArgument.players());
+        targets.then(allCouponsArguments());
         for (CouponEffectType effect : CouponEffectType.values()) {
             targets.then(effect(effect.commandName(), effect));
         }
         return targets;
+    }
+
+    private static com.mojang.brigadier.builder.ArgumentBuilder<CommandSourceStack, ?> allCouponsArguments() {
+        return Commands.literal("all")
+                .then(allMode("once", CouponMode.SINGLE_USE, 1, 1))
+                .then(allMode("multi", CouponMode.USES, 1, MAX_COMMAND_USES))
+                .then(allMode("timed", CouponMode.TIMED, 1, MAX_COMMAND_TIMED_SECONDS))
+                .then(Commands.argument("discountpercent", IntegerArgumentType.integer(1, 95))
+                        .executes(context -> giveAllCoupons(
+                                context,
+                                IntegerArgumentType.getInteger(context, "discountpercent"),
+                                1))
+                        .then(Commands.argument("count", IntegerArgumentType.integer(1, 64))
+                                .executes(context -> giveAllCoupons(
+                                        context,
+                                        IntegerArgumentType.getInteger(context, "discountpercent"),
+                                        IntegerArgumentType.getInteger(context, "count")))));
     }
 
     private static com.mojang.brigadier.builder.ArgumentBuilder<CommandSourceStack, ?> bestCouponArguments() {
@@ -285,6 +306,49 @@ public final class CouponCommands {
         return Commands.literal(name).then(discountArgument);
     }
 
+    private static com.mojang.brigadier.builder.ArgumentBuilder<CommandSourceStack, ?> allMode(
+            String name,
+            CouponMode mode,
+            int minValue,
+            int maxValue
+    ) {
+        var discountArgument = Commands.argument("discountpercent", IntegerArgumentType.integer(1, 95))
+                .executes(context -> giveAllCoupons(
+                        context,
+                        mode,
+                        IntegerArgumentType.getInteger(context, "discountpercent"),
+                        null,
+                        1));
+
+        if (mode == CouponMode.SINGLE_USE) {
+            discountArgument.then(Commands.argument("count", IntegerArgumentType.integer(1, 64))
+                    .executes(context -> giveAllCoupons(
+                            context,
+                            mode,
+                            IntegerArgumentType.getInteger(context, "discountpercent"),
+                            null,
+                            IntegerArgumentType.getInteger(context, "count"))));
+        } else {
+            String valueArgumentName = mode == CouponMode.TIMED ? "seconds" : "uses";
+            discountArgument.then(Commands.argument(valueArgumentName, IntegerArgumentType.integer(minValue, maxValue))
+                    .executes(context -> giveAllCoupons(
+                            context,
+                            mode,
+                            IntegerArgumentType.getInteger(context, "discountpercent"),
+                            IntegerArgumentType.getInteger(context, valueArgumentName),
+                            1))
+                    .then(Commands.argument("count", IntegerArgumentType.integer(1, 64))
+                            .executes(context -> giveAllCoupons(
+                                    context,
+                                    mode,
+                                    IntegerArgumentType.getInteger(context, "discountpercent"),
+                                    IntegerArgumentType.getInteger(context, valueArgumentName),
+                                    IntegerArgumentType.getInteger(context, "count")))));
+        }
+
+        return Commands.literal(name).then(discountArgument);
+    }
+
     private static int giveCoupons(CommandContext<CommandSourceStack> context, CouponEffectType effect, CouponMode mode, int discountPercent, int value, int count) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
         if (!CouponConfig.areCommandsEnabled()) {
             context.getSource().sendFailure(Component.literal("Coupon Codes commands are disabled in the config."));
@@ -346,6 +410,45 @@ public final class CouponCommands {
         int givenCount = given;
         context.getSource().sendSuccess(
                 () -> Component.literal("Gave " + givenCount + " " + readableName(category) + " " + modeName(mode) + " coupon(s) to " + targets.size() + " player(s)."),
+                true
+        );
+        return given;
+    }
+
+    private static int giveAllCoupons(CommandContext<CommandSourceStack> context, CouponMode mode, int discountPercent, Integer value, int count) throws CommandSyntaxException {
+        if (!CouponConfig.areCommandsEnabled()) {
+            context.getSource().sendFailure(Component.literal("Coupon Codes commands are disabled in the config."));
+            return 0;
+        }
+
+        Collection<ServerPlayer> targets = EntityArgument.getPlayers(context, "targets");
+        int given = 0;
+
+        for (ServerPlayer target : targets) {
+            for (CouponEffectType effect : CouponEffectType.values()) {
+                if (!CouponConfig.isCouponEnabled(effect, mode)) {
+                    continue;
+                }
+                int couponValue = value == null
+                        ? defaultValue(effect, mode)
+                        : value;
+                for (int i = 0; i < count; i++) {
+                    ItemStack coupon = new ItemStack(ModItems.couponItem(effect, mode).get());
+                    CouponData.set(coupon, mode, discountPercent, couponValue, false);
+                    giveOrDrop(target, coupon);
+                    given++;
+                }
+            }
+        }
+
+        if (given <= 0) {
+            context.getSource().sendFailure(Component.literal("No enabled " + modeName(mode) + " coupons are available."));
+            return 0;
+        }
+
+        int givenCount = given;
+        context.getSource().sendSuccess(
+                () -> Component.literal("Gave " + givenCount + " configured " + modeName(mode) + " coupon(s) to " + targets.size() + " player(s)."),
                 true
         );
         return given;
