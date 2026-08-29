@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.BlockItem;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public final class CouponData {
     private static final Map<UUID, List<ItemStack>> ACTIVE_TIMED_COUPONS = new HashMap<>();
@@ -85,7 +87,7 @@ public final class CouponData {
         }
 
         CompoundTag tag = tag(stack);
-        if (tag.getBoolean(INITIALIZED_KEY)) {
+        if (tag.getBooleanOr(INITIALIZED_KEY, false)) {
             return;
         }
 
@@ -167,7 +169,7 @@ public final class CouponData {
 
     private static void activateTimed(ItemStack stack) {
         CompoundTag tag = tag(stack);
-        if (!tag.getBoolean(INITIALIZED_KEY)) {
+        if (!tag.getBooleanOr(INITIALIZED_KEY, false)) {
             return;
         }
 
@@ -176,11 +178,11 @@ public final class CouponData {
     }
 
     public static boolean isTimedActive(ItemStack stack) {
-        return tag(stack).getBoolean(ACTIVE_KEY);
+        return tag(stack).getBooleanOr(ACTIVE_KEY, false);
     }
 
     public static boolean isInitialized(ItemStack stack) {
-        return tag(stack).getBoolean(INITIALIZED_KEY);
+        return tag(stack).getBooleanOr(INITIALIZED_KEY, false);
     }
 
     public static boolean isActiveTimedCoupon(ItemStack stack, CouponItem coupon) {
@@ -189,8 +191,8 @@ public final class CouponData {
 
     public static float timedProgress(ItemStack stack) {
         CompoundTag tag = tag(stack);
-        int initialTicks = tag.getInt(INITIAL_TICKS_KEY);
-        int ticksRemaining = tag.getInt(TICKS_KEY);
+        int initialTicks = tag.getIntOr(INITIAL_TICKS_KEY, 0);
+        int ticksRemaining = tag.getIntOr(TICKS_KEY, 0);
 
         if (initialTicks <= 0) {
             initialTicks = Math.max(1, ticksRemaining);
@@ -224,7 +226,7 @@ public final class CouponData {
         }
 
         CompoundTag tag = tag(stack);
-        int ticksRemaining = tag.getInt(TICKS_KEY);
+        int ticksRemaining = tag.getIntOr(TICKS_KEY, 0);
         if (ticksRemaining > 0) {
             int updatedTicks = ticksRemaining - 1;
             tag.putInt(TICKS_KEY, updatedTicks);
@@ -237,8 +239,7 @@ public final class CouponData {
     }
 
     public static void tickCouponsInInventory(Player player) {
-        tickCouponsInStacks(player, player.getInventory().items, player.getRandom(), 0);
-        tickCouponsInStacks(player, player.getInventory().offhand, player.getRandom(), 0);
+        tickCouponsInStacks(player, nonEquipmentAndOffhandStacks(player), player.getRandom(), 0);
         CuriosCompat.tickCouponsInEquippedCurios(player, player.getRandom());
         updateBestCarriedMarkers(player);
         tickActiveTimedCoupons(player);
@@ -468,10 +469,10 @@ public final class CouponData {
     private static void addTimedCouponDuration(ItemStack activeCoupon, ItemStack addedCoupon) {
         CompoundTag activeTag = tag(activeCoupon);
         CompoundTag addedTag = tag(addedCoupon);
-        int addedTicks = Math.max(0, addedTag.getInt(TICKS_KEY));
+        int addedTicks = Math.max(0, addedTag.getIntOr(TICKS_KEY, 0));
 
-        activeTag.putInt(TICKS_KEY, addTicks(activeTag.getInt(TICKS_KEY), addedTicks));
-        activeTag.putInt(INITIAL_TICKS_KEY, addTicks(activeTag.getInt(INITIAL_TICKS_KEY), addedTicks));
+        activeTag.putInt(TICKS_KEY, addTicks(activeTag.getIntOr(TICKS_KEY, 0), addedTicks));
+        activeTag.putInt(INITIAL_TICKS_KEY, addTicks(activeTag.getIntOr(INITIAL_TICKS_KEY, 0), addedTicks));
         save(activeCoupon, activeTag);
     }
 
@@ -512,11 +513,11 @@ public final class CouponData {
     }
 
     public static boolean isBestCarriedCoupon(ItemStack stack) {
-        return tag(stack).getBoolean(BEST_CARRIED_KEY);
+        return tag(stack).getBooleanOr(BEST_CARRIED_KEY, false);
     }
 
     public static int discountPercent(ItemStack stack) {
-        return Mth.clamp(tag(stack).getInt(DISCOUNT_KEY), 0, 95);
+        return Mth.clamp(tag(stack).getIntOr(DISCOUNT_KEY, 0), 0, 95);
     }
 
     public static int discountPercent(ItemStack stack, CouponItem coupon, Level level) {
@@ -538,7 +539,7 @@ public final class CouponData {
             return;
         }
 
-        int usesRemaining = Math.max(0, tag.getInt(USES_KEY) - 1);
+        int usesRemaining = Math.max(0, tag.getIntOr(USES_KEY, 0) - 1);
         tag.putInt(USES_KEY, usesRemaining);
         save(stack, tag);
 
@@ -550,21 +551,21 @@ public final class CouponData {
     public static boolean isExpired(ItemStack stack, CouponItem coupon) {
         CompoundTag tag = tag(stack);
         return switch (coupon.mode()) {
-            case TIMED -> tag.getInt(TICKS_KEY) <= 0;
-            case SINGLE_USE, USES -> tag.getInt(USES_KEY) <= 0;
+            case TIMED -> tag.getIntOr(TICKS_KEY, 0) <= 0;
+            case SINGLE_USE, USES -> tag.getIntOr(USES_KEY, 0) <= 0;
         };
     }
 
     public static void appendHoverText(ItemStack stack, CouponItem coupon, List<Component> tooltip, TooltipFlag flag) {
-        appendHoverText(stack, coupon, null, tooltip, flag);
+        appendHoverText(stack, coupon, null, tooltip::add, flag);
     }
 
-    public static void appendHoverText(ItemStack stack, CouponItem coupon, Level level, List<Component> tooltip, TooltipFlag flag) {
+    public static void appendHoverText(ItemStack stack, CouponItem coupon, Level level, Consumer<Component> tooltip, TooltipFlag flag) {
         Rarity rarity = ModItems.couponRarity(coupon.effect(), coupon.mode());
-        tooltip.add(Component.translatable("item.coupon_codes.coupon.rarity." + rarity.name().toLowerCase(Locale.ROOT))
+        tooltip.accept(Component.translatable("item.coupon_codes.coupon.rarity." + rarity.name().toLowerCase(Locale.ROOT))
                 .withStyle(rarity.getStyleModifier()));
         if (flag.isAdvanced()) {
-            tooltip.add(Component.translatable(
+            tooltip.accept(Component.translatable(
                             "item.coupon_codes.coupon.category",
                             Component.translatable("item.coupon_codes.coupon.category." + coupon.effect().category().id())
                     )
@@ -572,60 +573,60 @@ public final class CouponData {
         }
 
         if (!CouponConfig.isCouponEnabled(coupon.effect(), coupon.mode())) {
-            tooltip.add(Component.translatable("item.coupon_codes.coupon.disabled").withStyle(ChatFormatting.RED));
+            tooltip.accept(Component.translatable("item.coupon_codes.coupon.disabled").withStyle(ChatFormatting.RED));
             return;
         }
 
-        if (!tag(stack).getBoolean(INITIALIZED_KEY)) {
-            tooltip.add(Component.translatable("item.coupon_codes.coupon.unrolled").withStyle(ChatFormatting.GRAY));
+        if (!tag(stack).getBooleanOr(INITIALIZED_KEY, false)) {
+            tooltip.accept(Component.translatable("item.coupon_codes.coupon.unrolled").withStyle(ChatFormatting.GRAY));
             if (flag.isAdvanced()) {
-                tooltip.add(Component.translatable("item.coupon_codes.coupon.mode." + coupon.mode().id() + ".pending")
+                tooltip.accept(Component.translatable("item.coupon_codes.coupon.mode." + coupon.mode().id() + ".pending")
                         .withStyle(ChatFormatting.DARK_GRAY));
-                tooltip.add(Component.translatable("item.coupon_codes.coupon.scope." + coupon.effect().id())
+                tooltip.accept(Component.translatable("item.coupon_codes.coupon.scope." + coupon.effect().id())
                         .withStyle(ChatFormatting.DARK_GRAY));
             }
             return;
         }
 
         int discount = discountPercent(stack, coupon, level);
-        tooltip.add(Component.translatable("item.coupon_codes.coupon.effect." + coupon.effect().id(), discount)
+        tooltip.accept(Component.translatable("item.coupon_codes.coupon.effect." + coupon.effect().id(), discount)
                 .withStyle(ChatFormatting.GOLD));
         if (CouponDailyBoost.isBoosted(level, coupon.effect(), coupon.mode())) {
-            tooltip.add(Component.translatable("item.coupon_codes.coupon.daily_boost")
+            tooltip.accept(Component.translatable("item.coupon_codes.coupon.daily_boost")
                     .withStyle(ChatFormatting.LIGHT_PURPLE));
         }
 
         if (coupon.mode() == CouponMode.TIMED) {
             String stateKey = isTimedActive(stack) ? "active" : "inactive";
-            tooltip.add(Component.translatable("item.coupon_codes.coupon.mode.timed." + stateKey, secondsRemaining(stack, coupon, level))
+            tooltip.accept(Component.translatable("item.coupon_codes.coupon.mode.timed." + stateKey, secondsRemaining(stack, coupon, level))
                     .withStyle(ChatFormatting.GRAY));
         } else {
             int usesRemaining = usesRemaining(stack, coupon, level);
             String key = coupon.mode() == CouponMode.SINGLE_USE && usesRemaining == 1
                     ? "item.coupon_codes.coupon.mode.single_use.uses"
                     : "item.coupon_codes.coupon.mode.uses.uses";
-            tooltip.add(Component.translatable(key, usesRemaining)
+            tooltip.accept(Component.translatable(key, usesRemaining)
                     .withStyle(ChatFormatting.GRAY));
         }
         if (!isExpired(stack, coupon) && (coupon.mode() != CouponMode.TIMED || isTimedActive(stack))) {
             String bestKey = isBestCarriedCoupon(stack) ? "best" : "outclassed";
-            tooltip.add(Component.translatable("item.coupon_codes.coupon.best." + bestKey)
+            tooltip.accept(Component.translatable("item.coupon_codes.coupon.best." + bestKey)
                     .withStyle(isBestCarriedCoupon(stack) ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY));
         }
         if (flag.isAdvanced()) {
-            tooltip.add(Component.translatable("item.coupon_codes.coupon.scope." + coupon.effect().id())
+            tooltip.accept(Component.translatable("item.coupon_codes.coupon.scope." + coupon.effect().id())
                     .withStyle(ChatFormatting.DARK_GRAY));
-            tooltip.add(Component.translatable("item.coupon_codes.coupon.note." + coupon.effect().id())
+            tooltip.accept(Component.translatable("item.coupon_codes.coupon.note." + coupon.effect().id())
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 
     public static int secondsRemaining(ItemStack stack) {
-        return Math.max(0, tag(stack).getInt(TICKS_KEY) / 20);
+        return Math.max(0, tag(stack).getIntOr(TICKS_KEY, 0) / 20);
     }
 
     public static int secondsRemaining(ItemStack stack, CouponItem coupon, Level level) {
-        int ticksRemaining = Math.max(0, tag(stack).getInt(TICKS_KEY));
+        int ticksRemaining = Math.max(0, tag(stack).getIntOr(TICKS_KEY, 0));
         if (CouponDailyBoost.isBoosted(level, coupon.effect(), coupon.mode())) {
             int durationMultiplier = CouponConfig.dailyBoostDurationMultiplier();
             return ticksToSeconds((long) ticksRemaining * durationMultiplier);
@@ -634,7 +635,7 @@ public final class CouponData {
     }
 
     public static int usesRemaining(ItemStack stack, CouponItem coupon, Level level) {
-        int usesRemaining = Math.max(0, tag(stack).getInt(USES_KEY));
+        int usesRemaining = Math.max(0, tag(stack).getIntOr(USES_KEY, 0));
         if (!CouponDailyBoost.isBoosted(level, coupon.effect(), coupon.mode())) {
             return usesRemaining;
         }
@@ -672,8 +673,8 @@ public final class CouponData {
 
         long day = CouponDailyBoost.minecraftDay(level);
         if (!tag.contains(BOOST_SPARE_DAY_KEY)
-                || tag.getLong(BOOST_SPARE_DAY_KEY) != day
-                || tag.getInt(BOOST_USE_MULTIPLIER_KEY) != useMultiplier) {
+                || tag.getLongOr(BOOST_SPARE_DAY_KEY, 0L) != day
+                || tag.getIntOr(BOOST_USE_MULTIPLIER_KEY, 0) != useMultiplier) {
             tag.putLong(BOOST_SPARE_DAY_KEY, day);
             tag.putInt(BOOST_USE_MULTIPLIER_KEY, useMultiplier);
             tag.putInt(BOOST_FREE_USES_KEY, useMultiplier - 1);
@@ -681,11 +682,11 @@ public final class CouponData {
         }
 
         if (!tag.contains(BOOST_FREE_USES_KEY) && tag.contains(BOOST_SPARE_READY_KEY)) {
-            tag.putInt(BOOST_FREE_USES_KEY, tag.getBoolean(BOOST_SPARE_READY_KEY) ? 1 : 0);
+            tag.putInt(BOOST_FREE_USES_KEY, tag.getBooleanOr(BOOST_SPARE_READY_KEY, false) ? 1 : 0);
             tag.remove(BOOST_SPARE_READY_KEY);
         }
 
-        int freeUses = Mth.clamp(tag.getInt(BOOST_FREE_USES_KEY), 0, useMultiplier - 1);
+        int freeUses = Mth.clamp(tag.getIntOr(BOOST_FREE_USES_KEY, 0), 0, useMultiplier - 1);
         if (freeUses <= 0) {
             tag.putInt(BOOST_FREE_USES_KEY, useMultiplier - 1);
             return false;
@@ -698,14 +699,14 @@ public final class CouponData {
     private static int spentBoostedUsesForCurrentCharge(ItemStack stack, Level level, int useMultiplier) {
         CompoundTag tag = tag(stack);
         if (!tag.contains(BOOST_SPARE_DAY_KEY)
-                || tag.getLong(BOOST_SPARE_DAY_KEY) != CouponDailyBoost.minecraftDay(level)
-                || tag.getInt(BOOST_USE_MULTIPLIER_KEY) != useMultiplier) {
+                || tag.getLongOr(BOOST_SPARE_DAY_KEY, 0L) != CouponDailyBoost.minecraftDay(level)
+                || tag.getIntOr(BOOST_USE_MULTIPLIER_KEY, 0) != useMultiplier) {
             return 0;
         }
 
         int freeUses = tag.contains(BOOST_FREE_USES_KEY)
-                ? tag.getInt(BOOST_FREE_USES_KEY)
-                : tag.getBoolean(BOOST_SPARE_READY_KEY) ? 1 : 0;
+                ? tag.getIntOr(BOOST_FREE_USES_KEY, 0)
+                : tag.getBooleanOr(BOOST_SPARE_READY_KEY, false) ? 1 : 0;
         return useMultiplier - 1 - Mth.clamp(freeUses, 0, useMultiplier - 1);
     }
 
@@ -721,11 +722,7 @@ public final class CouponData {
     private static List<CarriedCoupon> carriedCoupons(Player player) {
         List<CarriedCoupon> coupons = new ArrayList<>();
         CouponPouchMenu openPouch = player.containerMenu instanceof CouponPouchMenu pouchMenu ? pouchMenu : null;
-        collectCarriedCoupons(player.getInventory().items, () -> {
-        }, coupons, 0, openPouch);
-        collectCarriedCoupons(player.getInventory().offhand, () -> {
-        }, coupons, 0, openPouch);
-        collectCarriedCoupons(player.getInventory().armor, () -> {
+        collectCarriedCoupons(carriedInventoryStacks(player), () -> {
         }, coupons, 0, openPouch);
         CuriosCompat.collectCarriedCoupons(player, coupons, openPouch);
         return coupons;
@@ -818,7 +815,7 @@ public final class CouponData {
     private static void setBestCarriedMarker(ItemStack stack, boolean best) {
         CompoundTag tag = tag(stack);
         if (best) {
-            if (tag.getBoolean(BEST_CARRIED_KEY)) {
+            if (tag.getBooleanOr(BEST_CARRIED_KEY, false)) {
                 return;
             }
             tag.putBoolean(BEST_CARRIED_KEY, true);
@@ -852,6 +849,22 @@ public final class CouponData {
 
     private static boolean isShulkerBox(ItemStack stack) {
         return stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof ShulkerBoxBlock;
+    }
+
+    private static List<ItemStack> nonEquipmentAndOffhandStacks(Player player) {
+        List<ItemStack> stacks = new ArrayList<>(player.getInventory().getNonEquipmentItems());
+        stacks.add(player.getItemBySlot(EquipmentSlot.OFFHAND));
+        return stacks;
+    }
+
+    private static List<ItemStack> carriedInventoryStacks(Player player) {
+        List<ItemStack> stacks = new ArrayList<>(player.getInventory().getNonEquipmentItems());
+        stacks.add(player.getItemBySlot(EquipmentSlot.OFFHAND));
+        stacks.add(player.getItemBySlot(EquipmentSlot.FEET));
+        stacks.add(player.getItemBySlot(EquipmentSlot.LEGS));
+        stacks.add(player.getItemBySlot(EquipmentSlot.CHEST));
+        stacks.add(player.getItemBySlot(EquipmentSlot.HEAD));
+        return stacks;
     }
 
     private static boolean isCouponContainer(ItemStack stack) {

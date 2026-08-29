@@ -21,9 +21,11 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class CouponPouchItem extends Item {
     public static final int SLOT_COUNT = 27;
@@ -35,18 +37,18 @@ public class CouponPouchItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltip, TooltipFlag flag) {
         if (!CouponConfig.areCouponPouchesEnabled()) {
-            tooltip.add(Component.translatable("item.coupon_codes.coupon_pouch.disabled").withStyle(ChatFormatting.RED));
+            tooltip.accept(Component.translatable("item.coupon_codes.coupon_pouch.disabled").withStyle(ChatFormatting.RED));
             return;
         }
 
-        tooltip.add(Component.translatable("item.coupon_codes.coupon_pouch.count", occupiedSlots(stack), SLOT_COUNT)
+        tooltip.accept(Component.translatable("item.coupon_codes.coupon_pouch.count", occupiedSlots(stack), SLOT_COUNT)
                 .withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable("item.coupon_codes.coupon_pouch.auto_activation." + (isAutoActivationEnabled(stack) ? "on" : "off"))
+        tooltip.accept(Component.translatable("item.coupon_codes.coupon_pouch.auto_activation." + (isAutoActivationEnabled(stack) ? "on" : "off"))
                 .withStyle(isAutoActivationEnabled(stack) ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY));
         if (flag.isAdvanced()) {
-            tooltip.add(Component.translatable("item.coupon_codes.coupon_pouch.tooltip").withStyle(ChatFormatting.DARK_GRAY));
+            tooltip.accept(Component.translatable("item.coupon_codes.coupon_pouch.tooltip").withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 
@@ -90,7 +92,7 @@ public class CouponPouchItem extends Item {
     }
 
     public static boolean isAutoActivationEnabled(ItemStack stack) {
-        return !tag(stack).contains(AUTO_ACTIVATION_KEY) || tag(stack).getBoolean(AUTO_ACTIVATION_KEY);
+        return !tag(stack).contains(AUTO_ACTIVATION_KEY) || tag(stack).getBooleanOr(AUTO_ACTIVATION_KEY, false);
     }
 
     public static void setAutoActivationEnabled(ItemStack stack, boolean enabled) {

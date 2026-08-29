@@ -4,6 +4,7 @@ import de.doomedartemis.couponcodes.compat.curios.CuriosCompat;
 import de.doomedartemis.couponcodes.common.item.CouponPouchItem;
 import de.doomedartemis.couponcodes.common.menu.CouponPouchMenu;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -38,16 +39,15 @@ public final class ModNetwork {
     }
 
     private static void openFirstCarriedPouch(ServerPlayer player) {
-        for (ItemStack stack : player.getInventory().items) {
+        for (ItemStack stack : player.getInventory().getNonEquipmentItems()) {
             if (CouponPouchItem.open(player, stack)) {
                 return;
             }
         }
 
-        for (ItemStack stack : player.getInventory().offhand) {
-            if (CouponPouchItem.open(player, stack)) {
-                return;
-            }
+        ItemStack offhand = player.getItemBySlot(EquipmentSlot.OFFHAND);
+        if (CouponPouchItem.open(player, offhand)) {
+            return;
         }
 
         CuriosCompat.openFirstPouch(player);

@@ -13,8 +13,10 @@ import de.doomedartemis.couponcodes.common.coupon.CouponEffectType;
 import de.doomedartemis.couponcodes.common.coupon.CouponMode;
 import de.doomedartemis.couponcodes.common.item.CouponItem;
 import de.doomedartemis.couponcodes.common.registry.ModItems;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.FileToIdConverter;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -63,7 +65,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
 
     private static TradePool genericPool = new TradePool(1, List.of());
     private static TradePool rarePool = new TradePool(1, List.of());
-    private static Map<VillagerProfession, Int2ObjectMap<TradePool>> professionPools = Map.of();
+    private static Map<ResourceKey<VillagerProfession>, Int2ObjectMap<TradePool>> professionPools = Map.of();
 
     public CouponTradeDataManager() {
     }
@@ -119,7 +121,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
     protected void apply(Map<ResourceLocation, JsonElement> resources, ResourceManager resourceManager, ProfilerFiller profiler) {
         MutableTradePool generic = new MutableTradePool(1);
         MutableTradePool rare = new MutableTradePool(1);
-        Map<VillagerProfession, Int2ObjectMap<MutableTradePool>> professions = new HashMap<>();
+        Map<ResourceKey<VillagerProfession>, Int2ObjectMap<MutableTradePool>> professions = new HashMap<>();
 
         resources.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey(Comparator.comparing(ResourceLocation::toString)))
@@ -135,7 +137,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
         LOGGER.info("Loaded {} generic and {} rare coupon wandering trader offers, plus {} villager profession coupon offers", genericPool.entries().size(), rarePool.entries().size(), professionOfferCount);
     }
 
-    private static void parseFile(ResourceLocation fileId, JsonElement json, MutableTradePool generic, MutableTradePool rare, Map<VillagerProfession, Int2ObjectMap<MutableTradePool>> professions) {
+    private static void parseFile(ResourceLocation fileId, JsonElement json, MutableTradePool generic, MutableTradePool rare, Map<ResourceKey<VillagerProfession>, Int2ObjectMap<MutableTradePool>> professions) {
         try {
             JsonObject root = GsonHelper.convertToJsonObject(json, fileId.toString());
             if (GsonHelper.getAsBoolean(root, "replace", false)) {
@@ -179,7 +181,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
         }
     }
 
-    private static void parseProfessionTrades(JsonObject root, Map<VillagerProfession, Int2ObjectMap<MutableTradePool>> professions) {
+    private static void parseProfessionTrades(JsonObject root, Map<ResourceKey<VillagerProfession>, Int2ObjectMap<MutableTradePool>> professions) {
         JsonArray pools = GsonHelper.getAsJsonArray(root, "villagers", null);
         if (pools == null) {
             return;
@@ -187,7 +189,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
 
         for (JsonElement element : pools) {
             JsonObject json = GsonHelper.convertToJsonObject(element, "villager trade pool");
-            VillagerProfession profession = parseProfession(GsonHelper.getAsString(json, "profession"));
+            ResourceKey<VillagerProfession> profession = parseProfession(GsonHelper.getAsString(json, "profession"));
             int level = Mth.clamp(GsonHelper.getAsInt(json, "level", 5), 1, 5);
             MutableTradePool pool = professions
                     .computeIfAbsent(profession, ignored -> new Int2ObjectOpenHashMap<>())
@@ -317,11 +319,15 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
                 .orElseThrow(() -> new JsonParseException("Unknown item " + itemId));
     }
 
-    private static VillagerProfession parseProfession(String name) {
+    private static ResourceKey<VillagerProfession> parseProfession(String name) {
         ResourceLocation professionId = ResourceLocation.parse(name);
-        return BuiltInRegistries.VILLAGER_PROFESSION.getOptional(professionId)
-                .filter(profession -> profession != VillagerProfession.NONE && profession != VillagerProfession.NITWIT)
-                .orElseThrow(() -> new JsonParseException("Unknown or invalid villager profession " + professionId));
+        ResourceKey<VillagerProfession> professionKey = ResourceKey.create(Registries.VILLAGER_PROFESSION, professionId);
+        if (professionKey.equals(VillagerProfession.NONE)
+                || professionKey.equals(VillagerProfession.NITWIT)
+                || BuiltInRegistries.VILLAGER_PROFESSION.getOptional(professionId).isEmpty()) {
+            throw new JsonParseException("Unknown or invalid villager profession " + professionId);
+        }
+        return professionKey;
     }
 
     private static CouponEffectType parseEffect(String name) {
@@ -337,8 +343,8 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
         };
     }
 
-    private static Map<VillagerProfession, Int2ObjectMap<TradePool>> freezeProfessions(Map<VillagerProfession, Int2ObjectMap<MutableTradePool>> professions) {
-        Map<VillagerProfession, Int2ObjectMap<TradePool>> frozen = new HashMap<>();
+    private static Map<ResourceKey<VillagerProfession>, Int2ObjectMap<TradePool>> freezeProfessions(Map<ResourceKey<VillagerProfession>, Int2ObjectMap<MutableTradePool>> professions) {
+        Map<ResourceKey<VillagerProfession>, Int2ObjectMap<TradePool>> frozen = new HashMap<>();
         professions.forEach((profession, pools) -> {
             Int2ObjectMap<TradePool> frozenPools = new Int2ObjectOpenHashMap<>();
             pools.forEach((level, pool) -> {

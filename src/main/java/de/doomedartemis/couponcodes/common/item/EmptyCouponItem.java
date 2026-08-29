@@ -13,12 +13,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.registries.DeferredItem;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class EmptyCouponItem extends Item {
     public EmptyCouponItem(Properties properties) {
@@ -26,14 +27,14 @@ public class EmptyCouponItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltip, TooltipFlag flag) {
         if (CouponConfig.canRollEmptyCoupons()) {
-            tooltip.add(Component.translatable("item.coupon_codes.empty_coupon.tooltip").withStyle(ChatFormatting.GRAY));
+            tooltip.accept(Component.translatable("item.coupon_codes.empty_coupon.tooltip").withStyle(ChatFormatting.GRAY));
             if (flag.isAdvanced()) {
-                tooltip.add(Component.translatable("item.coupon_codes.empty_coupon.note").withStyle(ChatFormatting.DARK_GRAY));
+                tooltip.accept(Component.translatable("item.coupon_codes.empty_coupon.note").withStyle(ChatFormatting.DARK_GRAY));
             }
         } else {
-            tooltip.add(Component.translatable("item.coupon_codes.empty_coupon.disabled").withStyle(ChatFormatting.RED));
+            tooltip.accept(Component.translatable("item.coupon_codes.empty_coupon.disabled").withStyle(ChatFormatting.RED));
         }
     }
 

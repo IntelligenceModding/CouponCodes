@@ -44,7 +44,7 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingUseTotemEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
+import net.neoforged.neoforge.event.entity.player.AnvilCraftEvent;
 import net.neoforged.neoforge.event.entity.player.BonemealEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEnchantItemEvent;
@@ -174,7 +174,7 @@ public final class CouponEvents {
         coupon.consumeUse(player);
     }
 
-    public static void onAnvilRepair(AnvilRepairEvent event) {
+    public static void onAnvilRepair(AnvilCraftEvent.Post event) {
         Player player = event.getEntity();
         if (player.level().isClientSide()) {
             return;
@@ -426,12 +426,11 @@ public final class CouponEvents {
     }
 
     private static void reduceNewDurabilityDamage(Player player) {
-        Inventory inventory = player.getInventory();
         Map<String, ItemStack> trackedStacks = TRACKED_DAMAGE_STACKS.computeIfAbsent(player.getUUID(), ignored -> new HashMap<>());
 
-        trackAndDiscountContainer(player, trackedStacks, "main", inventory.items);
-        trackAndDiscountContainer(player, trackedStacks, "armor", inventory.armor);
-        trackAndDiscountContainer(player, trackedStacks, "offhand", inventory.offhand);
+        trackAndDiscountContainer(player, trackedStacks, "main", player.getInventory().getNonEquipmentItems());
+        trackAndDiscountContainer(player, trackedStacks, "armor", armorStacks(player));
+        trackAndDiscountContainer(player, trackedStacks, "offhand", List.of(player.getItemBySlot(EquipmentSlot.OFFHAND)));
     }
 
     private static void reduceNewElytraGlideDamage(Player player) {
@@ -549,7 +548,7 @@ public final class CouponEvents {
         }
 
         if (discountedXpCost != currentXpCost) {
-            menu.setMaximumCost(discountedXpCost);
+            menu.setCost(discountedXpCost);
         }
         if (discountedMaterialCost != currentMaterialCost) {
             menu.repairItemCountCost = discountedMaterialCost;
@@ -650,7 +649,7 @@ public final class CouponEvents {
     private static void syncMerchantOffers(Player player, TradeWithVillagerEvent event) {
         if (player instanceof ServerPlayer serverPlayer && player.containerMenu instanceof MerchantMenu menu) {
             int traderLevel = event.getAbstractVillager() instanceof Villager villager
-                    ? villager.getVillagerData().getLevel()
+                    ? villager.getVillagerData().level()
                     : menu.getTraderLevel();
             serverPlayer.sendMerchantOffers(
                     menu.containerId,
@@ -884,9 +883,9 @@ public final class CouponEvents {
 
         int count = 0;
         Inventory inventory = player.getInventory();
-        count += countMatchingItems(inventory.items, match);
-        count += countMatchingItems(inventory.armor, match);
-        count += countMatchingItems(inventory.offhand, match);
+        count += countMatchingItems(inventory.getNonEquipmentItems(), match);
+        count += countMatchingItems(armorStacks(player), match);
+        count += countMatchingItems(List.of(player.getItemBySlot(EquipmentSlot.OFFHAND)), match);
         ItemStack carried = player.containerMenu.getCarried();
         if (ItemStack.isSameItemSameComponents(carried, match)) {
             count += carried.getCount();
@@ -902,6 +901,15 @@ public final class CouponEvents {
             }
         }
         return count;
+    }
+
+    private static List<ItemStack> armorStacks(Player player) {
+        return List.of(
+                player.getItemBySlot(EquipmentSlot.FEET),
+                player.getItemBySlot(EquipmentSlot.LEGS),
+                player.getItemBySlot(EquipmentSlot.CHEST),
+                player.getItemBySlot(EquipmentSlot.HEAD)
+        );
     }
 
     private static void refundIntoSmithingTemplateSlot(Player player, SmithingMenu menu, ItemStack refund) {

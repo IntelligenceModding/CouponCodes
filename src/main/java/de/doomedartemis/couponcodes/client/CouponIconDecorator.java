@@ -1,7 +1,6 @@
 package de.doomedartemis.couponcodes.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import de.doomedartemis.couponcodes.common.coupon.CouponEffectType;
 import de.doomedartemis.couponcodes.common.item.CouponItem;
 import net.minecraft.client.gui.Font;
@@ -31,10 +30,8 @@ public class CouponIconDecorator implements IItemDecorator {
         poseStack.pushPose();
         poseStack.translate(xOffset + ICON_OFFSET_X, yOffset + ICON_OFFSET_Y, ICON_Z);
         poseStack.scale(ICON_SCALE, ICON_SCALE, ICON_SCALE);
-        RenderSystem.disableDepthTest();
         guiGraphics.renderItem(new ItemStack(icon(coupon.effect())), 0, 0);
         guiGraphics.flush();
-        RenderSystem.enableDepthTest();
         poseStack.popPose();
         return true;
     }
