@@ -28,13 +28,13 @@ public final class ModItems {
     public static final DeferredItem<EmptyCouponItem> EMPTY_COUPON = ITEMS.registerItem(
             "empty_coupon",
             EmptyCouponItem::new,
-            new Item.Properties().stacksTo(64).rarity(Rarity.RARE)
+            () -> new Item.Properties().stacksTo(64).rarity(Rarity.RARE)
     );
 
     public static final DeferredItem<CouponPouchItem> COUPON_POUCH = ITEMS.registerItem(
             "coupon_pouch",
             CouponPouchItem::new,
-            new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)
+            () -> new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)
     );
 
     private static final List<String> COUPON_POUCH_COLORS = List.of(
@@ -66,7 +66,7 @@ public final class ModItems {
             COLORED_COUPON_POUCHES.put(color, ITEMS.registerItem(
                     color + "_coupon_pouch",
                     CouponPouchItem::new,
-                    new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)
+                    () -> new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)
             ));
         }
         for (CouponEffectType effect : CouponEffectType.values()) {
@@ -142,7 +142,7 @@ public final class ModItems {
         return ITEMS.registerItem(
                 name,
                 properties -> new CouponItem(effect, mode, properties),
-                new Item.Properties().stacksTo(1).rarity(couponRarity(effect, mode))
+                () -> new Item.Properties().stacksTo(1).rarity(couponRarity(effect, mode))
         );
     }
 
