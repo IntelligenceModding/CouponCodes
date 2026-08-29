@@ -19,7 +19,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
@@ -166,8 +166,8 @@ public class CouponPouchMenu extends AbstractContainerMenu {
     }
 
     @Override
-    public void clicked(int slotId, int button, ClickType clickType, Player player) {
-        if (isRightClickTimedCouponActivation(slotId, button, clickType)) {
+    public void clicked(int slotId, int button, ContainerInput containerInput, Player player) {
+        if (isRightClickTimedCouponActivation(slotId, button, containerInput)) {
             if (!clientSideMenu && activateTimedCouponInPouch(slotId, player)) {
                 return;
             }
@@ -176,7 +176,7 @@ public class CouponPouchMenu extends AbstractContainerMenu {
             }
         }
 
-        super.clicked(slotId, button, clickType, player);
+        super.clicked(slotId, button, containerInput, player);
     }
 
     @Override
@@ -247,11 +247,11 @@ public class CouponPouchMenu extends AbstractContainerMenu {
         };
     }
 
-    private boolean isRightClickTimedCouponActivation(int slotId, int button, ClickType clickType) {
+    private boolean isRightClickTimedCouponActivation(int slotId, int button, ContainerInput containerInput) {
         if (slotId < 0
                 || slotId >= POUCH_SLOT_COUNT
                 || button != 1
-                || clickType != ClickType.PICKUP
+                || containerInput != ContainerInput.PICKUP
                 || !getCarried().isEmpty()
                 || !CouponConfig.allowTimedCouponPouchActivation()) {
             return false;

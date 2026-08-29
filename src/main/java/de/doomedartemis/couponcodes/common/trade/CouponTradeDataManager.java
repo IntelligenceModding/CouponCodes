@@ -1,23 +1,21 @@
 package de.doomedartemis.couponcodes.common.trade;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import com.mojang.logging.LogUtils;
 import de.doomedartemis.couponcodes.common.config.CouponConfig;
 import de.doomedartemis.couponcodes.common.coupon.CouponEffectType;
 import de.doomedartemis.couponcodes.common.coupon.CouponMode;
 import de.doomedartemis.couponcodes.common.item.CouponItem;
 import de.doomedartemis.couponcodes.common.registry.ModItems;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.FileToIdConverter;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -27,22 +25,20 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
-import net.minecraft.world.entity.npc.villager.VillagerTrades;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.item.trading.MerchantOffers;
+import net.minecraft.world.item.trading.TradeSet;
+import net.minecraft.world.item.trading.TradeSets;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
-import net.neoforged.neoforge.event.village.VillagerTradesEvent;
-import net.neoforged.neoforge.event.village.WandererTradesEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import org.slf4j.Logger;
-
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -56,7 +52,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<Identifier, JsonElement>> {
-    private static final Gson GSON = new GsonBuilder().create();
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String DIRECTORY = "coupon_trades";
     private static final FileToIdConverter LISTER = FileToIdConverter.json(DIRECTORY);
@@ -66,42 +61,55 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
 
     private static TradePool genericPool = new TradePool(1, List.of());
     private static TradePool rarePool = new TradePool(1, List.of());
-    private static Map<ResourceKey<VillagerProfession>, Int2ObjectMap<TradePool>> professionPools = Map.of();
-
-    public CouponTradeDataManager() {
-    }
+    private static Map<ResourceKey<TradeSet>, TradePool> professionPools = Map.of();
 
     public static void onAddReloadListener(AddServerReloadListenersEvent event) {
         event.addListener(Identifier.fromNamespaceAndPath("coupon_codes", "coupon_trades"), new CouponTradeDataManager());
     }
 
-    public static void onWandererTrades(WandererTradesEvent event) {
-        addListings(event.getGenericTrades(), genericPool);
-        addListings(event.getRareTrades(), rarePool);
-    }
-
-    public static void onVillagerTrades(VillagerTradesEvent event) {
-        Int2ObjectMap<TradePool> pools = professionPools.get(event.getType());
-        if (pools == null || pools.isEmpty()) {
+    public static void addOffersForTradeSet(ServerLevel level, AbstractVillager trader, MerchantOffers offers, ResourceKey<TradeSet> tradeSet) {
+        if (tradeSet.equals(TradeSets.WANDERING_TRADER_COMMON)) {
+            addOffers(level, trader, offers, genericPool);
+            return;
+        }
+        if (tradeSet.equals(TradeSets.WANDERING_TRADER_UNCOMMON)) {
+            addOffers(level, trader, offers, rarePool);
             return;
         }
 
-        pools.forEach((level, pool) -> {
-            List<VillagerTrades.ItemListing> trades = event.getTrades().get(level);
-            if (trades != null) {
-                addListings(trades, pool);
-            }
-        });
+        TradePool pool = professionPools.get(tradeSet);
+        if (pool != null) {
+            addOffers(level, trader, offers, pool);
+        }
     }
 
-    private static void addListings(List<VillagerTrades.ItemListing> trades, TradePool pool) {
+    private static void addOffers(ServerLevel level, Entity trader, MerchantOffers offers, TradePool pool) {
         if (pool.entries().isEmpty()) {
             return;
         }
 
+        RandomSource random = trader.getRandom();
         for (int i = 0; i < pool.listings(); i++) {
-            trades.add(new PoolTradeListing(pool));
+            MerchantOffer offer = createOffer(level, trader, random, pool);
+            if (offer != null) {
+                offers.add(offer);
+            }
         }
+    }
+
+    private static MerchantOffer createOffer(ServerLevel level, Entity trader, RandomSource random, TradePool pool) {
+        for (int attempt = 0; attempt < 8; attempt++) {
+            TradeEntry entry = choose(pool.entries(), random);
+            if (entry == null) {
+                return null;
+            }
+
+            MerchantOffer offer = entry.create(level, trader, random);
+            if (offer != null) {
+                return offer;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -122,7 +130,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
     protected void apply(Map<Identifier, JsonElement> resources, ResourceManager resourceManager, ProfilerFiller profiler) {
         MutableTradePool generic = new MutableTradePool(1);
         MutableTradePool rare = new MutableTradePool(1);
-        Map<ResourceKey<VillagerProfession>, Int2ObjectMap<MutableTradePool>> professions = new HashMap<>();
+        Map<ResourceKey<TradeSet>, MutableTradePool> professions = new HashMap<>();
 
         resources.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey(Comparator.comparing(Identifier::toString)))
@@ -132,13 +140,12 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
         rarePool = rare.freeze();
         professionPools = freezeProfessions(professions);
         int professionOfferCount = professionPools.values().stream()
-                .flatMap(pools -> pools.values().stream())
                 .mapToInt(pool -> pool.entries().size())
                 .sum();
         LOGGER.info("Loaded {} generic and {} rare coupon wandering trader offers, plus {} villager profession coupon offers", genericPool.entries().size(), rarePool.entries().size(), professionOfferCount);
     }
 
-    private static void parseFile(Identifier fileId, JsonElement json, MutableTradePool generic, MutableTradePool rare, Map<ResourceKey<VillagerProfession>, Int2ObjectMap<MutableTradePool>> professions) {
+    private static void parseFile(Identifier fileId, JsonElement json, MutableTradePool generic, MutableTradePool rare, Map<ResourceKey<TradeSet>, MutableTradePool> professions) {
         try {
             JsonObject root = GsonHelper.convertToJsonObject(json, fileId.toString());
             if (GsonHelper.getAsBoolean(root, "replace", false)) {
@@ -182,7 +189,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
         }
     }
 
-    private static void parseProfessionTrades(JsonObject root, Map<ResourceKey<VillagerProfession>, Int2ObjectMap<MutableTradePool>> professions) {
+    private static void parseProfessionTrades(JsonObject root, Map<ResourceKey<TradeSet>, MutableTradePool> professions) {
         JsonArray pools = GsonHelper.getAsJsonArray(root, "villagers", null);
         if (pools == null) {
             return;
@@ -190,11 +197,9 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
 
         for (JsonElement element : pools) {
             JsonObject json = GsonHelper.convertToJsonObject(element, "villager trade pool");
-            ResourceKey<VillagerProfession> profession = parseProfession(GsonHelper.getAsString(json, "profession"));
+            Identifier profession = parseProfession(GsonHelper.getAsString(json, "profession"));
             int level = Mth.clamp(GsonHelper.getAsInt(json, "level", 5), 1, 5);
-            MutableTradePool pool = professions
-                    .computeIfAbsent(profession, ignored -> new Int2ObjectOpenHashMap<>())
-                    .computeIfAbsent(level, ignored -> new MutableTradePool(1));
+            MutableTradePool pool = professions.computeIfAbsent(tradeSet(profession, level), ignored -> new MutableTradePool(1));
 
             if (GsonHelper.getAsBoolean(json, "replace", false)) {
                 pool.clear();
@@ -320,7 +325,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
                 .orElseThrow(() -> new JsonParseException("Unknown item " + itemId));
     }
 
-    private static ResourceKey<VillagerProfession> parseProfession(String name) {
+    private static Identifier parseProfession(String name) {
         Identifier professionId = Identifier.parse(name);
         ResourceKey<VillagerProfession> professionKey = ResourceKey.create(Registries.VILLAGER_PROFESSION, professionId);
         if (professionKey.equals(VillagerProfession.NONE)
@@ -328,7 +333,14 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
                 || BuiltInRegistries.VILLAGER_PROFESSION.getOptional(professionId).isEmpty()) {
             throw new JsonParseException("Unknown or invalid villager profession " + professionId);
         }
-        return professionKey;
+        return professionId;
+    }
+
+    private static ResourceKey<TradeSet> tradeSet(Identifier profession, int level) {
+        return ResourceKey.create(
+                Registries.TRADE_SET,
+                Identifier.fromNamespaceAndPath(profession.getNamespace(), profession.getPath() + "/level_" + level)
+        );
     }
 
     private static CouponEffectType parseEffect(String name) {
@@ -344,21 +356,35 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
         };
     }
 
-    private static Map<ResourceKey<VillagerProfession>, Int2ObjectMap<TradePool>> freezeProfessions(Map<ResourceKey<VillagerProfession>, Int2ObjectMap<MutableTradePool>> professions) {
-        Map<ResourceKey<VillagerProfession>, Int2ObjectMap<TradePool>> frozen = new HashMap<>();
-        professions.forEach((profession, pools) -> {
-            Int2ObjectMap<TradePool> frozenPools = new Int2ObjectOpenHashMap<>();
-            pools.forEach((level, pool) -> {
-                TradePool tradePool = pool.freeze();
-                if (!tradePool.entries().isEmpty()) {
-                    frozenPools.put(level, tradePool);
-                }
-            });
-            if (!frozenPools.isEmpty()) {
-                frozen.put(profession, frozenPools);
+    private static Map<ResourceKey<TradeSet>, TradePool> freezeProfessions(Map<ResourceKey<TradeSet>, MutableTradePool> professions) {
+        Map<ResourceKey<TradeSet>, TradePool> frozen = new HashMap<>();
+        professions.forEach((tradeSet, pool) -> {
+            TradePool tradePool = pool.freeze();
+            if (!tradePool.entries().isEmpty()) {
+                frozen.put(tradeSet, tradePool);
             }
         });
         return Map.copyOf(frozen);
+    }
+
+    private static TradeEntry choose(List<TradeEntry> entries, RandomSource random) {
+        int totalWeight = 0;
+        for (TradeEntry entry : entries) {
+            totalWeight += entry.weight();
+        }
+
+        if (totalWeight <= 0) {
+            return null;
+        }
+
+        int selectedWeight = random.nextInt(totalWeight);
+        for (TradeEntry entry : entries) {
+            selectedWeight -= entry.weight();
+            if (selectedWeight < 0) {
+                return entry;
+            }
+        }
+        return null;
     }
 
     private record TradePool(int listings, List<TradeEntry> entries) {
@@ -400,12 +426,12 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
     private interface TradeEntry {
         int weight();
 
-        MerchantOffer create(Entity trader, RandomSource random);
+        MerchantOffer create(ServerLevel level, Entity trader, RandomSource random);
     }
 
     private record EmptyCouponTradeEntry(int weight, int emeraldCost, int count, int maxUses, int xp, float priceMultiplier) implements TradeEntry {
         @Override
-        public MerchantOffer create(Entity trader, RandomSource random) {
+        public MerchantOffer create(ServerLevel level, Entity trader, RandomSource random) {
             if (!CouponConfig.canRollEmptyCoupons()) {
                 return null;
             }
@@ -415,7 +441,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
 
     private record CouponTradeEntry(int weight, int emeraldCost, CouponEffectType effect, CouponMode mode, int maxUses, int xp, float priceMultiplier) implements TradeEntry {
         @Override
-        public MerchantOffer create(Entity trader, RandomSource random) {
+        public MerchantOffer create(ServerLevel level, Entity trader, RandomSource random) {
             if (!CouponConfig.isCouponEnabled(effect, mode)) {
                 return null;
             }
@@ -425,7 +451,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
 
     private record RandomCouponTradeEntry(int weight, Map<Rarity, Integer> costs, int maxUses, int xp, float priceMultiplier) implements TradeEntry {
         @Override
-        public MerchantOffer create(Entity trader, RandomSource random) {
+        public MerchantOffer create(ServerLevel level, Entity trader, RandomSource random) {
             if (!CouponConfig.areCouponsEnabled()) {
                 return null;
             }
@@ -443,7 +469,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
 
     private record ProfessionCouponTradeEntry(int weight, CostRange cost, CouponEffectType effect, CouponMode mode, int maxUses, int xp) implements TradeEntry {
         @Override
-        public MerchantOffer create(Entity trader, RandomSource random) {
+        public MerchantOffer create(ServerLevel level, Entity trader, RandomSource random) {
             if (!CouponConfig.isCouponEnabled(effect, mode)) {
                 return null;
             }
@@ -453,7 +479,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
 
     private record ProfessionRandomCouponTradeEntry(int weight, CostRange cost, int maxUses, int xp) implements TradeEntry {
         @Override
-        public MerchantOffer create(Entity trader, RandomSource random) {
+        public MerchantOffer create(ServerLevel level, Entity trader, RandomSource random) {
             if (!CouponConfig.areCouponsEnabled()) {
                 return null;
             }
@@ -469,7 +495,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
 
     private record ItemTradeEntry(int weight, int emeraldCost, Item item, int count, int maxUses, int xp, float priceMultiplier) implements TradeEntry {
         @Override
-        public MerchantOffer create(Entity trader, RandomSource random) {
+        public MerchantOffer create(ServerLevel level, Entity trader, RandomSource random) {
             return offer(emeraldCost, new ItemStack(item, count), maxUses, xp, priceMultiplier);
         }
     }
@@ -546,44 +572,6 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<I
         @Override
         public MerchantOffer copy() {
             return new FixedPriceMerchantOffer(getItemCostA(), getItemCostB(), getResult().copy(), getUses(), getMaxUses(), getXp());
-        }
-    }
-
-    private record PoolTradeListing(TradePool pool) implements VillagerTrades.ItemListing {
-        @Override
-        public MerchantOffer getOffer(ServerLevel level, Entity trader, RandomSource random) {
-            for (int attempt = 0; attempt < 8; attempt++) {
-                TradeEntry entry = choose(pool.entries(), random);
-                if (entry == null) {
-                    return null;
-                }
-
-                MerchantOffer offer = entry.create(trader, random);
-                if (offer != null) {
-                    return offer;
-                }
-            }
-            return null;
-        }
-
-        private static TradeEntry choose(List<TradeEntry> entries, RandomSource random) {
-            int totalWeight = 0;
-            for (TradeEntry entry : entries) {
-                totalWeight += entry.weight();
-            }
-
-            if (totalWeight <= 0) {
-                return null;
-            }
-
-            int selectedWeight = random.nextInt(totalWeight);
-            for (TradeEntry entry : entries) {
-                selectedWeight -= entry.weight();
-                if (selectedWeight < 0) {
-                    return entry;
-                }
-            }
-            return null;
         }
     }
 }

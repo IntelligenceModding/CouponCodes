@@ -5,9 +5,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import de.doomedartemis.couponcodes.common.network.SortCouponPouchPayload;
 import de.doomedartemis.couponcodes.common.network.ToggleCouponPouchAutoActivationPayload;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -21,8 +19,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
-import java.util.List;
-
 public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> {
     private static final Identifier CONTAINER_BACKGROUND =
             Identifier.withDefaultNamespace("textures/gui/container/generic_54.png");
@@ -34,17 +30,14 @@ public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> 
     private static final int TAB_HEIGHT = 32;
 
     public CouponPouchScreen(CouponPouchMenu menu, Inventory playerInventory, Component title) {
-        super(menu, playerInventory, title);
-        imageHeight = 114 + CouponPouchMenu.ROWS * 18;
-        inventoryLabelY = imageHeight - 94;
+        super(menu, playerInventory, title, 176, 114 + CouponPouchMenu.ROWS * 18);
+        this.inventoryLabelY = this.imageHeight - 94;
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        renderTooltip(guiGraphics, mouseX, mouseY);
-        renderTabTooltip(guiGraphics, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
+        extractTabTooltip(guiGraphics, mouseX, mouseY);
     }
 
     @Override
@@ -78,25 +71,26 @@ public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> 
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        int left = (width - imageWidth) / 2;
-        int top = (height - imageHeight) / 2;
-        renderTabs(guiGraphics, left, top);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(guiGraphics, mouseX, mouseY, partialTick);
+        int left = this.leftPos;
+        int top = this.topPos;
+        extractTabs(guiGraphics, left, top);
         int pouchHeight = CouponPouchMenu.ROWS * 18 + 17;
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, CONTAINER_BACKGROUND, left, top, 0, 0, imageWidth, pouchHeight, 256, 256);
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, CONTAINER_BACKGROUND, left, top + pouchHeight, 0, 126, imageWidth, 96, 256, 256);
     }
 
-    private void renderTabs(GuiGraphics guiGraphics, int left, int top) {
-        renderTab(guiGraphics, AUTO_ACTIVATION_TAB, left + tabX(0), top - 28, autoActivationIcon());
-        renderTab(guiGraphics, SORT_TAB, left + tabX(1), top - 28, new ItemStack(Items.BRUSH));
+    private void extractTabs(GuiGraphicsExtractor guiGraphics, int left, int top) {
+        extractTab(guiGraphics, AUTO_ACTIVATION_TAB, left + tabX(0), top - 28, autoActivationIcon());
+        extractTab(guiGraphics, SORT_TAB, left + tabX(1), top - 28, new ItemStack(Items.BRUSH));
     }
 
-    private void renderTab(GuiGraphics guiGraphics, Identifier sprite, int x, int y, ItemStack icon) {
+    private void extractTab(GuiGraphicsExtractor guiGraphics, Identifier sprite, int x, int y, ItemStack icon) {
         guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, TAB_WIDTH, TAB_HEIGHT);
         guiGraphics.nextStratum();
-        guiGraphics.renderItem(icon, x + 5, y + 9);
-        guiGraphics.renderItemDecorations(font, icon, x + 5, y + 9);
+        guiGraphics.item(icon, x + 5, y + 9);
+        guiGraphics.itemDecorations(font, icon, x + 5, y + 9);
     }
 
     private ItemStack autoActivationIcon() {
@@ -105,24 +99,13 @@ public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> 
                 : new ItemStack(Items.RED_CONCRETE);
     }
 
-    private void renderTabTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    private void extractTabTooltip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
         if (isHoveringTab(0, mouseX, mouseY)) {
             String state = menu.isAutoActivationEnabled() ? "on" : "off";
-            renderComponentTooltip(guiGraphics, Component.translatable("container.coupon_codes.coupon_pouch.auto_activation." + state + ".tooltip"), mouseX, mouseY);
+            guiGraphics.setTooltipForNextFrame(font, Component.translatable("container.coupon_codes.coupon_pouch.auto_activation." + state + ".tooltip"), mouseX, mouseY);
         } else if (isHoveringTab(1, mouseX, mouseY)) {
-            renderComponentTooltip(guiGraphics, Component.translatable("container.coupon_codes.coupon_pouch.sort.tooltip"), mouseX, mouseY);
+            guiGraphics.setTooltipForNextFrame(font, Component.translatable("container.coupon_codes.coupon_pouch.sort.tooltip"), mouseX, mouseY);
         }
-    }
-
-    private void renderComponentTooltip(GuiGraphics guiGraphics, Component component, int mouseX, int mouseY) {
-        guiGraphics.renderTooltip(
-                font,
-                List.of(ClientTooltipComponent.create(component.getVisualOrderText())),
-                mouseX,
-                mouseY,
-                DefaultTooltipPositioner.INSTANCE,
-                null
-        );
     }
 
     private boolean isHoveringTab(int index, double mouseX, double mouseY) {

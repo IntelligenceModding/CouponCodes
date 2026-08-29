@@ -3,6 +3,7 @@ package de.doomedartemis.couponcodes.compat.jei;
 import de.doomedartemis.couponcodes.CouponCodes;
 import de.doomedartemis.couponcodes.common.coupon.CouponEffectType;
 import de.doomedartemis.couponcodes.common.coupon.CouponMode;
+import de.doomedartemis.couponcodes.common.recipe.DyeCouponPouchRecipe;
 import de.doomedartemis.couponcodes.common.registry.ModItems;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -16,12 +17,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 
@@ -125,12 +127,12 @@ public final class CouponCodesJeiPlugin implements IModPlugin {
                         Ingredient.of(ModItems.allCouponPouches().stream()
                                 .map(item -> item.get().asItem())
                                 .filter(item -> item != targetItem)),
-                        Ingredient.of(DyeItem.byColor(color))
+                        Ingredient.of(DyeCouponPouchRecipe.dyeItem(color))
                 );
                 ShapelessRecipe recipe = new ShapelessRecipe(
-                        "coupon_pouch_dyeing",
-                        CraftingBookCategory.MISC,
-                        target.get().getDefaultInstance(),
+                        new Recipe.CommonInfo(true),
+                        new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, "coupon_pouch_dyeing"),
+                        ItemStackTemplate.fromNonEmptyStack(target.get().getDefaultInstance()),
                         ingredients
                 );
                 recipes.add(new RecipeHolder<>(

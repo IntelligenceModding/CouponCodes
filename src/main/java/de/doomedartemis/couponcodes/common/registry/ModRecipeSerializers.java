@@ -13,7 +13,7 @@ public final class ModRecipeSerializers {
             DeferredRegister.create(Registries.RECIPE_SERIALIZER, CouponCodes.MOD_ID);
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<DyeCouponPouchRecipe>> COUPON_POUCH_DYEING =
-            RECIPE_SERIALIZERS.register("coupon_pouch_dyeing", DyeCouponPouchRecipe.Serializer::new);
+            RECIPE_SERIALIZERS.register("coupon_pouch_dyeing", () -> new RecipeSerializer<>(DyeCouponPouchRecipe.CODEC, DyeCouponPouchRecipe.STREAM_CODEC));
 
     private ModRecipeSerializers() {
     }

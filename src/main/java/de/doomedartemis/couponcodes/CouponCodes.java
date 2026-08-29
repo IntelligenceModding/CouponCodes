@@ -57,8 +57,6 @@ public class CouponCodes {
         NeoForge.EVENT_BUS.addListener(CouponDailyBoost::onServerTick);
         NeoForge.EVENT_BUS.addListener(CouponLootDataManager::onAddReloadListener);
         NeoForge.EVENT_BUS.addListener(CouponTradeDataManager::onAddReloadListener);
-        NeoForge.EVENT_BUS.addListener(CouponTradeDataManager::onWandererTrades);
-        NeoForge.EVENT_BUS.addListener(CouponTradeDataManager::onVillagerTrades);
         NeoForge.EVENT_BUS.addListener(AdvancementRewards::onAdvancementEarned);
     }
 }

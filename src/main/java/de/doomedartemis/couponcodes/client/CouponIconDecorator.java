@@ -3,7 +3,7 @@ package de.doomedartemis.couponcodes.client;
 import de.doomedartemis.couponcodes.common.coupon.CouponEffectType;
 import de.doomedartemis.couponcodes.common.item.CouponItem;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -15,7 +15,7 @@ public class CouponIconDecorator implements IItemDecorator {
     private static final int ICON_OFFSET_Y = 0;
 
     @Override
-    public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xOffset, int yOffset) {
+    public boolean render(GuiGraphicsExtractor guiGraphics, Font font, ItemStack stack, int xOffset, int yOffset) {
         if (!ClientConfig.showCouponIconOverlays()) {
             return false;
         }
@@ -28,7 +28,7 @@ public class CouponIconDecorator implements IItemDecorator {
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(xOffset + ICON_OFFSET_X, yOffset + ICON_OFFSET_Y);
         guiGraphics.pose().scale(ICON_SCALE, ICON_SCALE);
-        guiGraphics.renderItem(new ItemStack(icon(coupon.effect())), 0, 0);
+        guiGraphics.item(new ItemStack(icon(coupon.effect())), 0, 0);
         guiGraphics.pose().popMatrix();
         return true;
     }

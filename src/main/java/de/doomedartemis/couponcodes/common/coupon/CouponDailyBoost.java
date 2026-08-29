@@ -65,7 +65,7 @@ public final class CouponDailyBoost {
     }
 
     public static long minecraftDay(Level level) {
-        return Math.floorDiv(level.getDayTime(), TICKS_PER_DAY);
+        return Math.floorDiv(level.getOverworldClockTime(), TICKS_PER_DAY);
     }
 
     public static void onServerTick(ServerTickEvent.Post event) {
@@ -84,7 +84,7 @@ public final class CouponDailyBoost {
             return;
         }
 
-        long dayTime = Math.floorMod(level.getDayTime(), TICKS_PER_DAY);
+        long dayTime = Math.floorMod(level.getOverworldClockTime(), TICKS_PER_DAY);
         if (dayTime > 200L) {
             return;
         }

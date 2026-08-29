@@ -4,7 +4,7 @@ import de.doomedartemis.couponcodes.common.item.CouponItem;
 import mezz.jei.library.render.batch.SimpleItemStackBatchRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -18,21 +18,21 @@ public abstract class SimpleItemStackBatchRendererMixin {
             method = "renderBatch",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/GuiGraphics;renderFakeItem(Lnet/minecraft/world/item/ItemStack;II)V",
+                    target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fakeItem(Lnet/minecraft/world/item/ItemStack;II)V",
                     remap = true
             ),
             remap = false
     )
     private void couponcodes$renderFakeItemWithCouponDecorations(
-            GuiGraphics guiGraphics,
+            GuiGraphicsExtractor guiGraphics,
             ItemStack stack,
             int x,
             int y
     ) {
-        guiGraphics.renderFakeItem(stack, x, y);
+        guiGraphics.fakeItem(stack, x, y);
         if (stack.getItem() instanceof CouponItem) {
             Font font = Minecraft.getInstance().font;
-            guiGraphics.renderItemDecorations(font, stack, x, y);
+            guiGraphics.itemDecorations(font, stack, x, y);
         }
     }
 }

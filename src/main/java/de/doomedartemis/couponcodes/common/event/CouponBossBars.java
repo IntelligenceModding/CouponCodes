@@ -66,6 +66,7 @@ public final class CouponBossBars {
 
     private static ServerBossEvent create(ServerPlayer player) {
         ServerBossEvent bossBar = new ServerBossEvent(
+                UUID.randomUUID(),
                 Component.translatable("bossbar.coupon_codes.timed_coupon.empty"),
                 BossEvent.BossBarColor.YELLOW,
                 BossEvent.BossBarOverlay.PROGRESS

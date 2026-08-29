@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import de.doomedartemis.couponcodes.CouponCodes;
 import de.doomedartemis.couponcodes.common.item.CouponItem;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -18,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class ActiveTimedCouponSavedData extends SavedData {
-    private static final String DATA_NAME = CouponCodes.MOD_ID + "_active_timed_coupons";
+    private static final String DATA_NAME = "active_timed_coupons";
     private static final String PLAYERS_KEY = "Players";
     private static final String PLAYER_KEY = "Player";
     private static final String COUPONS_KEY = "Coupons";
@@ -30,7 +31,7 @@ public final class ActiveTimedCouponSavedData extends SavedData {
             SAVED_PLAYER_COUPONS_CODEC.listOf().optionalFieldOf(PLAYERS_KEY, List.of()).forGetter(ActiveTimedCouponSavedData::savedPlayers)
     ).apply(instance, ActiveTimedCouponSavedData::new));
     private static final SavedDataType<ActiveTimedCouponSavedData> TYPE = new SavedDataType<>(
-            DATA_NAME,
+            Identifier.fromNamespaceAndPath(CouponCodes.MOD_ID, DATA_NAME),
             ActiveTimedCouponSavedData::new,
             CODEC
     );

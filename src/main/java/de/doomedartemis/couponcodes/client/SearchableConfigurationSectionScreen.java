@@ -9,7 +9,7 @@ import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import net.minecraft.client.OptionInstance;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -78,13 +78,13 @@ public class SearchableConfigurationSectionScreen extends ConfigurationScreen.Co
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         applySearchLayout();
-        super.render(graphics, mouseX, mouseY, partialTick);
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         if (searchBox != null) {
             Component label = Component.translatable("coupon_codes.configuration.search");
             int x = searchBox.getX() + (searchBox.getWidth() - font.width(label)) / 2;
-            graphics.drawString(font, label, x, searchBox.getY() - font.lineHeight, 0xFFFFFF, false);
+            graphics.text(font, label, x, searchBox.getY() - font.lineHeight, 0xFFFFFF, false);
         }
     }
 
