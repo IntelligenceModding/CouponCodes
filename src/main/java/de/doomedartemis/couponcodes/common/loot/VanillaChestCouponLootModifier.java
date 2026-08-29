@@ -14,8 +14,8 @@ public class VanillaChestCouponLootModifier extends LootModifier {
     public static final MapCodec<VanillaChestCouponLootModifier> CODEC = RecordCodecBuilder.mapCodec(instance ->
             codecStart(instance).apply(instance, VanillaChestCouponLootModifier::new));
 
-    public VanillaChestCouponLootModifier(LootItemCondition[] conditionsIn) {
-        super(conditionsIn);
+    public VanillaChestCouponLootModifier(LootItemCondition[] conditionsIn, int priority) {
+        super(conditionsIn, priority);
     }
 
     @Override

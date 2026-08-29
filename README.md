@@ -17,17 +17,17 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Minecraft-26.1.1-3C8527?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft 26.1.1">
+  <img src="https://img.shields.io/badge/Minecraft-26.1.2-3C8527?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft 26.1.2">
   &nbsp;&nbsp;&nbsp;
   <img src="https://img.shields.io/badge/Loader-NeoForge-6C47FF?style=for-the-badge" alt="NeoForge">
 </p>
 
 <p align="center">
-  <strong>JEI and Curios are optional integrations on Minecraft 26.1.1.</strong>
+  <strong>JEI, REI, and Curios are optional integrations on Minecraft 26.1.2.</strong>
 </p>
 
 <p align="center">
-  Install JEI alongside Coupon Codes if you want in-game information pages. Install Curios if you want coupon pouches to work from an equipped belt slot.
+  Install JEI or REI alongside Coupon Codes if you want in-game information pages. Install Curios if you want coupon pouches to work from an equipped belt slot.
 </p>
 
 <br>
@@ -137,7 +137,7 @@
   &bull; The Minecraft modding community for examples, tools, and support<br>
   &bull; The Intelligence Modding community for feedback, testing, and ideas<br>
   &bull; Everyone who reports issues, suggests improvements, or includes Coupon Codes in their worlds, servers, or modpacks<br>
-  &bull; The JEI and Curios projects for their optional compatibility APIs
+  &bull; The JEI, REI, and Curios projects for their optional compatibility APIs
 </p>
 
 <p align="center">

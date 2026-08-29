@@ -23,7 +23,7 @@ Examples include:
 - command problems;
 - configuration problems;
 - datapack problems;
-- JEI or Curios integration problems;
+- JEI, REI, or Curios integration problems;
 - rendering or interface problems;
 - compatibility problems;
 - other unexpected in-game behavior.
@@ -56,7 +56,7 @@ Feature requests may include:
 - datapack improvements;
 - configuration improvements;
 - command improvements;
-- JEI or Curios integration improvements;
+- JEI, REI, or Curios integration improvements;
 - compatibility improvements;
 - visual improvements;
 - other additions that fit the purpose of Coupon Codes.
@@ -102,7 +102,7 @@ For general questions such as:
 - questions about coupon pouches;
 - questions about configuration or datapacks;
 - questions about commands;
-- JEI or Curios integration questions;
+- JEI, REI, or Curios integration questions;
 - multiplayer usage questions;
 - general usage questions;
 - questions that are not confirmed bugs;
