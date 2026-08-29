@@ -9,7 +9,7 @@ import de.doomedartemis.couponcodes.common.item.CouponItem;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
@@ -21,15 +21,15 @@ import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
-import net.minecraft.world.entity.projectile.ThrownEnderpearl;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
 import net.minecraft.world.item.enchantment.EnchantedItemInUse;
 import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -67,7 +67,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public final class CouponEvents {
-    private static final ResourceLocation ENDER_DRAGON_ENTITY = ResourceLocation.parse("minecraft:ender_dragon");
+    private static final Identifier ENDER_DRAGON_ENTITY = Identifier.parse("minecraft:ender_dragon");
     private static final int DRAGON_COUPON_DROP_DEATH_TIME = 199;
     private static final Item[] SMITHING_TEMPLATES = {
             Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE,
@@ -369,7 +369,7 @@ public final class CouponEvents {
             return;
         }
 
-        ResourceLocation entityType = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
+        Identifier entityType = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
         if (entityType == null) {
             return;
         }
@@ -385,7 +385,7 @@ public final class CouponEvents {
         addGeneratedCouponDrops(entity, entityType, killer, event.getDrops()::add);
     }
 
-    private static void addGeneratedCouponDrops(LivingEntity entity, ResourceLocation entityType, ServerPlayer killer, Consumer<ItemEntity> drops) {
+    private static void addGeneratedCouponDrops(LivingEntity entity, Identifier entityType, ServerPlayer killer, Consumer<ItemEntity> drops) {
         for (ItemStack stack : CouponLootDataManager.generate(CouponLootDataManager.entityProfile(entityType), entity.getRandom())) {
             drops.accept(new ItemEntity(entity.level(), entity.getX(), entity.getY(), entity.getZ(), stack));
             if (killer != null && stack.getItem() instanceof CouponItem coupon) {

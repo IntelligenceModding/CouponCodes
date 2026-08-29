@@ -7,6 +7,7 @@ import net.minecraft.core.particles.DustColorTransitionOptions;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -28,7 +29,7 @@ public final class CouponFeedback {
 
         Rarity rarity = ModItems.couponRarity(coupon.effect(), coupon.mode());
         spawnGlintBurst(serverPlayer, rarity, CouponConfig.activationParticleCount(), 0.75F, 0.12D, 0.32D);
-        serverPlayer.playNotifySound(SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS, 0.26F, pitch(rarity, 1.0F));
+        playSound(serverPlayer, SoundEvents.ENCHANTMENT_TABLE_USE, 0.26F, pitch(rarity, 1.0F));
     }
 
     public static void playUse(Player player, CouponItem coupon) {
@@ -38,7 +39,7 @@ public final class CouponFeedback {
 
         Rarity rarity = ModItems.couponRarity(coupon.effect(), coupon.mode());
         spawnGlintBurst(serverPlayer, rarity, CouponConfig.useParticleCount(), 0.55F, 0.08D, 0.22D);
-        serverPlayer.playNotifySound(SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.10F, pitch(rarity, 1.15F));
+        playSound(serverPlayer, SoundEvents.EXPERIENCE_ORB_PICKUP, 0.10F, pitch(rarity, 1.15F));
     }
 
     private static boolean isUseFeedbackCoolingDown(ServerPlayer player) {
@@ -137,6 +138,10 @@ public final class CouponFeedback {
             case RARE -> 0x55FFFF;
             case EPIC -> 0xFF55FF;
         };
+    }
+
+    private static void playSound(ServerPlayer player, SoundEvent sound, float volume, float pitch) {
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), sound, SoundSource.PLAYERS, volume, pitch);
     }
 
     private static float pitch(Rarity rarity, float basePitch) {

@@ -5,7 +5,7 @@ import de.doomedartemis.couponcodes.common.config.CouponConfig;
 import de.doomedartemis.couponcodes.common.coupon.CouponData;
 import de.doomedartemis.couponcodes.common.item.CouponItem;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -24,7 +24,7 @@ public final class AdvancementRewards {
             return;
         }
 
-        ResourceLocation advancementId = event.getAdvancement().id();
+        Identifier advancementId = event.getAdvancement().id();
         if (!CouponCodes.MOD_ID.equals(advancementId.getNamespace())) {
             return;
         }
@@ -38,9 +38,9 @@ public final class AdvancementRewards {
     }
 
     private static Optional<Item> rewardItem() {
-        ResourceLocation itemId;
+        Identifier itemId;
         try {
-            itemId = ResourceLocation.parse(CouponConfig.advancementRewardItem());
+            itemId = Identifier.parse(CouponConfig.advancementRewardItem());
         } catch (RuntimeException exception) {
             return Optional.empty();
         }

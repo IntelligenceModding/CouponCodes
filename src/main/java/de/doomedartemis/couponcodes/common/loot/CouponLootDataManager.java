@@ -16,7 +16,7 @@ import de.doomedartemis.couponcodes.common.item.CouponPouchItem;
 import de.doomedartemis.couponcodes.common.registry.ModItems;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.FileToIdConverter;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
@@ -40,27 +40,27 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-public class CouponLootDataManager extends SimplePreparableReloadListener<Map<ResourceLocation, JsonElement>> {
+public class CouponLootDataManager extends SimplePreparableReloadListener<Map<Identifier, JsonElement>> {
     private static final Gson GSON = new GsonBuilder().create();
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String DIRECTORY = "coupon_loot";
     private static final FileToIdConverter LISTER = FileToIdConverter.json(DIRECTORY);
 
-    private static Map<ResourceLocation, LootProfile> lootTableProfiles = Map.of();
-    private static Map<ResourceLocation, LootProfile> entityProfiles = Map.of();
+    private static Map<Identifier, LootProfile> lootTableProfiles = Map.of();
+    private static Map<Identifier, LootProfile> entityProfiles = Map.of();
 
     public CouponLootDataManager() {
     }
 
     public static void onAddReloadListener(AddServerReloadListenersEvent event) {
-        event.addListener(ResourceLocation.fromNamespaceAndPath("coupon_codes", "coupon_loot"), new CouponLootDataManager());
+        event.addListener(Identifier.fromNamespaceAndPath("coupon_codes", "coupon_loot"), new CouponLootDataManager());
     }
 
-    public static LootProfile lootTableProfile(ResourceLocation lootTable) {
+    public static LootProfile lootTableProfile(Identifier lootTable) {
         return lootTableProfiles.get(lootTable);
     }
 
-    public static LootProfile entityProfile(ResourceLocation entityType) {
+    public static LootProfile entityProfile(Identifier entityType) {
         return entityProfiles.get(entityType);
     }
 
@@ -93,10 +93,10 @@ public class CouponLootDataManager extends SimplePreparableReloadListener<Map<Re
     }
 
     @Override
-    protected Map<ResourceLocation, JsonElement> prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
-        Map<ResourceLocation, JsonElement> resources = new HashMap<>();
-        for (Map.Entry<ResourceLocation, Resource> entry : LISTER.listMatchingResources(resourceManager).entrySet()) {
-            ResourceLocation id = LISTER.fileToId(entry.getKey());
+    protected Map<Identifier, JsonElement> prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> resources = new HashMap<>();
+        for (Map.Entry<Identifier, Resource> entry : LISTER.listMatchingResources(resourceManager).entrySet()) {
+            Identifier id = LISTER.fileToId(entry.getKey());
             try (Reader reader = entry.getValue().openAsReader()) {
                 resources.put(id, JsonParser.parseReader(reader));
             } catch (IOException | JsonParseException exception) {
@@ -107,12 +107,12 @@ public class CouponLootDataManager extends SimplePreparableReloadListener<Map<Re
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> resources, ResourceManager resourceManager, ProfilerFiller profiler) {
-        Map<ResourceLocation, List<LootRoll>> loadedLootTables = new HashMap<>();
-        Map<ResourceLocation, List<LootRoll>> loadedEntities = new HashMap<>();
+    protected void apply(Map<Identifier, JsonElement> resources, ResourceManager resourceManager, ProfilerFiller profiler) {
+        Map<Identifier, List<LootRoll>> loadedLootTables = new HashMap<>();
+        Map<Identifier, List<LootRoll>> loadedEntities = new HashMap<>();
 
         resources.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey(Comparator.comparing(ResourceLocation::toString)))
+                .sorted(Map.Entry.comparingByKey(Comparator.comparing(Identifier::toString)))
                 .forEach(entry -> parseFile(entry.getKey(), entry.getValue(), loadedLootTables, loadedEntities));
 
         lootTableProfiles = freeze(loadedLootTables);
@@ -120,8 +120,8 @@ public class CouponLootDataManager extends SimplePreparableReloadListener<Map<Re
         LOGGER.info("Loaded {} coupon loot table profiles and {} coupon entity drop profiles", lootTableProfiles.size(), entityProfiles.size());
     }
 
-    private static Map<ResourceLocation, LootProfile> freeze(Map<ResourceLocation, List<LootRoll>> profiles) {
-        Map<ResourceLocation, LootProfile> frozen = new HashMap<>();
+    private static Map<Identifier, LootProfile> freeze(Map<Identifier, List<LootRoll>> profiles) {
+        Map<Identifier, LootProfile> frozen = new HashMap<>();
         profiles.forEach((target, rolls) -> {
             if (!rolls.isEmpty()) {
                 frozen.put(target, new LootProfile(List.copyOf(rolls)));
@@ -130,7 +130,7 @@ public class CouponLootDataManager extends SimplePreparableReloadListener<Map<Re
         return Map.copyOf(frozen);
     }
 
-    private static void parseFile(ResourceLocation fileId, JsonElement json, Map<ResourceLocation, List<LootRoll>> lootTables, Map<ResourceLocation, List<LootRoll>> entities) {
+    private static void parseFile(Identifier fileId, JsonElement json, Map<Identifier, List<LootRoll>> lootTables, Map<Identifier, List<LootRoll>> entities) {
         try {
             JsonObject root = GsonHelper.convertToJsonObject(json, fileId.toString());
             boolean replace = GsonHelper.getAsBoolean(root, "replace", false);
@@ -146,18 +146,18 @@ public class CouponLootDataManager extends SimplePreparableReloadListener<Map<Re
         }
     }
 
-    private static void parseProfile(ResourceLocation fileId, JsonObject profile, boolean rootReplace, Map<ResourceLocation, List<LootRoll>> lootTables, Map<ResourceLocation, List<LootRoll>> entities) {
+    private static void parseProfile(Identifier fileId, JsonObject profile, boolean rootReplace, Map<Identifier, List<LootRoll>> lootTables, Map<Identifier, List<LootRoll>> entities) {
         boolean replace = GsonHelper.getAsBoolean(profile, "replace", rootReplace);
         List<LootRoll> rolls = parseRolls(profile);
 
         if (GsonHelper.isArrayNode(profile, "loot_tables")) {
-            for (ResourceLocation lootTable : parseIds(GsonHelper.getAsJsonArray(profile, "loot_tables"), "loot_tables")) {
+            for (Identifier lootTable : parseIds(GsonHelper.getAsJsonArray(profile, "loot_tables"), "loot_tables")) {
                 applyProfile(lootTables, lootTable, rolls, replace);
             }
         }
 
         if (GsonHelper.isArrayNode(profile, "entities")) {
-            for (ResourceLocation entity : parseIds(GsonHelper.getAsJsonArray(profile, "entities"), "entities")) {
+            for (Identifier entity : parseIds(GsonHelper.getAsJsonArray(profile, "entities"), "entities")) {
                 applyProfile(entities, entity, rolls, replace);
             }
         }
@@ -167,7 +167,7 @@ public class CouponLootDataManager extends SimplePreparableReloadListener<Map<Re
         }
     }
 
-    private static void applyProfile(Map<ResourceLocation, List<LootRoll>> profiles, ResourceLocation target, List<LootRoll> rolls, boolean replace) {
+    private static void applyProfile(Map<Identifier, List<LootRoll>> profiles, Identifier target, List<LootRoll> rolls, boolean replace) {
         List<LootRoll> targetRolls = profiles.computeIfAbsent(target, ignored -> new ArrayList<>());
         if (replace) {
             targetRolls.clear();
@@ -175,10 +175,10 @@ public class CouponLootDataManager extends SimplePreparableReloadListener<Map<Re
         targetRolls.addAll(rolls);
     }
 
-    private static List<ResourceLocation> parseIds(JsonArray array, String fieldName) {
-        List<ResourceLocation> ids = new ArrayList<>();
+    private static List<Identifier> parseIds(JsonArray array, String fieldName) {
+        List<Identifier> ids = new ArrayList<>();
         for (JsonElement element : array) {
-            ids.add(ResourceLocation.parse(GsonHelper.convertToString(element, fieldName)));
+            ids.add(Identifier.parse(GsonHelper.convertToString(element, fieldName)));
         }
         return ids;
     }
@@ -242,7 +242,7 @@ public class CouponLootDataManager extends SimplePreparableReloadListener<Map<Re
                         weight
                 ));
             } else if ("item".equals(type)) {
-                ResourceLocation itemId = ResourceLocation.parse(GsonHelper.getAsString(entry, "item"));
+                Identifier itemId = Identifier.parse(GsonHelper.getAsString(entry, "item"));
                 Item item = BuiltInRegistries.ITEM.getOptional(itemId)
                         .filter(found -> found != Items.AIR)
                         .orElseThrow(() -> new JsonParseException("Unknown item " + itemId));

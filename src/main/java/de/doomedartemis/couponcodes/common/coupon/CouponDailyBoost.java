@@ -6,7 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -75,7 +75,7 @@ public final class CouponDailyBoost {
 
         MinecraftServer server = event.getServer();
         ServerLevel level = server.overworld();
-        if (level.players().isEmpty() || !level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)) {
+        if (level.players().isEmpty() || !level.getGameRules().get(GameRules.ADVANCE_TIME)) {
             return;
         }
 

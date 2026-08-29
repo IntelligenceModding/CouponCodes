@@ -58,7 +58,7 @@ public final class CouponCommands {
                 .then(Commands.literal("inspect")
                         .executes(CouponCommands::inspectSelf)
                         .then(Commands.argument("targets", EntityArgument.players())
-                                .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                                 .executes(CouponCommands::inspectPlayers)))
                 .then(Commands.literal("best")
                         .then(bestCouponArguments()))
@@ -67,16 +67,16 @@ public final class CouponCommands {
                         .then(Commands.literal("category")
                                 .then(activeTimedCategoryArguments()))
                         .then(Commands.argument("targets", EntityArgument.players())
-                                .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                                 .executes(CouponCommands::showActiveTimedCoupons)))
                 .then(Commands.literal("give")
-                        .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(effectArguments()))
                 .then(Commands.literal("givecategory")
-                        .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(categoryGiveArguments()))
                 .then(Commands.literal("giveall")
-                        .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("targets", EntityArgument.players())
                                 .then(allMode("once", CouponMode.SINGLE_USE, 1, 1))
                                 .then(allMode("multi", CouponMode.USES, 1, MAX_COMMAND_USES))
@@ -92,7 +92,7 @@ public final class CouponCommands {
                                                         IntegerArgumentType.getInteger(context, "discountpercent"),
                                                         IntegerArgumentType.getInteger(context, "count")))))))
                 .then(Commands.literal("giverandom")
-                        .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.literal("category")
                                 .then(randomCategoryArguments()))
                         .then(Commands.argument("targets", EntityArgument.players())
@@ -100,19 +100,19 @@ public final class CouponCommands {
                                 .then(Commands.argument("count", IntegerArgumentType.integer(1, 2304))
                                         .executes(context -> giveRandomCoupons(context, IntegerArgumentType.getInteger(context, "count"))))))
                 .then(Commands.literal("giveempty")
-                        .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("targets", EntityArgument.players())
                                 .executes(context -> giveSimpleItem(context, ModItems.EMPTY_COUPON.get().getDefaultInstance(), "empty coupon", 1))
                                 .then(Commands.argument("count", IntegerArgumentType.integer(1, 2304))
                                         .executes(context -> giveSimpleItem(context, ModItems.EMPTY_COUPON.get().getDefaultInstance(), "empty coupon", IntegerArgumentType.getInteger(context, "count"))))))
                 .then(Commands.literal("givepouch")
-                        .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("targets", EntityArgument.players())
                                 .executes(context -> giveSimpleItem(context, ModItems.COUPON_POUCH.get().getDefaultInstance(), "coupon pouch", 1))
                                 .then(Commands.argument("count", IntegerArgumentType.integer(1, 64))
                                         .executes(context -> giveSimpleItem(context, ModItems.COUPON_POUCH.get().getDefaultInstance(), "coupon pouch", IntegerArgumentType.getInteger(context, "count"))))))
                 .then(Commands.literal("cleartimed")
-                        .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(clearTimedArguments())));
     }
 
@@ -147,7 +147,7 @@ public final class CouponCommands {
                 .suggests((context, builder) -> SharedSuggestionProvider.suggest(EFFECT_NAMES, builder))
                 .executes(context -> showOwnBestCoupon(context, parseEffectArgument(context)));
         effectArgument.then(Commands.argument("targets", EntityArgument.players())
-                .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .executes(context -> showBestCoupons(context, parseEffectArgument(context))));
         return effectArgument;
     }
@@ -174,7 +174,7 @@ public final class CouponCommands {
                 .suggests((context, builder) -> SharedSuggestionProvider.suggest(CATEGORY_NAMES, builder))
                 .executes(context -> showOwnActiveTimedCoupon(context, parseCategoryArgument(context)))
                 .then(Commands.argument("targets", EntityArgument.players())
-                        .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .executes(context -> showActiveTimedCoupons(context, parseCategoryArgument(context))));
     }
 

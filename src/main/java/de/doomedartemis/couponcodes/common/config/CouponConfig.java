@@ -2,7 +2,7 @@ package de.doomedartemis.couponcodes.common.config;
 
 import de.doomedartemis.couponcodes.common.coupon.CouponEffectType;
 import de.doomedartemis.couponcodes.common.coupon.CouponMode;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Rarity;
@@ -536,7 +536,7 @@ public final class CouponConfig {
             return false;
         }
         try {
-            ResourceLocation.parse(id);
+            Identifier.parse(id);
             return true;
         } catch (RuntimeException exception) {
             return false;

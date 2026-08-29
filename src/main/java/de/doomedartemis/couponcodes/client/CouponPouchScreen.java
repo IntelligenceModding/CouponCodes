@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Items;
@@ -24,12 +24,12 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import java.util.List;
 
 public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> {
-    private static final ResourceLocation CONTAINER_BACKGROUND =
-            ResourceLocation.withDefaultNamespace("textures/gui/container/generic_54.png");
-    private static final ResourceLocation AUTO_ACTIVATION_TAB =
-            ResourceLocation.withDefaultNamespace("container/creative_inventory/tab_top_unselected_1");
-    private static final ResourceLocation SORT_TAB =
-            ResourceLocation.withDefaultNamespace("container/creative_inventory/tab_top_unselected_2");
+    private static final Identifier CONTAINER_BACKGROUND =
+            Identifier.withDefaultNamespace("textures/gui/container/generic_54.png");
+    private static final Identifier AUTO_ACTIVATION_TAB =
+            Identifier.withDefaultNamespace("container/creative_inventory/tab_top_unselected_1");
+    private static final Identifier SORT_TAB =
+            Identifier.withDefaultNamespace("container/creative_inventory/tab_top_unselected_2");
     private static final int TAB_WIDTH = 26;
     private static final int TAB_HEIGHT = 32;
 
@@ -92,7 +92,7 @@ public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> 
         renderTab(guiGraphics, SORT_TAB, left + tabX(1), top - 28, new ItemStack(Items.BRUSH));
     }
 
-    private void renderTab(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, ItemStack icon) {
+    private void renderTab(GuiGraphics guiGraphics, Identifier sprite, int x, int y, ItemStack icon) {
         guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, TAB_WIDTH, TAB_HEIGHT);
         guiGraphics.nextStratum();
         guiGraphics.renderItem(icon, x + 5, y + 9);

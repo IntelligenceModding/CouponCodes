@@ -9,11 +9,11 @@ import de.doomedartemis.couponcodes.common.coupon.CouponEffectType;
 import de.doomedartemis.couponcodes.common.coupon.CouponMode;
 import de.doomedartemis.couponcodes.common.registry.ModItems;
 import net.minecraft.advancements.CriterionTrigger;
-import net.minecraft.advancements.critereon.ContextAwarePredicate;
-import net.minecraft.advancements.critereon.EntityPredicate;
-import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
+import net.minecraft.advancements.criterion.ContextAwarePredicate;
+import net.minecraft.advancements.criterion.EntityPredicate;
+import net.minecraft.advancements.criterion.SimpleCriterionTrigger;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Rarity;
 import net.neoforged.bus.api.IEventBus;
@@ -65,7 +65,7 @@ public final class CouponCriteria {
         COUPON_OBTAINED.get().trigger(player, effect, mode);
     }
 
-    public static void triggerEntityCouponDropped(ServerPlayer player, ResourceLocation entityType, CouponEffectType effect, CouponMode mode) {
+    public static void triggerEntityCouponDropped(ServerPlayer player, Identifier entityType, CouponEffectType effect, CouponMode mode) {
         ENTITY_COUPON_DROPPED.get().trigger(player, entityType, effect, mode);
     }
 
@@ -151,27 +151,27 @@ public final class CouponCriteria {
             return TriggerInstance.CODEC;
         }
 
-        public void trigger(ServerPlayer player, ResourceLocation entityType, CouponEffectType effect, CouponMode mode) {
+        public void trigger(ServerPlayer player, Identifier entityType, CouponEffectType effect, CouponMode mode) {
             trigger(player, instance -> instance.matches(entityType, effect, mode));
         }
 
         public record TriggerInstance(
                 Optional<ContextAwarePredicate> player,
-                Optional<ResourceLocation> entity,
+                Optional<Identifier> entity,
                 Optional<CouponEffectType> effect,
                 Optional<CouponCategory> category,
                 Optional<CouponMode> mode
         ) implements SimpleCriterionTrigger.SimpleInstance {
             public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                     EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
-                    ResourceLocation.CODEC.optionalFieldOf("entity").forGetter(TriggerInstance::entity),
+                    Identifier.CODEC.optionalFieldOf("entity").forGetter(TriggerInstance::entity),
                     CouponTrigger.TriggerInstance.EFFECT_CODEC.optionalFieldOf("effect").forGetter(TriggerInstance::effect),
                     CouponTrigger.TriggerInstance.CATEGORY_CODEC.optionalFieldOf("category").forGetter(TriggerInstance::category),
                     CouponTrigger.TriggerInstance.MODE_CODEC.optionalFieldOf("mode").forGetter(TriggerInstance::mode)
                     )
                     .apply(instance, TriggerInstance::new));
 
-            public boolean matches(ResourceLocation entityType, CouponEffectType effect, CouponMode mode) {
+            public boolean matches(Identifier entityType, CouponEffectType effect, CouponMode mode) {
                 return this.entity.map(value -> value.equals(entityType)).orElse(true)
                         && this.effect.map(value -> value == effect).orElse(true)
                         && this.category.map(value -> value == effect.category()).orElse(true)

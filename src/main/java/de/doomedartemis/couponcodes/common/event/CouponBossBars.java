@@ -4,6 +4,7 @@ import de.doomedartemis.couponcodes.common.config.CouponConfig;
 import de.doomedartemis.couponcodes.common.coupon.CouponData;
 import de.doomedartemis.couponcodes.common.item.CouponItem;
 import de.doomedartemis.couponcodes.common.registry.ModItems;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.server.level.ServerBossEvent;
@@ -96,15 +97,19 @@ public final class CouponBossBars {
     }
 
     private static void playAppearSound(ServerPlayer player) {
-        player.playNotifySound(SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS, 0.28F, 1.15F);
+        playSound(player, SoundEvents.ENCHANTMENT_TABLE_USE, 0.28F, 1.15F);
     }
 
     private static void playSecondSound(ServerPlayer player) {
-        player.playNotifySound(SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.04F, 1.65F);
+        playSound(player, SoundEvents.ITEM_PICKUP, 0.04F, 1.65F);
     }
 
     private static void playDisappearSound(ServerPlayer player) {
-        player.playNotifySound(SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 0.25F, 1.4F);
+        playSound(player, SoundEvents.BEACON_DEACTIVATE, 0.25F, 1.4F);
+    }
+
+    private static void playSound(ServerPlayer player, SoundEvent sound, float volume, float pitch) {
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), sound, SoundSource.PLAYERS, volume, pitch);
     }
 
     private static BossEvent.BossBarColor color(Rarity rarity) {

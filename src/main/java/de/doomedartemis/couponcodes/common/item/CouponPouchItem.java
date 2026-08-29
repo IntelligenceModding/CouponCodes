@@ -17,6 +17,7 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.component.CustomData;
@@ -108,11 +109,15 @@ public class CouponPouchItem extends Item {
     }
 
     public static void playCloseSound(ServerPlayer player) {
-        player.playNotifySound(SoundEvents.BUNDLE_REMOVE_ONE, SoundSource.PLAYERS, 0.65F, 0.92F);
+        playSound(player, SoundEvents.BUNDLE_REMOVE_ONE, 0.65F, 0.92F);
     }
 
     private static void playOpenSound(ServerPlayer player) {
-        player.playNotifySound(SoundEvents.BUNDLE_INSERT, SoundSource.PLAYERS, 0.65F, 1.08F);
+        playSound(player, SoundEvents.BUNDLE_INSERT, 0.65F, 1.08F);
+    }
+
+    private static void playSound(ServerPlayer player, SoundEvent sound, float volume, float pitch) {
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), sound, SoundSource.PLAYERS, volume, pitch);
     }
 
     private static int occupiedSlots(ItemStack stack) {

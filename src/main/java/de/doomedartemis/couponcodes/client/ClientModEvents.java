@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
@@ -21,7 +21,7 @@ import org.lwjgl.glfw.GLFW;
 
 public final class ClientModEvents {
     private static final KeyMapping.Category COUPON_CODES_CATEGORY =
-            new KeyMapping.Category(ResourceLocation.fromNamespaceAndPath("coupon_codes", "coupon_codes"));
+            new KeyMapping.Category(Identifier.fromNamespaceAndPath("coupon_codes", "coupon_codes"));
     private static final KeyMapping OPEN_COUPON_POUCH = new KeyMapping(
             "key.coupon_codes.open_coupon_pouch",
             KeyConflictContext.IN_GAME,

@@ -17,7 +17,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
@@ -26,8 +27,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.entity.npc.VillagerTrades;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
+import net.minecraft.world.entity.npc.villager.VillagerTrades;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -54,7 +55,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<ResourceLocation, JsonElement>> {
+public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<Identifier, JsonElement>> {
     private static final Gson GSON = new GsonBuilder().create();
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String DIRECTORY = "coupon_trades";
@@ -71,7 +72,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
     }
 
     public static void onAddReloadListener(AddServerReloadListenersEvent event) {
-        event.addListener(ResourceLocation.fromNamespaceAndPath("coupon_codes", "coupon_trades"), new CouponTradeDataManager());
+        event.addListener(Identifier.fromNamespaceAndPath("coupon_codes", "coupon_trades"), new CouponTradeDataManager());
     }
 
     public static void onWandererTrades(WandererTradesEvent event) {
@@ -86,7 +87,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
         }
 
         pools.forEach((level, pool) -> {
-            List<VillagerTrades.ItemListing> trades = event.getTrades().get(level.intValue());
+            List<VillagerTrades.ItemListing> trades = event.getTrades().get(level);
             if (trades != null) {
                 addListings(trades, pool);
             }
@@ -104,10 +105,10 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
     }
 
     @Override
-    protected Map<ResourceLocation, JsonElement> prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
-        Map<ResourceLocation, JsonElement> resources = new HashMap<>();
-        for (Map.Entry<ResourceLocation, Resource> entry : LISTER.listMatchingResources(resourceManager).entrySet()) {
-            ResourceLocation id = LISTER.fileToId(entry.getKey());
+    protected Map<Identifier, JsonElement> prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> resources = new HashMap<>();
+        for (Map.Entry<Identifier, Resource> entry : LISTER.listMatchingResources(resourceManager).entrySet()) {
+            Identifier id = LISTER.fileToId(entry.getKey());
             try (Reader reader = entry.getValue().openAsReader()) {
                 resources.put(id, JsonParser.parseReader(reader));
             } catch (IOException | JsonParseException exception) {
@@ -118,13 +119,13 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> resources, ResourceManager resourceManager, ProfilerFiller profiler) {
+    protected void apply(Map<Identifier, JsonElement> resources, ResourceManager resourceManager, ProfilerFiller profiler) {
         MutableTradePool generic = new MutableTradePool(1);
         MutableTradePool rare = new MutableTradePool(1);
         Map<ResourceKey<VillagerProfession>, Int2ObjectMap<MutableTradePool>> professions = new HashMap<>();
 
         resources.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey(Comparator.comparing(ResourceLocation::toString)))
+                .sorted(Map.Entry.comparingByKey(Comparator.comparing(Identifier::toString)))
                 .forEach(entry -> parseFile(entry.getKey(), entry.getValue(), generic, rare, professions));
 
         genericPool = generic.freeze();
@@ -137,7 +138,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
         LOGGER.info("Loaded {} generic and {} rare coupon wandering trader offers, plus {} villager profession coupon offers", genericPool.entries().size(), rarePool.entries().size(), professionOfferCount);
     }
 
-    private static void parseFile(ResourceLocation fileId, JsonElement json, MutableTradePool generic, MutableTradePool rare, Map<ResourceKey<VillagerProfession>, Int2ObjectMap<MutableTradePool>> professions) {
+    private static void parseFile(Identifier fileId, JsonElement json, MutableTradePool generic, MutableTradePool rare, Map<ResourceKey<VillagerProfession>, Int2ObjectMap<MutableTradePool>> professions) {
         try {
             JsonObject root = GsonHelper.convertToJsonObject(json, fileId.toString());
             if (GsonHelper.getAsBoolean(root, "replace", false)) {
@@ -313,14 +314,14 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
     }
 
     private static Item parseItem(String name) {
-        ResourceLocation itemId = ResourceLocation.parse(name);
+        Identifier itemId = Identifier.parse(name);
         return BuiltInRegistries.ITEM.getOptional(itemId)
                 .filter(item -> item != Items.AIR)
                 .orElseThrow(() -> new JsonParseException("Unknown item " + itemId));
     }
 
     private static ResourceKey<VillagerProfession> parseProfession(String name) {
-        ResourceLocation professionId = ResourceLocation.parse(name);
+        Identifier professionId = Identifier.parse(name);
         ResourceKey<VillagerProfession> professionKey = ResourceKey.create(Registries.VILLAGER_PROFESSION, professionId);
         if (professionKey.equals(VillagerProfession.NONE)
                 || professionKey.equals(VillagerProfession.NITWIT)
@@ -350,7 +351,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
             pools.forEach((level, pool) -> {
                 TradePool tradePool = pool.freeze();
                 if (!tradePool.entries().isEmpty()) {
-                    frozenPools.put(level.intValue(), tradePool);
+                    frozenPools.put(level, tradePool);
                 }
             });
             if (!frozenPools.isEmpty()) {
@@ -550,7 +551,7 @@ public class CouponTradeDataManager extends SimplePreparableReloadListener<Map<R
 
     private record PoolTradeListing(TradePool pool) implements VillagerTrades.ItemListing {
         @Override
-        public MerchantOffer getOffer(Entity trader, RandomSource random) {
+        public MerchantOffer getOffer(ServerLevel level, Entity trader, RandomSource random) {
             for (int attempt = 0; attempt < 8; attempt++) {
                 TradeEntry entry = choose(pool.entries(), random);
                 if (entry == null) {

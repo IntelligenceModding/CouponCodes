@@ -14,7 +14,7 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
@@ -30,10 +30,10 @@ import java.util.List;
 
 @JeiPlugin
 public final class CouponCodesJeiPlugin implements IModPlugin {
-    private static final ResourceLocation PLUGIN_ID = ResourceLocation.fromNamespaceAndPath(CouponCodes.MOD_ID, "jei");
+    private static final Identifier PLUGIN_ID = Identifier.fromNamespaceAndPath(CouponCodes.MOD_ID, "jei");
 
     @Override
-    public ResourceLocation getPluginUid() {
+    public Identifier getPluginUid() {
         return PLUGIN_ID;
     }
 
@@ -142,7 +142,7 @@ public final class CouponCodesJeiPlugin implements IModPlugin {
         return recipes;
     }
 
-    private static ResourceLocation dyeingRecipeId(DyeColor color) {
-        return ResourceLocation.fromNamespaceAndPath(CouponCodes.MOD_ID, "coupon_pouch_dyeing/" + color.getName());
+    private static Identifier dyeingRecipeId(DyeColor color) {
+        return Identifier.fromNamespaceAndPath(CouponCodes.MOD_ID, "coupon_pouch_dyeing/" + color.getName());
     }
 }
