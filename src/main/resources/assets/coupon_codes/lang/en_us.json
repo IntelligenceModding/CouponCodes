@@ -175,6 +175,7 @@
   "item.coupon_codes.coupon.mode.uses": "%s uses remaining",
   "bossbar.coupon_codes.timed_coupon": "%s: %ss",
   "bossbar.coupon_codes.timed_coupon.empty": "Coupon Active",
+  "key.category.coupon_codes.coupon_codes": "Coupon Codes",
   "key.categories.coupon_codes": "Coupon Codes",
   "key.coupon_codes.open_coupon_pouch": "Open Coupon Pouch",
   "jei.coupon_codes.empty_coupon": "Right-click an Empty Coupon to roll one random coupon. The result uses server rarity weights, enabled coupon settings, and any configured loot or trade distribution.",

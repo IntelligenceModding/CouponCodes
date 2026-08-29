@@ -17,18 +17,17 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Minecraft-1.21.8-3C8527?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft 1.21.8">
+  <img src="https://img.shields.io/badge/Minecraft-1.21.9-3C8527?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft 1.21.9">
   &nbsp;&nbsp;&nbsp;
   <img src="https://img.shields.io/badge/Loader-NeoForge-6C47FF?style=for-the-badge" alt="NeoForge">
 </p>
 
 <p align="center">
-  <strong>JEI, REI, and Curios are optional integrations on Minecraft 1.21.8.</strong>
+  <strong>JEI, REI, and Curios are optional integrations on Minecraft 1.21.9.</strong>
 </p>
 
 <p align="center">
   Install JEI or REI alongside Coupon Codes if you want in-game information pages. Install Curios if you want coupon pouches to work from an equipped belt slot.
-  JEI's Minecraft 1.21.8 builds require NeoForge 21.8.23 or newer.
 </p>
 
 <br>

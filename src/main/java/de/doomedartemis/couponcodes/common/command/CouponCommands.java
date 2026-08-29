@@ -583,7 +583,7 @@ public final class CouponCommands {
     private static void sendInspection(CommandSourceStack source, ServerPlayer target) {
         CouponData.CouponInventoryStats stats = CouponData.inventoryStats(target);
         source.sendSuccess(
-                () -> Component.literal(target.getGameProfile().getName() + " coupons: "
+                () -> Component.literal(target.getName().getString() + " coupons: "
                         + stats.carriedCoupons() + " carried, "
                         + stats.uninitializedCoupons() + " unrolled, "
                         + stats.activeTimedCoupons() + " active timed."),
@@ -629,7 +629,7 @@ public final class CouponCommands {
         CouponData.CarriedCoupon carriedCoupon = CouponData.findBestCarriedCoupon(target, effect);
         if (carriedCoupon == null) {
             source.sendSuccess(
-                    () -> Component.literal(target.getGameProfile().getName() + " has no active or usable " + readableName(effect) + " coupon."),
+                    () -> Component.literal(target.getName().getString() + " has no active or usable " + readableName(effect) + " coupon."),
                     false
             );
             return;
@@ -641,7 +641,7 @@ public final class CouponCommands {
                 ? CouponData.secondsRemaining(stack, coupon, target.level()) + "s"
                 : CouponData.usesRemaining(stack, coupon, target.level()) + " use(s)";
         source.sendSuccess(
-                () -> Component.literal(target.getGameProfile().getName() + "'s best " + readableName(effect) + " coupon is "
+                () -> Component.literal(target.getName().getString() + "'s best " + readableName(effect) + " coupon is "
                         + CouponData.discountPercent(stack, coupon, target.level()) + "% "
                         + modeName(coupon.mode()) + " with " + remaining + " remaining."),
                 false
@@ -718,14 +718,14 @@ public final class CouponCommands {
         ItemStack stack = CouponData.findBestActiveTimedCoupon(target);
         if (stack.isEmpty() || !(stack.getItem() instanceof CouponItem coupon)) {
             source.sendSuccess(
-                    () -> Component.literal(target.getGameProfile().getName() + " has no active timed coupon."),
+                    () -> Component.literal(target.getName().getString() + " has no active timed coupon."),
                     false
             );
             return;
         }
 
         source.sendSuccess(
-                () -> Component.literal(target.getGameProfile().getName() + "'s strongest active timed coupon is "
+                () -> Component.literal(target.getName().getString() + "'s strongest active timed coupon is "
                         + CouponData.discountPercent(stack, coupon, target.level()) + "% "
                         + readableName(coupon.effect()) + " with "
                         + CouponData.secondsRemaining(stack, coupon, target.level()) + "s remaining."),
@@ -737,14 +737,14 @@ public final class CouponCommands {
         ItemStack stack = CouponData.findBestActiveTimedCoupon(target, category);
         if (stack.isEmpty() || !(stack.getItem() instanceof CouponItem coupon)) {
             source.sendSuccess(
-                    () -> Component.literal(target.getGameProfile().getName() + " has no active " + readableName(category) + " timed coupon."),
+                    () -> Component.literal(target.getName().getString() + " has no active " + readableName(category) + " timed coupon."),
                     false
             );
             return;
         }
 
         source.sendSuccess(
-                () -> Component.literal(target.getGameProfile().getName() + "'s strongest active " + readableName(category) + " timed coupon is "
+                () -> Component.literal(target.getName().getString() + "'s strongest active " + readableName(category) + " timed coupon is "
                         + CouponData.discountPercent(stack, coupon, target.level()) + "% "
                         + readableName(coupon.effect()) + " with "
                         + CouponData.secondsRemaining(stack, coupon, target.level()) + "s remaining."),

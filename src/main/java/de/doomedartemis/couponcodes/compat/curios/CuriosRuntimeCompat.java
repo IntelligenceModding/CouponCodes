@@ -10,9 +10,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 import java.util.List;
 
@@ -28,29 +28,29 @@ final class CuriosRuntimeCompat {
     }
 
     static void tickCouponsInEquippedCurios(Player player, RandomSource random) {
-        CuriosApi.getCuriosInventory(player).ifPresent(handler -> {
-            IItemHandlerModifiable equippedCurios = handler.getEquippedCurios();
-            for (int slot = 0; slot < equippedCurios.getSlots(); slot++) {
-                CouponData.tickCouponsInCarriedStack(player, equippedCurios.getStackInSlot(slot), random);
+        CuriosApi.getCuriosInventory(player).ifPresent(handler -> handler.getCurios().values().forEach(stacksHandler -> {
+            IDynamicStackHandler stacks = stacksHandler.getStacks();
+            for (int slot = 0; slot < stacks.getSlots(); slot++) {
+                CouponData.tickCouponsInCarriedStack(player, stacks.getStackInSlot(slot), random);
             }
-        });
+        }));
     }
 
     static void collectCarriedCoupons(Player player, List<CouponData.CarriedCoupon> coupons, CouponPouchMenu openPouch) {
-        CuriosApi.getCuriosInventory(player).ifPresent(handler -> {
-            IItemHandlerModifiable equippedCurios = handler.getEquippedCurios();
-            for (int slot = 0; slot < equippedCurios.getSlots(); slot++) {
+        CuriosApi.getCuriosInventory(player).ifPresent(handler -> handler.getCurios().values().forEach(stacksHandler -> {
+            IDynamicStackHandler stacks = stacksHandler.getStacks();
+            for (int slot = 0; slot < stacks.getSlots(); slot++) {
                 int equippedSlot = slot;
-                ItemStack stack = equippedCurios.getStackInSlot(equippedSlot);
+                ItemStack stack = stacks.getStackInSlot(equippedSlot);
                 CouponData.collectCarriedCouponsFromStack(
                         player,
                         stack,
-                        () -> equippedCurios.setStackInSlot(equippedSlot, stack),
+                        () -> stacks.setStackInSlot(equippedSlot, stack),
                         coupons,
                         openPouch
                 );
             }
-        });
+        }));
     }
 
     static boolean openFirstPouch(ServerPlayer player) {

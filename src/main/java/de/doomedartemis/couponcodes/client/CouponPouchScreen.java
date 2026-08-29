@@ -8,6 +8,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -46,18 +48,20 @@ public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> 
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == InputConstants.KEY_ESCAPE || ClientModEvents.matchesOpenCouponPouchKey(keyCode, scanCode)) {
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.isEscape() || ClientModEvents.matchesOpenCouponPouchKey(keyEvent)) {
             onClose();
             return true;
         }
 
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(keyEvent);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 0) {
+    public boolean mouseClicked(MouseButtonEvent mouseEvent, boolean doubleClick) {
+        double mouseX = mouseEvent.x();
+        double mouseY = mouseEvent.y();
+        if (mouseEvent.button() == 0) {
             if (isHoveringTab(0, mouseX, mouseY)) {
                 playTabClickSound();
                 ClientPacketDistributor.sendToServer(ToggleCouponPouchAutoActivationPayload.INSTANCE);
@@ -70,7 +74,7 @@ public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> 
             }
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(mouseEvent, doubleClick);
     }
 
     @Override

@@ -129,7 +129,7 @@ public class SearchableConfigurationSectionScreen extends ConfigurationScreen.Co
                     if (element.name() == null) {
                         list.addSmall(new StringWidget(Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, Component.empty(), font), element.getWidget(options));
                     } else {
-                        final StringWidget label = new StringWidget(Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, element.name(), font).alignLeft();
+                        final StringWidget label = new StringWidget(Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, element.name(), font);
                         label.setTooltip(Tooltip.create(element.tooltip()));
                         list.addSmall(label, element.getWidget(options));
                     }

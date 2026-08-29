@@ -6,8 +6,10 @@ import de.doomedartemis.couponcodes.common.registry.ModItems;
 import de.doomedartemis.couponcodes.common.registry.ModMenus;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
@@ -18,23 +20,26 @@ import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import org.lwjgl.glfw.GLFW;
 
 public final class ClientModEvents {
+    private static final KeyMapping.Category COUPON_CODES_CATEGORY =
+            new KeyMapping.Category(ResourceLocation.fromNamespaceAndPath("coupon_codes", "coupon_codes"));
     private static final KeyMapping OPEN_COUPON_POUCH = new KeyMapping(
             "key.coupon_codes.open_coupon_pouch",
             KeyConflictContext.IN_GAME,
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_P,
-            "key.categories.coupon_codes"
+            COUPON_CODES_CATEGORY
     );
 
     private ClientModEvents() {
     }
 
     public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+        event.registerCategory(COUPON_CODES_CATEGORY);
         event.register(OPEN_COUPON_POUCH);
     }
 
-    public static boolean matchesOpenCouponPouchKey(int keyCode, int scanCode) {
-        return OPEN_COUPON_POUCH.matches(keyCode, scanCode);
+    public static boolean matchesOpenCouponPouchKey(KeyEvent keyEvent) {
+        return OPEN_COUPON_POUCH.matches(keyEvent);
     }
 
     public static void onClientTick(ClientTickEvent.Post event) {

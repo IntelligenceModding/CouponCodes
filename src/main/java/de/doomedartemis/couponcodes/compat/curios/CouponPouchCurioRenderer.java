@@ -5,10 +5,11 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.LivingEntity;
@@ -23,7 +24,7 @@ final class CouponPouchCurioRenderer implements ICurioRenderer {
             ItemStack stack,
             SlotContext slotContext,
             PoseStack poseStack,
-            MultiBufferSource buffer,
+            SubmitNodeCollector submitNodeCollector,
             int light,
             S renderState,
             RenderLayerParent<S, M> renderLayerParent,
@@ -45,16 +46,14 @@ final class CouponPouchCurioRenderer implements ICurioRenderer {
         poseStack.mulPose(Axis.ZP.rotationDegrees(186.0F));
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
-        Minecraft.getInstance().getItemRenderer().renderStatic(
+        ItemStackRenderState itemRenderState = new ItemStackRenderState();
+        Minecraft.getInstance().getItemModelResolver().updateForLiving(
+                itemRenderState,
                 stack,
                 ItemDisplayContext.FIXED,
-                light,
-                OverlayTexture.NO_OVERLAY,
-                poseStack,
-                buffer,
-                wearer.level(),
-                wearer.getId()
+                wearer
         );
+        itemRenderState.submit(poseStack, submitNodeCollector, light, OverlayTexture.NO_OVERLAY, renderState.outlineColor);
         poseStack.popPose();
     }
 }
