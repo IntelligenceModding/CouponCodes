@@ -318,7 +318,7 @@ public final class CouponEvents {
         }
 
         ItemStack stack = selected.get().itemStack();
-        int vanillaRepair = mendingRepairAmount(serverPlayer.serverLevel(), stack, orb.getValue());
+        int vanillaRepair = mendingRepairAmount(serverPlayer.level(), stack, orb.getValue());
         if (vanillaRepair <= 0) {
             return;
         }

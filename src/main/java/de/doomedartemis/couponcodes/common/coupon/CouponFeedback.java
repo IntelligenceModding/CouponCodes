@@ -47,7 +47,7 @@ public final class CouponFeedback {
             return false;
         }
 
-        long gameTime = player.serverLevel().getGameTime();
+        long gameTime = player.level().getGameTime();
         Long lastFeedbackTime = LAST_USE_FEEDBACK.get(player.getUUID());
         if (lastFeedbackTime != null && gameTime - lastFeedbackTime < cooldownTicks) {
             return true;
@@ -81,7 +81,7 @@ public final class CouponFeedback {
             double xSpeed = xDirection * outwardSpeed;
             double zSpeed = zDirection * outwardSpeed;
 
-            player.serverLevel().sendParticles(
+            player.level().sendParticles(
                     player,
                     dust,
                     false,
@@ -97,7 +97,7 @@ public final class CouponFeedback {
             );
 
             if (i % 2 == 0) {
-                player.serverLevel().sendParticles(
+                player.level().sendParticles(
                         player,
                         ParticleTypes.ENCHANT,
                         false,
@@ -112,7 +112,7 @@ public final class CouponFeedback {
                         1.0D
                 );
             } else {
-                player.serverLevel().sendParticles(
+                player.level().sendParticles(
                         player,
                         glintDust,
                         false,

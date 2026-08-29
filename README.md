@@ -17,17 +17,17 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Minecraft-1.21.5-3C8527?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft 1.21.5">
+  <img src="https://img.shields.io/badge/Minecraft-1.21.6-3C8527?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft 1.21.6">
   &nbsp;&nbsp;&nbsp;
   <img src="https://img.shields.io/badge/Loader-NeoForge-6C47FF?style=for-the-badge" alt="NeoForge">
 </p>
 
 <p align="center">
-  <strong>JEI, REI, and Curios are optional integrations.</strong>
+  <strong>REI and Curios are optional integrations on Minecraft 1.21.6.</strong>
 </p>
 
 <p align="center">
-  Install JEI or REI alongside Coupon Codes if you want in-game information pages. Install Curios if you want coupon pouches to work from an equipped belt slot.
+  Install REI alongside Coupon Codes if you want in-game information pages. Install Curios if you want coupon pouches to work from an equipped belt slot. JEI does not currently publish a matching NeoForge artifact for Minecraft 1.21.6.
 </p>
 
 <br>
@@ -137,7 +137,7 @@
   &bull; The Minecraft modding community for examples, tools, and support<br>
   &bull; The Intelligence Modding community for feedback, testing, and ideas<br>
   &bull; Everyone who reports issues, suggests improvements, or includes Coupon Codes in their worlds, servers, or modpacks<br>
-  &bull; The JEI, REI, and Curios projects for their optional compatibility APIs
+  &bull; The REI and Curios projects for their optional compatibility APIs, and JEI for compatibility support on Minecraft versions where a matching NeoForge artifact is available
 </p>
 
 <p align="center">

@@ -6,8 +6,10 @@ import de.doomedartemis.couponcodes.common.network.SortCouponPouchPayload;
 import de.doomedartemis.couponcodes.common.network.ToggleCouponPouchAutoActivationPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -16,6 +18,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.util.List;
 
 public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> {
     private static final ResourceLocation CONTAINER_BACKGROUND =
@@ -75,8 +79,8 @@ public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> 
         int top = (height - imageHeight) / 2;
         renderTabs(guiGraphics, left, top);
         int pouchHeight = CouponPouchMenu.ROWS * 18 + 17;
-        guiGraphics.blit(RenderType::guiTextured, CONTAINER_BACKGROUND, left, top, 0, 0, imageWidth, pouchHeight, 256, 256);
-        guiGraphics.blit(RenderType::guiTextured, CONTAINER_BACKGROUND, left, top + pouchHeight, 0, 126, imageWidth, 96, 256, 256);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, CONTAINER_BACKGROUND, left, top, 0, 0, imageWidth, pouchHeight, 256, 256);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, CONTAINER_BACKGROUND, left, top + pouchHeight, 0, 126, imageWidth, 96, 256, 256);
     }
 
     private void renderTabs(GuiGraphics guiGraphics, int left, int top) {
@@ -85,12 +89,10 @@ public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> 
     }
 
     private void renderTab(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, ItemStack icon) {
-        guiGraphics.blitSprite(RenderType::guiTextured, sprite, x, y, TAB_WIDTH, TAB_HEIGHT);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F, 0.0F, 100.0F);
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, TAB_WIDTH, TAB_HEIGHT);
+        guiGraphics.nextStratum();
         guiGraphics.renderItem(icon, x + 5, y + 9);
         guiGraphics.renderItemDecorations(font, icon, x + 5, y + 9);
-        guiGraphics.pose().popPose();
     }
 
     private ItemStack autoActivationIcon() {
@@ -102,10 +104,21 @@ public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> 
     private void renderTabTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (isHoveringTab(0, mouseX, mouseY)) {
             String state = menu.isAutoActivationEnabled() ? "on" : "off";
-            guiGraphics.renderTooltip(font, Component.translatable("container.coupon_codes.coupon_pouch.auto_activation." + state + ".tooltip"), mouseX, mouseY);
+            renderComponentTooltip(guiGraphics, Component.translatable("container.coupon_codes.coupon_pouch.auto_activation." + state + ".tooltip"), mouseX, mouseY);
         } else if (isHoveringTab(1, mouseX, mouseY)) {
-            guiGraphics.renderTooltip(font, Component.translatable("container.coupon_codes.coupon_pouch.sort.tooltip"), mouseX, mouseY);
+            renderComponentTooltip(guiGraphics, Component.translatable("container.coupon_codes.coupon_pouch.sort.tooltip"), mouseX, mouseY);
         }
+    }
+
+    private void renderComponentTooltip(GuiGraphics guiGraphics, Component component, int mouseX, int mouseY) {
+        guiGraphics.renderTooltip(
+                font,
+                List.of(ClientTooltipComponent.create(component.getVisualOrderText())),
+                mouseX,
+                mouseY,
+                DefaultTooltipPositioner.INSTANCE,
+                null
+        );
     }
 
     private boolean isHoveringTab(int index, double mouseX, double mouseY) {

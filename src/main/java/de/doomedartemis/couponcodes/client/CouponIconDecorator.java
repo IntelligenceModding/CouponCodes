@@ -1,6 +1,5 @@
 package de.doomedartemis.couponcodes.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import de.doomedartemis.couponcodes.common.coupon.CouponEffectType;
 import de.doomedartemis.couponcodes.common.item.CouponItem;
 import net.minecraft.client.gui.Font;
@@ -14,7 +13,6 @@ public class CouponIconDecorator implements IItemDecorator {
     private static final float ICON_SCALE = 0.625F;
     private static final int ICON_OFFSET_X = 6;
     private static final int ICON_OFFSET_Y = 0;
-    private static final int ICON_Z = 120;
 
     @Override
     public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xOffset, int yOffset) {
@@ -26,13 +24,12 @@ public class CouponIconDecorator implements IItemDecorator {
             return false;
         }
 
-        PoseStack poseStack = guiGraphics.pose();
-        poseStack.pushPose();
-        poseStack.translate(xOffset + ICON_OFFSET_X, yOffset + ICON_OFFSET_Y, ICON_Z);
-        poseStack.scale(ICON_SCALE, ICON_SCALE, ICON_SCALE);
+        guiGraphics.nextStratum();
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(xOffset + ICON_OFFSET_X, yOffset + ICON_OFFSET_Y);
+        guiGraphics.pose().scale(ICON_SCALE, ICON_SCALE);
         guiGraphics.renderItem(new ItemStack(icon(coupon.effect())), 0, 0);
-        guiGraphics.flush();
-        poseStack.popPose();
+        guiGraphics.pose().popMatrix();
         return true;
     }
 
