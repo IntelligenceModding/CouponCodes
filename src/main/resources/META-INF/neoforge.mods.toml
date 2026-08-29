@@ -9,9 +9,10 @@ config="${mod_id}.mixins.json"
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/coupon-codes"
-logoFile="banner.png"
-logoBlur=true
+displayURL="https://www.curseforge.com/minecraft/mc-mods/coupon_codes"
+issueTrackerURL="https://github.com/IntelligenceModding/CouponCodes/issues"
+bannerFile="banner.png"
+iconFile="icon.png"
 authors="${mod_authors}"
 description='''${mod_description}'''
 

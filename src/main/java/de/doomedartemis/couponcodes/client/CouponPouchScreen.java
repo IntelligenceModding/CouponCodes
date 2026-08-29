@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
@@ -95,8 +96,8 @@ public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> 
 
     private ItemStack autoActivationIcon() {
         return menu.isAutoActivationEnabled()
-                ? new ItemStack(Items.GREEN_CONCRETE)
-                : new ItemStack(Items.RED_CONCRETE);
+                ? new ItemStack(Items.CONCRETE.pick(DyeColor.GREEN))
+                : new ItemStack(Items.CONCRETE.pick(DyeColor.RED));
     }
 
     private void extractTabTooltip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {

@@ -184,7 +184,7 @@ public class SearchableConfigurationSectionScreen extends ConfigurationScreen.Co
     protected <T> Element createList(final String key, final ListValueSpec spec, final ModConfigSpec.ConfigValue<List<T>> list) {
         return new Element(Component.translatable(SECTION, getTranslationComponent(key)), getTooltipComponent(key, null),
                 Button.builder(Component.translatable(SECTION, Component.translatable(getTranslationKey(key) + ".button")),
-                        button -> minecraft.setScreen(sectionCache.computeIfAbsent(key,
+                        button -> minecraft.gui.setScreen(sectionCache.computeIfAbsent(key,
                                 ignored -> new SearchableConfigurationListScreen<>(
                                         Context.list(context, this),
                                         key,
@@ -206,7 +206,7 @@ public class SearchableConfigurationSectionScreen extends ConfigurationScreen.Co
         }
         return new Element(Component.translatable(SECTION, getTranslationComponent(key)), getTooltipComponent(key, null),
                 Button.builder(Component.translatable(SECTION, Component.translatable(getTranslationKey(key) + ".button")),
-                        button -> minecraft.setScreen(sectionCache.computeIfAbsent(key,
+                        button -> minecraft.gui.setScreen(sectionCache.computeIfAbsent(key,
                                 ignored -> new SearchableConfigurationSectionScreen(
                                         context,
                                         this,

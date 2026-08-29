@@ -147,6 +147,7 @@ dependencies {
     compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:${rei_version}"
     compileOnly "net.fabricmc:fabric-loader:0.16.9"
     reiRuntimeMod "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
+    reiRuntimeMod "dev.architectury:architectury-neoforge:21.0.7"
     compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
     clientRuntimeMods "top.theillusivec4.curios:curios-neoforge:${curios_version}"
 }

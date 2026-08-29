@@ -89,7 +89,7 @@ You can view the available branches [here][branches].
 
 When contributing, always work against the branch matching the Minecraft version and loader your change targets.
 
-For example, a change developed for Minecraft 26.1.2 with NeoForge should target the corresponding 26.1.2 NeoForge branch.
+For example, a change developed for Minecraft 26.2 with NeoForge should target the corresponding 26.2 NeoForge branch.
 
 Do **not** target the `assets` branch for code changes. The `assets` branch is used for project images and other repository assets.
 
@@ -117,7 +117,7 @@ Check the following line in the branch's `build.gradle` file if you are unsure:
 java.toolchain.languageVersion = JavaLanguageVersion.of(...)
 ```
 
-For example, the Minecraft 26.1.2 NeoForge branch uses Java 25.
+For example, the Minecraft 26.2 NeoForge branch uses Java 25.
 
 Java builds such as Eclipse Temurin can be downloaded from [Adoptium][adoptium].
 
@@ -149,7 +149,7 @@ Before beginning work, switch to the branch matching the Minecraft version you w
 For example:
 
 ```bash
-git switch 26.1.2-neoforge
+git switch 26.2-neoforge
 ```
 
 It is recommended to create your own development branch from there.

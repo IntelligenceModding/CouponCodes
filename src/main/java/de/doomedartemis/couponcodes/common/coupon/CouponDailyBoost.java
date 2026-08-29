@@ -210,12 +210,20 @@ public final class CouponDailyBoost {
             return;
         }
 
-        if (format.isColor()) {
-            activeFormats.removeIf(ChatFormatting::isColor);
+        if (isColor(format)) {
+            activeFormats.removeIf(CouponDailyBoost::isColor);
         }
         if (!activeFormats.contains(format)) {
             activeFormats.add(format);
         }
+    }
+
+    private static boolean isColor(ChatFormatting format) {
+        return switch (format) {
+            case BLACK, DARK_BLUE, DARK_GREEN, DARK_AQUA, DARK_RED, DARK_PURPLE, GOLD, GRAY,
+                    DARK_GRAY, BLUE, GREEN, AQUA, RED, LIGHT_PURPLE, YELLOW, WHITE -> true;
+            default -> false;
+        };
     }
 
     private static void appendSegment(MutableComponent result, StringBuilder segment, List<ChatFormatting> formats) {

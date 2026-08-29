@@ -44,7 +44,7 @@ public final class ClientModEvents {
 
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player == null || minecraft.getConnection() == null || minecraft.screen != null) {
+        if (minecraft.player == null || minecraft.getConnection() == null || minecraft.gui.screen() != null) {
             return;
         }
 
