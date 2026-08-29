@@ -190,7 +190,7 @@ Coupon entries create uninitialized coupon items. When the item initializes in a
 
 ## Coupon Trade Datapack Files
 
-Files in `data/<namespace>/coupon_trades/*.json` add wandering trader and villager profession offers. On Minecraft 26.1, Coupon Codes attaches these custom pools after the matching vanilla trade set is generated, so the format below remains the supported Coupon Codes datapack format.
+Files in `data/<namespace>/coupon_trades/*.json` add wandering trader and villager profession offers. On Minecraft 26.1.1, Coupon Codes attaches these custom pools after the matching vanilla trade set is generated, so the format below remains the supported Coupon Codes datapack format.
 
 ### Wandering Trader Example
 
