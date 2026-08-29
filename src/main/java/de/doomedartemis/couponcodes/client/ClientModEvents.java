@@ -13,8 +13,8 @@ import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 public final class ClientModEvents {
@@ -44,7 +44,7 @@ public final class ClientModEvents {
         }
 
         while (OPEN_COUPON_POUCH.consumeClick()) {
-            PacketDistributor.sendToServer(OpenCouponPouchPayload.INSTANCE);
+            ClientPacketDistributor.sendToServer(OpenCouponPouchPayload.INSTANCE);
         }
     }
 

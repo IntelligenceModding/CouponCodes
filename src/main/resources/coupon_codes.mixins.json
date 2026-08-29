@@ -1,0 +1,12 @@
+{
+  "required": false,
+  "package": "de.doomedartemis.couponcodes.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "de.doomedartemis.couponcodes.mixin.CouponCodesMixinPlugin",
+  "client": [
+    "jei.SimpleItemStackBatchRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}
