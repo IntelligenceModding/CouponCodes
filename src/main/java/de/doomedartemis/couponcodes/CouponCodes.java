@@ -27,7 +27,7 @@ public class CouponCodes {
     public static final String MOD_ID = "coupon_codes";
 
     public CouponCodes(IEventBus modEventBus, ModContainer modContainer) {
-        modContainer.registerConfig(ModConfig.Type.SERVER, CouponConfig.SPEC);
+        modContainer.registerConfig(ModConfig.Type.SYNCED, CouponConfig.SPEC);
         modEventBus.addListener(ModNetwork::register);
         CuriosCompat.register(modEventBus);
         CouponCriteria.register(modEventBus);

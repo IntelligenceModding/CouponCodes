@@ -55,7 +55,7 @@ public class CouponPouchScreen extends AbstractContainerScreen<CouponPouchMenu> 
     public boolean mouseClicked(MouseButtonEvent mouseEvent, boolean doubleClick) {
         double mouseX = mouseEvent.x();
         double mouseY = mouseEvent.y();
-        if (mouseEvent.button() == 0) {
+        if (mouseEvent.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             if (isHoveringTab(0, mouseX, mouseY)) {
                 playTabClickSound();
                 ClientPacketDistributor.sendToServer(ToggleCouponPouchAutoActivationPayload.INSTANCE);

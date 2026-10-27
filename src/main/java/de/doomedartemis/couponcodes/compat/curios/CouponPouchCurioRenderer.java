@@ -42,8 +42,8 @@ final class CouponPouchCurioRenderer implements ICurioRenderer {
         }
 
         poseStack.translate(0.26D, 0.55D, 0.04D);
-        poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(186.0F));
+        poseStack.rotateDegrees(Axis.YP, 90.0F);
+        poseStack.rotateDegrees(Axis.ZP, 186.0F);
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
         ItemStackRenderState itemRenderState = new ItemStackRenderState();

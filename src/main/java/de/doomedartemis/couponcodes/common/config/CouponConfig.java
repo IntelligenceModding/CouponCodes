@@ -91,7 +91,7 @@ public final class CouponConfig {
         DISCOUNT_VALUES = builder
                 .comment("Possible discount percentages assigned when a coupon is initialized.")
                 .translation(serverConfigKey("general", "discount_values"))
-                .defineList("discountValues", List.of(10, 20, 25, 50), CouponConfig::isValidDiscount);
+                .defineList("discountValues", List.of(10, 20, 25, 50), () -> 10, CouponConfig::isValidDiscount);
         builder.pop();
 
         builder.push("dailyBoost");
@@ -225,7 +225,7 @@ public final class CouponConfig {
         for (CouponEffectType effect : CouponEffectType.values()) {
             MULTI_USE_COUNTS.put(effect, builder
                     .translation(serverConfigKey("values", "multi_use_counts", configName(effect)))
-                    .defineList(configName(effect), defaultMultiUseCount(effect).asList(), CouponConfig::isValidUseCount));
+                    .defineList(configName(effect), defaultMultiUseCount(effect).asList(), () -> defaultMultiUseCount(effect).asList().getFirst(), CouponConfig::isValidUseCount));
         }
         builder.pop();
 
@@ -234,7 +234,7 @@ public final class CouponConfig {
         for (CouponEffectType effect : CouponEffectType.values()) {
             TIMED_SECONDS.put(effect, builder
                     .translation(serverConfigKey("values", "timed_seconds", configName(effect)))
-                    .defineList(configName(effect), defaultTimedSeconds(effect).asList(), CouponConfig::isValidTimedSeconds));
+                    .defineList(configName(effect), defaultTimedSeconds(effect).asList(), () -> defaultTimedSeconds(effect).asList().getFirst(), CouponConfig::isValidTimedSeconds));
         }
         builder.pop();
         builder.pop();

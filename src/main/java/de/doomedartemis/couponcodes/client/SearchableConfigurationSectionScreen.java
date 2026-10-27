@@ -5,6 +5,8 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig.Entry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -33,6 +35,7 @@ public class SearchableConfigurationSectionScreen extends ConfigurationScreen.Co
     private static final int SEARCH_GAP = 6;
 
     private String searchText = "";
+    private final Map<String, ConfigValue<?>> visibleValues = new LinkedHashMap<>();
     @Nullable
     private EditBox searchBox;
     private int unshiftedListTop;
@@ -71,6 +74,7 @@ public class SearchableConfigurationSectionScreen extends ConfigurationScreen.Co
         searchBox.setResponder(value -> {
             searchText = value == null ? "" : value;
             rebuild();
+            list.setScrollAmount(0);
         });
         searchBox.setFocused(false);
         addRenderableWidget(searchBox);
@@ -84,7 +88,7 @@ public class SearchableConfigurationSectionScreen extends ConfigurationScreen.Co
         if (searchBox != null) {
             Component label = Component.translatable("coupon_codes.configuration.search");
             int x = searchBox.getX() + (searchBox.getWidth() - font.width(label)) / 2;
-            graphics.text(font, label, x, searchBox.getY() - font.lineHeight, 0xFFFFFF, false);
+            graphics.text(font, label, x, searchBox.getY() - font.lineHeight, 0xFFFFFFFF, false);
         }
     }
 
@@ -97,16 +101,18 @@ public class SearchableConfigurationSectionScreen extends ConfigurationScreen.Co
         int shiftedListTop = searchY + SEARCH_HEIGHT + SEARCH_GAP;
         searchBox.setX(width / 2 - SEARCH_WIDTH / 2);
         searchBox.setY(searchY);
-        list.setY(shiftedListTop);
-        list.setHeight(Math.max(0, unshiftedListBottom - shiftedListTop));
+        int listHeight = Math.max(0, unshiftedListBottom - shiftedListTop);
+        if (list.getY() != shiftedListTop || list.getHeight() != listHeight) {
+            list.updateSizeAndPosition(list.getWidth(), listHeight, list.getX(), shiftedListTop);
+        }
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected ConfigurationScreen.ConfigurationSectionScreen rebuild() {
         if (list != null) {
-            list.children().clear();
-            boolean hasUndoableElements = false;
+            list.clearEntries();
+            visibleValues.clear();
 
             final List<@Nullable Element> elements = new ArrayList<>();
             if (isRootGlobalSearch()) {
@@ -119,6 +125,7 @@ public class SearchableConfigurationSectionScreen extends ConfigurationScreen.Co
 
                     if (matchesSearch(key, element)) {
                         elements.add(element);
+                        trackVisibleValue(key, rawValue, element);
                     }
                 }
             }
@@ -133,16 +140,51 @@ public class SearchableConfigurationSectionScreen extends ConfigurationScreen.Co
                         label.setTooltip(Tooltip.create(element.tooltip()));
                         list.addSmall(label, element.getWidget(options));
                     }
-                    hasUndoableElements |= element.undoable();
                 }
             }
 
-            if (hasUndoableElements && undoButton == null) {
+            // Create footer controls during init, even before a root search exposes editable values.
+            if (undoButton == null) {
                 createUndoButton();
                 createResetButton();
             }
         }
         return this;
+    }
+
+    private void trackVisibleValue(String key, Object rawValue, @Nullable Element element) {
+        if (element != null && element.undoable() && rawValue instanceof ConfigValue<?> value
+                && !(getValueSpec(key) instanceof ListValueSpec)) {
+            visibleValues.put(key, value);
+        }
+    }
+
+    @Override
+    protected boolean isAnyNondefault() {
+        return visibleValues.values().stream().anyMatch(this::isNonDefault);
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    protected void createResetButton() {
+        resetButton = Button.builder(ConfigurationScreen.RESET, button -> {
+            List<ConfigurationScreen.UndoManager.Step<?>> steps = new ArrayList<>();
+            visibleValues.forEach((key, value) -> {
+                ValueSpec spec = getValueSpec(key);
+                if (spec != null && isNonDefault(value)) {
+                    ConfigValue target = value;
+                    steps.add(undoManager.step(v -> {
+                        target.set(v);
+                        onChanged(key);
+                    }, spec.correct(null), v -> {
+                        target.set(v);
+                        onChanged(key);
+                    }, value.getRaw()));
+                }
+            });
+            undoManager.add(steps);
+            rebuild();
+        }).tooltip(Tooltip.create(ConfigurationScreen.RESET_TOOLTIP)).width(Button.SMALL_WIDTH).build();
     }
 
     @Override
@@ -183,15 +225,14 @@ public class SearchableConfigurationSectionScreen extends ConfigurationScreen.Co
     @Nullable
     protected <T> Element createList(final String key, final ListValueSpec spec, final ModConfigSpec.ConfigValue<List<T>> list) {
         return new Element(Component.translatable(SECTION, getTranslationComponent(key)), getTooltipComponent(key, null),
-                Button.builder(Component.translatable(SECTION, Component.translatable(getTranslationKey(key) + ".button")),
-                        button -> minecraft.gui.setScreen(sectionCache.computeIfAbsent(key,
-                                ignored -> new SearchableConfigurationListScreen<>(
+                Button.builder(Component.translatable(SECTION, Component.translatableWithFallback(getTranslationKey(key) + ".button", Component.translatable(SECTION_TEXT).getString())),
+                        button -> minecraft.gui.setScreen(new SearchableConfigurationListScreen<>(
                                         Context.list(context, this),
                                         key,
                                         Component.translatable(getTranslationKey(key)),
                                         spec,
                                         list
-                                ).rebuilt())))
+                                ).rebuilt()))
                         .tooltip(Tooltip.create(getTooltipComponent(key, null)))
                         .width(Button.DEFAULT_WIDTH)
                         .build(),
@@ -205,7 +246,7 @@ public class SearchableConfigurationSectionScreen extends ConfigurationScreen.Co
             return null;
         }
         return new Element(Component.translatable(SECTION, getTranslationComponent(key)), getTooltipComponent(key, null),
-                Button.builder(Component.translatable(SECTION, Component.translatable(getTranslationKey(key) + ".button")),
+                Button.builder(Component.translatable(SECTION, Component.translatableWithFallback(getTranslationKey(key) + ".button", Component.translatable(SECTION_TEXT).getString())),
                         button -> minecraft.gui.setScreen(sectionCache.computeIfAbsent(key,
                                 ignored -> new SearchableConfigurationSectionScreen(
                                         context,
@@ -287,6 +328,7 @@ public class SearchableConfigurationSectionScreen extends ConfigurationScreen.Co
             Element element = createElement(key, rawValue, specValue);
             if (matchesSearch(key, element)) {
                 elements.add(element);
+                trackVisibleValue(key, rawValue, element);
             }
         }
     }

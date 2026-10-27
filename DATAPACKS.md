@@ -21,7 +21,6 @@ data/coupon_codes/advancement/
 data/coupon_codes/tags/item/
 data/coupon_codes/curios/entities/
 data/coupon_codes/loot_modifiers/
-data/neoforge/loot_modifiers/
 ```
 
 Use `/reload` after changing datapack JSON. Invalid custom JSON is logged and skipped.
@@ -190,7 +189,7 @@ Coupon entries create uninitialized coupon items. When the item initializes in a
 
 ## Coupon Trade Datapack Files
 
-Files in `data/<namespace>/coupon_trades/*.json` add wandering trader and villager profession offers. On Minecraft 26.2, Coupon Codes attaches these custom pools after the matching vanilla trade set is generated, so the format below remains the supported Coupon Codes datapack format.
+Files in `data/<namespace>/coupon_trades/*.json` add wandering trader and villager profession offers. On Minecraft 26.3, Coupon Codes attaches these custom pools after the matching vanilla trade set is generated, so the format below remains the supported Coupon Codes datapack format.
 
 ### Wandering Trader Example
 
@@ -333,9 +332,7 @@ Trade coupon entries also create uninitialized coupons. Their discount percent, 
 
 ### NeoForge Loot Modifier Data
 
-`data/neoforge/loot_modifiers/global_loot_modifiers.json` registers the mod's global loot modifier list.
+`data/coupon_codes/loot_modifiers/vanilla_chest_coupons.json` defines and automatically registers the `coupon_codes:vanilla_chest_coupons` modifier on NeoForge 26.3. It asks `CouponLootDataManager` for extra loot based on the queried loot table. The old `global_loot_modifiers.json` list is no longer used.
 
-`data/coupon_codes/loot_modifiers/vanilla_chest_coupons.json` defines the `coupon_codes:vanilla_chest_coupons` modifier. It asks `CouponLootDataManager` for extra loot based on the queried loot table.
-
-If a datapack replaces NeoForge global loot modifiers, keep `coupon_codes:vanilla_chest_coupons` unless you intentionally want to remove Coupon Codes chest loot.
+Datapacks can override this modifier file to customize its optional `condition` and `priority` fields. The old `conditions` array is no longer used.
 

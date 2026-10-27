@@ -19,6 +19,7 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -856,7 +857,7 @@ public final class CouponCommands {
 
     private static void giveOrDrop(ServerPlayer target, ItemStack stack) {
         if (!target.getInventory().add(stack)) {
-            target.drop(stack, false);
+            target.drop(stack, false, Prediction.SERVER_ONLY);
         }
     }
 

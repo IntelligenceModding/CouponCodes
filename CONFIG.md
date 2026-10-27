@@ -2,17 +2,25 @@
 
 Coupon Codes has a server config for gameplay behavior and a client config for local rendering.
 
-The server config is registered as a NeoForge server config. In a running world it is normally written as:
+The gameplay config uses NeoForge's synced config type on Minecraft 26.3. Its default location is:
 
 ```text
-<world>/serverconfig/coupon_codes-server.toml
+config/coupon_codes-synced.toml
 ```
+
+To override it for a specific world, place `coupon_codes-synced.toml` in `<world>/syncedconfig/`. When migrating a 26.2 world, copy its `serverconfig/coupon_codes-server.toml` to that location under the new filename to preserve gameplay settings.
 
 The client config is normally written as:
 
 ```text
 config/coupon_codes-client.toml
 ```
+
+## In-game Config Screens
+
+Open **Mods → Coupon Codes → Config**. Client Settings controls local rendering. Gameplay Settings uses NeoForge's synced config and becomes available after a world loads. NeoForge prevents clients from editing a remote server's gameplay config and disables editing while a singleplayer world is open to LAN.
+
+Search at the gameplay root finds settings across all sections. Undo reverses edits made in the current screen; Reset restores the visible scalar settings to their defaults. Open a list's editor to add, remove, reorder, undo, or reset its entries. Invalid input is rejected by the config spec. Done returns to the parent; leaving the top-level settings screen saves through NeoForge, including its reload and synchronization handling.
 
 ## Server Config Sections
 

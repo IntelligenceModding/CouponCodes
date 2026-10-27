@@ -4,18 +4,21 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import de.doomedartemis.couponcodes.common.registry.ModLootModifiers;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 import net.neoforged.neoforge.common.loot.LootModifier;
 
+import java.util.Optional;
+
 public class VanillaChestCouponLootModifier extends LootModifier {
     public static final MapCodec<VanillaChestCouponLootModifier> CODEC = RecordCodecBuilder.mapCodec(instance ->
             codecStart(instance).apply(instance, VanillaChestCouponLootModifier::new));
 
-    public VanillaChestCouponLootModifier(LootItemCondition[] conditionsIn, int priority) {
-        super(conditionsIn, priority);
+    public VanillaChestCouponLootModifier(Optional<Holder<LootItemCondition>> condition, int priority) {
+        super(condition, priority);
     }
 
     @Override

@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.144'
+    id 'net.neoforged.moddev' version '2.0.148'
     id 'idea'
 }
 
@@ -118,11 +118,13 @@ neoForge {
             server()
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            taskBefore tasks.named('syncClientRuntimeMods')
         }
 
         gameTestServer {
             type = 'gameTestServer'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            taskBefore tasks.named('syncClientRuntimeMods')
         }
 
         configureEach {
@@ -141,13 +143,15 @@ neoForge {
 dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
-    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
-    jeiRuntimeMod "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+    // The full JEI mod includes its libraries and configuration mod as nested jars.
+    jeiRuntimeMod("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}") {
+        transitive = false
+    }
     compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:${rei_version}"
     compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:${rei_version}"
     compileOnly "net.fabricmc:fabric-loader:0.16.9"
     reiRuntimeMod "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
-    reiRuntimeMod "dev.architectury:architectury-neoforge:21.0.7"
+    reiRuntimeMod "dev.architectury:architectury-neoforge:22.0.5"
     compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
     clientRuntimeMods "top.theillusivec4.curios:curios-neoforge:${curios_version}"
 }

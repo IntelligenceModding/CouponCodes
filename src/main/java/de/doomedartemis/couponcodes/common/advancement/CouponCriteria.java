@@ -8,14 +8,14 @@ import de.doomedartemis.couponcodes.common.coupon.CouponCategory;
 import de.doomedartemis.couponcodes.common.coupon.CouponEffectType;
 import de.doomedartemis.couponcodes.common.coupon.CouponMode;
 import de.doomedartemis.couponcodes.common.registry.ModItems;
-import net.minecraft.advancements.predicates.ContextAwarePredicate;
-import net.minecraft.advancements.predicates.entity.EntityPredicate;
 import net.minecraft.advancements.triggers.CriterionTrigger;
 import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -88,7 +88,7 @@ public final class CouponCriteria {
         }
 
         public record TriggerInstance(
-                Optional<ContextAwarePredicate> player,
+                Optional<Holder<LootItemCondition>> player,
                 Optional<CouponEffectType> effect,
                 Optional<CouponCategory> category,
                 Optional<CouponMode> mode,
@@ -111,7 +111,7 @@ public final class CouponCriteria {
                     value -> value.name().toLowerCase(Locale.ROOT)
             );
             public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                    EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
+                    LootItemCondition.CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
                     EFFECT_CODEC.optionalFieldOf("effect").forGetter(TriggerInstance::effect),
                     CATEGORY_CODEC.optionalFieldOf("category").forGetter(TriggerInstance::category),
                     MODE_CODEC.optionalFieldOf("mode").forGetter(TriggerInstance::mode),
@@ -156,14 +156,14 @@ public final class CouponCriteria {
         }
 
         public record TriggerInstance(
-                Optional<ContextAwarePredicate> player,
+                Optional<Holder<LootItemCondition>> player,
                 Optional<Identifier> entity,
                 Optional<CouponEffectType> effect,
                 Optional<CouponCategory> category,
                 Optional<CouponMode> mode
         ) implements SimpleCriterionTrigger.SimpleInstance {
             public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                    EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
+                    LootItemCondition.CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
                     Identifier.CODEC.optionalFieldOf("entity").forGetter(TriggerInstance::entity),
                     CouponTrigger.TriggerInstance.EFFECT_CODEC.optionalFieldOf("effect").forGetter(TriggerInstance::effect),
                     CouponTrigger.TriggerInstance.CATEGORY_CODEC.optionalFieldOf("category").forGetter(TriggerInstance::category),
@@ -190,9 +190,9 @@ public final class CouponCriteria {
             trigger(player, ignored -> true);
         }
 
-        public record TriggerInstance(Optional<ContextAwarePredicate> player) implements SimpleCriterionTrigger.SimpleInstance {
+        public record TriggerInstance(Optional<Holder<LootItemCondition>> player) implements SimpleCriterionTrigger.SimpleInstance {
             public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                            EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player)
+                            LootItemCondition.CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player)
                     )
                     .apply(instance, TriggerInstance::new));
         }
@@ -209,11 +209,11 @@ public final class CouponCriteria {
         }
 
         public record TriggerInstance(
-                Optional<ContextAwarePredicate> player,
+                Optional<Holder<LootItemCondition>> player,
                 int minCoupons
         ) implements SimpleCriterionTrigger.SimpleInstance {
             public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                            EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
+                            LootItemCondition.CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
                             Codec.INT.optionalFieldOf("min_coupons", 1).forGetter(TriggerInstance::minCoupons)
                     )
                     .apply(instance, TriggerInstance::new));

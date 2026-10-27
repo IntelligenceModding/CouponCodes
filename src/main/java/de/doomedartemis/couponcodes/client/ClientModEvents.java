@@ -17,7 +17,6 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
-import org.lwjgl.glfw.GLFW;
 
 public final class ClientModEvents {
     private static final KeyMapping.Category COUPON_CODES_CATEGORY =
@@ -25,8 +24,8 @@ public final class ClientModEvents {
     private static final KeyMapping OPEN_COUPON_POUCH = new KeyMapping(
             "key.coupon_codes.open_coupon_pouch",
             KeyConflictContext.IN_GAME,
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_P,
+            InputConstants.Type.KEYBOARD,
+            InputConstants.KEY_P,
             COUPON_CODES_CATEGORY
     );
 
